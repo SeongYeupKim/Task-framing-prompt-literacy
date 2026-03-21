@@ -6,7 +6,8 @@ export type TrainingSection = {
   /** Each item is a paragraph: plain string, or array of chunks for mixed bold */
   paragraphs: (string | TextChunk[])[];
   bullets?: string[];
-  numbered?: { title: string; detail: string }[];
+  /** One illustrative example per domain (goal, content, task conditions, etc.) */
+  numbered?: { title: string; detail: string; example: string }[];
   note?: string;
 };
 
@@ -28,19 +29,46 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
   {
     title: "What goes into a clear task?",
     paragraphs: [
-      "Strong prompts usually make these pieces easy to see. Provide one example per domain below (you can use your own subject or the examples in your head).",
+      "Strong prompts usually make these pieces easy to see. Below, each domain has a short question plus one concrete example. The examples are only illustrations—you would swap in your real assignment.",
     ],
     numbered: [
-      { title: "Goal", detail: "What are you trying to accomplish?" },
-      { title: "Content", detail: "What topics or ideas must be included?" },
+      {
+        title: "Goal",
+        detail: "What are you trying to accomplish?",
+        example:
+          "e.g., Explain how sleep affects memory so a classmate can use the idea when studying for exams.",
+      },
+      {
+        title: "Content",
+        detail: "What topics or ideas must be included?",
+        example:
+          "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
+      },
       {
         title: "Task conditions",
         detail:
-          "Length, level, format, or other limits (what has to be true about the answer?)",
+          "Length, level, format, or other limits—what has to be true about the answer?",
+        example:
+          "e.g., About 250–300 words; plain language for 9th graders; include two real-life examples.",
       },
-      { title: "Audience", detail: "Who is the answer for?" },
-      { title: "Format", detail: "Paragraph, list, essay, etc.?" },
-      { title: "Success", detail: "How will you judge if the answer is good enough?" },
+      {
+        title: "Audience",
+        detail: "Who is the answer for?",
+        example:
+          "e.g., Other students who have mixed reading levels, not experts in neuroscience.",
+      },
+      {
+        title: "Format",
+        detail: "Paragraph, list, essay, etc.?",
+        example:
+          "e.g., One coherent paragraph, not a bullet list of disconnected facts.",
+      },
+      {
+        title: "Success",
+        detail: "How will you judge if the answer is good enough?",
+        example:
+          "e.g., It uses evidence, links brain ideas to school life, and meets length and example requirements.",
+      },
     ],
     note: "You don’t need fancy wording. You do need enough detail that the AI knows what “done” looks like.",
   },

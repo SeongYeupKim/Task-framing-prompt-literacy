@@ -69,20 +69,26 @@ export function TrainingPanel({ isControl }: Props) {
             )}
 
             {s.numbered && (
-              <ol className="mt-2 space-y-3">
+              <ol className="mt-2 space-y-4">
                 {s.numbered.map((item, j) => (
                   <li
                     key={j}
-                    className="flex gap-3 rounded-xl bg-teal-50/60 px-3 py-2.5 text-student-ink"
+                    className="flex gap-3 rounded-xl bg-teal-50/60 px-3 py-3 text-student-ink"
                   >
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-600 text-xs font-semibold text-white">
                       {j + 1}
                     </span>
-                    <span>
+                    <span className="min-w-0 flex-1">
                       <span className="font-semibold text-student-ink">
                         {item.title}
                       </span>
                       <span className="text-student-muted"> — {item.detail}</span>
+                      <p className="mt-2 border-l-2 border-teal-400 pl-3 text-sm leading-relaxed text-student-ink">
+                        <span className="font-medium text-teal-800">
+                          Example for this domain:{" "}
+                        </span>
+                        {item.example}
+                      </p>
                     </span>
                   </li>
                 ))}
