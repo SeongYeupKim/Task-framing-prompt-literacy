@@ -20,20 +20,21 @@ export function getNextPhaseAfter(
   return null;
 }
 
+/** Short label for the header (student-friendly). */
 export function phaseLabel(phase: StudyPhase): string {
   switch (phase) {
     case "training":
-      return "Training";
+      return "Read the introduction";
     case "eval1":
-      return "Evaluation task 1";
+      return "Rate example prompts (1)";
     case "eval2":
-      return "Evaluation task 2";
+      return "Rate example prompts (2)";
     case "genai":
-      return "GenAI interaction";
+      return "Chat with the assistant";
     case "essay":
-      return "Essay submission";
+      return "Write your essay";
     case "complete":
-      return "Complete";
+      return "You’re done";
     default:
       return phase;
   }

@@ -5,7 +5,6 @@ import type { ChatMessage } from "@/types/study";
 import { GENAI_TASK } from "@/lib/studyContent";
 
 type Props = {
-  /** Controlled message list (saved to Firestore by parent). */
   messages: ChatMessage[];
   onMessagesChange: (messages: ChatMessage[]) => void;
   onContinueToEssay: () => void;
@@ -70,20 +69,21 @@ export function GenAIInteractionPanel({
   }
 
   return (
-    <div className="flex h-[min(70vh,640px)] flex-col rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">
-          {GENAI_TASK.title}
+    <div className="flex h-[min(70vh,640px)] flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student">
+      <div className="border-b border-student-border bg-teal-50/50 px-4 py-4 sm:px-5">
+        <h2 className="text-base font-semibold text-student-ink">
+          Chat with the assistant
         </h2>
-        <p className="text-xs text-slate-600">
-          Chat with the assistant. You may send as many messages as you need.
+        <p className="mt-1 text-xs text-student-muted">
+          Topic: {GENAI_TASK.title}. Ask questions, request outlines, or get
+          feedback. Send as many messages as you need.
         </p>
       </div>
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      <div className="flex-1 space-y-3 overflow-y-auto bg-student-canvas/40 p-4">
         {messages.length === 0 && (
-          <p className="text-sm text-slate-500">
-            Type your first message below to start (e.g., ask for an outline or
-            clarify concepts for your essay).
+          <p className="rounded-xl bg-white/80 px-3 py-2 text-sm text-student-muted">
+            Type a message below to start—for example, “Help me outline my
+            essay” or “What’s one example of exercise helping memory?”
           </p>
         )}
         {messages.map((m, i) => (
@@ -92,10 +92,10 @@ export function GenAIInteractionPanel({
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[90%] rounded-2xl px-4 py-2 text-sm ${
+              className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 m.role === "user"
-                  ? "bg-brand-600 text-white"
-                  : "bg-slate-100 text-slate-900"
+                  ? "bg-teal-600 text-white shadow-sm"
+                  : "border border-student-border bg-white text-student-ink shadow-sm"
               }`}
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
@@ -103,16 +103,16 @@ export function GenAIInteractionPanel({
           </div>
         ))}
         {loading && (
-          <p className="text-xs text-slate-500">Assistant is thinking…</p>
+          <p className="text-xs text-student-muted">Assistant is replying…</p>
         )}
         <div ref={bottomRef} />
       </div>
       {error && (
-        <p className="px-4 text-xs text-red-600" role="alert">
+        <p className="border-t border-red-100 bg-red-50 px-4 py-2 text-xs text-red-700" role="alert">
           {error}
         </p>
       )}
-      <div className="border-t border-slate-100 p-3">
+      <div className="border-t border-student-border bg-white p-3 sm:p-4">
         <div className="flex gap-2">
           <textarea
             value={input}
@@ -124,15 +124,15 @@ export function GenAIInteractionPanel({
               }
             }}
             rows={2}
-            className="flex-1 resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-            placeholder="Write your prompt… (Enter to send, Shift+Enter for newline)"
+            className="flex-1 resize-none rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            placeholder="Type your message… (Enter to send)"
             disabled={loading}
           />
           <button
             type="button"
             onClick={() => void send()}
             disabled={loading || !input.trim()}
-            className="self-end rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+            className="self-end rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
           >
             Send
           </button>
@@ -140,9 +140,9 @@ export function GenAIInteractionPanel({
         <button
           type="button"
           onClick={onContinueToEssay}
-          className="mt-3 w-full rounded-lg border border-slate-300 bg-slate-50 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+          className="mt-3 w-full rounded-xl border-2 border-teal-200 bg-teal-50 py-3 text-sm font-semibold text-teal-900 hover:bg-teal-100"
         >
-          I’m done chatting — continue to essay
+          I’m done — go to my essay
         </button>
       </div>
     </div>

@@ -1,53 +1,66 @@
-/** Training instruction (task framing) — editable copy. */
-export const TRAINING_SECTIONS = [
+/** Training — plain language, no markdown asterisks in source. */
+
+export type TrainingSection = {
+  title: string;
+  paragraphs: string[];
+  bullets?: string[];
+  numbered?: { title: string; detail: string }[];
+  note?: string;
+};
+
+export const TRAINING_SECTIONS: TrainingSection[] = [
   {
-    title: "What is task framing and why does it matter?",
-    body: `When using AI for academic tasks, many people focus on writing better prompts. However, effective use of AI begins before writing the prompt. It depends on how clearly you understand and define the task.
-
-We call this process **task framing**.
-
-Task framing means clearly thinking about:
-- what you want the AI to do
-- what kind of answer you expect
-- what counts as a good response
-
-If the task is not clearly framed, AI responses are often vague, unfocused, or not aligned with your goal. If the task is well framed, AI responses are more relevant, structured, and useful.`,
+    title: "What is task framing?",
+    paragraphs: [
+      "When you use AI for school work, it’s easy to focus only on the exact words you type. But helpful AI use starts earlier: you need a clear picture of what the assignment is asking.",
+      "We call that thinking task framing.",
+      "Task framing means being clear about a few things:",
+    ],
+    bullets: [
+      "What you want the AI to help you with",
+      "What kind of answer you’re aiming for",
+      "What would count as a good answer for your class",
+    ],
+    note: "If the task is fuzzy in your mind, the AI’s answer often feels vague or off-topic. If the task is clear, you usually get answers that are easier to use.",
   },
   {
-    title: "What is good task framing? (Key dimensions)",
-    body: `A well-framed task usually includes:
-
-1. **Goal** — What are you trying to do?
-2. **Content scope** — What should be included?
-3. **Context & constraints** — Under what conditions? (length, level, etc.)
-4. **Audience** — For whom is the response?
-5. **Output format** — What should the answer look like?
-6. **Evaluation criteria** — What makes a good answer?
-
-Weak prompts often miss several of these. Strong prompts coordinate them so the AI can help you meet your learning goal.`,
+    title: "What goes into a clear task?",
+    paragraphs: ["Strong prompts usually make these pieces easy to see:"],
+    numbered: [
+      { title: "Goal", detail: "What are you trying to accomplish?" },
+      { title: "Content", detail: "What topics or ideas must be included?" },
+      { title: "Limits", detail: "Length, level, format, or other constraints?" },
+      { title: "Audience", detail: "Who is the answer for?" },
+      { title: "Format", detail: "Paragraph, list, essay, etc.?" },
+      { title: "Success", detail: "How will you judge if the answer is good enough?" },
+    ],
+    note: "You don’t need fancy wording. You do need enough detail that the AI knows what “done” looks like.",
   },
   {
-    title: "What will you do next?",
-    body: `Depending on your assigned session, you may be asked to **evaluate example student prompts** for a learning task. Focus on how well each prompt defines the task using the elements above.
-
-Later, you will **interact with ChatGPT** on a new explanation task and submit your own written response. Your prompts, AI replies, and final essay will be recorded for research purposes only.`,
+    title: "What happens next in this session?",
+    paragraphs: [
+      "Depending on how your session is set up, you may rate example prompts from other students and explain why they are stronger or weaker.",
+      "Later you will chat with the AI on a new topic and then write your own response. Your chat and your writing are saved only for this research study.",
+    ],
   },
-] as const;
+];
 
 export const EVAL1_SCENARIO = {
-  title: "How Sleep Affects Learning",
-  scenario: `Three students are developing a short explanation titled **"How Sleep Affects Learning"** for a school website section "Study Smart: Understanding How Learning Works." The audience is **9th-grade students with mixed reading abilities**. They may use ChatGPT and two source texts (Text A: sleep and the brain; Text B: sleep and everyday school performance).`,
+  title: "How sleep affects learning",
+  scenario:
+    'Three students are writing a short piece called “How Sleep Affects Learning” for a school website (section: “Study Smart: Understanding How Learning Works”). Readers are 9th-grade students with mixed reading levels. The students can use the AI and two readings: one on sleep and the brain, one on sleep and everyday school life.',
   taskConditions: [
-    "Avoid misinformation; base the explanation on evidence.",
-    "Conceptual connection: link brain processes (e.g., memory, attention) to real-life learning outcomes.",
-    "Purpose alignment: help students see why sleep matters for their learning.",
-    "Audience: accessible for mixed reading levels—avoid overly technical language without oversimplifying.",
+    "Use evidence; avoid made-up facts.",
+    "Connect brain ideas (e.g. memory, attention) to real school outcomes.",
+    "Help readers see why sleep matters for learning—not only random facts.",
+    "Write so mixed reading levels can follow; don’t hide important ideas behind jargon.",
     "Include at least two concrete school-related examples.",
-    "Length: approximately 250–300 words; one coherent paragraph.",
+    "About 250–300 words, one connected paragraph (not a bullet list).",
   ],
   cases: {
     studentA: {
-      label: "Student A (medium task framing)",
+      label: "Student A",
+      sublabel: "Moderate clarity",
       prompts: [
         "Explain how sleep affects learning, including brain processes like memory and attention and how it impacts school performance.",
         "Write it for students so it's clear and not too technical.",
@@ -57,7 +70,8 @@ export const EVAL1_SCENARIO = {
       ],
     },
     studentB: {
-      label: "Student B (high task framing)",
+      label: "Student B",
+      sublabel: "Strong clarity",
       prompts: [
         "Using these two texts, explain how sleep affects learning for students with different reading levels.",
         "Focus on how sleep supports brain processes like memory and attention and how those lead to outcomes like focus and grades.",
@@ -67,7 +81,8 @@ export const EVAL1_SCENARIO = {
       ],
     },
     studentC: {
-      label: "Student C (low task framing)",
+      label: "Student C",
+      sublabel: "Weaker clarity",
       prompts: [
         "Explain how sleep affects learning outcomes for students.",
         "Can you include something about how the brain works during sleep?",
@@ -80,20 +95,22 @@ export const EVAL1_SCENARIO = {
 };
 
 export const EVAL2_SCENARIO = {
-  title: "Should You Use Smartphones While Studying?",
-  scenario: `Students are preparing a short explanation for a community center guide **"Smart Study Habits."** Topic: **"Should You Use Smartphones While Studying?"** Audience: **9th-grade students with mixed reading abilities** during orientation. They have Text A (costs/distraction) and Text B (potential benefits).`,
+  title: "Phones while studying",
+  scenario:
+    'Students are writing for a guide called “Smart Study Habits.” Topic: “Should you use smartphones while studying?” The audience is 9th-grade students with mixed reading levels at an orientation. They have one reading on downsides of phones and one on possible benefits.',
   taskConditions: [
-    "Avoid misinformation; use evidence.",
-    "Conceptual balance: benefits and drawbacks.",
-    "Conditional reasoning: when phones help vs harm learning—not one-sided.",
-    "Purpose alignment: help students make better decisions about study habits.",
-    "Audience: clear and engaging; avoid overly technical language without oversimplifying.",
-    "At least two concrete examples of help and interference.",
-    "Length: approximately 250–300 words; one coherent paragraph.",
+    "Use evidence; avoid made-up claims.",
+    "Include both benefits and drawbacks.",
+    "Explain when phones might help or hurt—not only “phones are bad” or “phones are good.”",
+    "Help readers make better choices about their own habits.",
+    "Clear and engaging; not overly technical.",
+    "At least two concrete examples of phones helping or hurting studying.",
+    "About 250–300 words, one connected paragraph.",
   ],
   cases: {
     studentA: {
-      label: "Student A (high task framing)",
+      label: "Student A",
+      sublabel: "Strong clarity",
       prompts: [
         "Using the two texts, explain the effectiveness of smartphones in studying.",
         "Can you explain both negative effects (e.g., distraction, reduced attention) and positive uses (e.g., learning tools, organization)?",
@@ -104,7 +121,8 @@ export const EVAL2_SCENARIO = {
       ],
     },
     studentB: {
-      label: "Student B (low task framing)",
+      label: "Student B",
+      sublabel: "Weaker clarity",
       prompts: [
         "Explain whether smartphones are positive or negative for studying.",
         "Can you include something about distractions and multitasking?",
@@ -115,7 +133,8 @@ export const EVAL2_SCENARIO = {
       ],
     },
     studentC: {
-      label: "Student C (high task framing)",
+      label: "Student C",
+      sublabel: "Strong clarity",
       prompts: [
         "Explain how smartphones affect studying, including both negative effects like distraction and positive uses like helping with learning tools.",
         "Write it clearly for students and avoid difficult terms.",
@@ -128,17 +147,18 @@ export const EVAL2_SCENARIO = {
 };
 
 export const GENAI_TASK = {
-  title: "How Does Physical Exercise Influence Learning and Academic Performance?",
-  scenario: `You are preparing for a science class assignment: a short **explanatory essay** on human learning and performance. You may use ChatGPT to develop and refine your explanation.`,
+  title: "Exercise, learning, and school performance",
+  scenario:
+    "You have a science assignment: a short explanatory essay on how physical exercise relates to learning and academic performance. You may use the AI to help you think it through, but your final essay should reflect your own understanding.",
   taskConditions: [
-    "Accuracy: scientifically valid ideas about exercise, brain, and learning.",
-    "Conceptual integration: physiological processes and behavioral effects, and how they relate.",
-    "Causal reasoning: how and why exercise influences learning and performance.",
-    "Conditional understanding: e.g., type, intensity, or timing of exercise.",
-    "Purpose alignment: help the reader use exercise to support their own learning.",
-    "Audience: general students—clear but not oversimplified.",
-    "At least two concrete real-life examples.",
-    "Length: approximately 300 words.",
-    "Organization: clear essay, not a bullet list.",
+    "Use ideas that fit what science generally says about exercise, the brain, and learning.",
+    "Connect body/brain processes with habits and behavior (not only one or the other).",
+    "Explain how and why exercise might affect learning (not only that it does).",
+    "Mention how type, intensity, or timing of exercise might matter.",
+    "Help a student reader use the ideas for their own learning.",
+    "Write for a general student audience; clear but not dumbed down.",
+    "At least two real-life examples.",
+    "About 300 words.",
+    "Write as a short essay, not a bullet list.",
   ],
 };

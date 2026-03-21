@@ -33,61 +33,67 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
-      <h1 className="text-2xl font-semibold text-slate-900">Register</h1>
-      <p className="mt-2 text-sm text-slate-600">
-        Create an account to participate. You will be assigned to a study path
-        automatically.
-      </p>
-      <form onSubmit={(e) => void handleSubmit(e)} className="mt-8 space-y-4">
-        <div>
-          <label className="text-sm font-medium text-slate-800">Email</label>
-          <input
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-slate-800">Password</label>
-          <input
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-          <p className="mt-1 text-xs text-slate-500">Minimum 8 characters.</p>
-        </div>
-        {error && (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-brand-600 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
-        >
-          {loading ? "Creating account…" : "Create account"}
-        </button>
-      </form>
-      <p className="mt-6 text-center text-sm text-slate-600">
-        Already have an account?{" "}
-        <Link href="/login" className="text-brand-600 hover:underline">
-          Log in
-        </Link>
-      </p>
-      <p className="mt-4 text-center">
-        <Link href="/" className="text-sm text-slate-500 hover:text-slate-800">
-          ← Home
-        </Link>
-      </p>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-student-canvas px-6 py-16">
+      <div className="w-full max-w-md rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+        <h1 className="text-2xl font-semibold text-student-ink">
+          Create an account
+        </h1>
+        <p className="mt-2 text-sm text-student-muted">
+          You’ll get a study path at random. Your responses are used only for
+          this research.
+        </p>
+        <form onSubmit={(e) => void handleSubmit(e)} className="mt-8 space-y-4">
+          <div>
+            <label className="text-sm font-medium text-student-ink">Email</label>
+            <input
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-student-ink">
+              Password
+            </label>
+            <input
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            />
+            <p className="mt-1 text-xs text-student-muted">At least 8 characters.</p>
+          </div>
+          {error && (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
+          >
+            {loading ? "Creating account…" : "Continue"}
+          </button>
+        </form>
+        <p className="mt-6 text-center text-sm text-student-muted">
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-teal-700 hover:underline">
+            Sign in
+          </Link>
+        </p>
+        <p className="mt-4 text-center">
+          <Link href="/" className="text-sm text-student-muted hover:text-student-ink">
+            ← Back
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

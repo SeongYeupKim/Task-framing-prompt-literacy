@@ -16,7 +16,7 @@ export function EssaySubmissionPanel({ initialText, onSubmit }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (text.trim().length < 50) {
-      setError("Please write a fuller response (at least a short paragraph).");
+      setError("Please write a bit more—at least a short paragraph.");
       return;
     }
     setSaving(true);
@@ -30,32 +30,33 @@ export function EssaySubmissionPanel({ initialText, onSubmit }: Props) {
     }
   }
 
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mx-auto max-w-3xl rounded-2xl border border-student-border bg-student-card p-6 shadow-student sm:p-8"
     >
-      <h2 className="text-lg font-semibold text-slate-900">
-        Your explanatory essay
-      </h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Topic: <strong>{GENAI_TASK.title}</strong>
+      <h2 className="text-xl font-semibold text-student-ink">Your essay</h2>
+      <p className="mt-2 text-sm text-student-muted">
+        Topic:{" "}
+        <span className="font-medium text-student-ink">{GENAI_TASK.title}</span>
       </p>
-      <p className="mt-2 text-sm text-slate-700">
-        Paste or write your final essay here. It should reflect your
-        understanding and may build on your chat above. Aim for about{" "}
-        <strong>300 words</strong> and meet the task conditions from the
-        instructions.
+      <p className="mt-4 text-sm leading-relaxed text-student-ink">
+        Write your own explanation here. You can use ideas from the chat, but
+        the essay should be your words. Aim for about{" "}
+        <span className="font-medium">300 words</span> and cover the points on
+        the previous screen as best you can.
       </p>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={18}
-        className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-        placeholder="Write your essay…"
+        className="mt-4 w-full rounded-2xl border border-student-border bg-white px-4 py-3 text-base leading-relaxed text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+        placeholder="Start typing your essay…"
       />
-      <p className="mt-2 text-xs text-slate-500">
-        Word count (approx.): {text.trim() ? text.trim().split(/\s+/).length : 0}
+      <p className="mt-2 text-xs text-student-muted">
+        Approx. word count: <span className="font-medium">{words}</span>
       </p>
       {error && (
         <p className="mt-2 text-sm text-red-600" role="alert">
@@ -65,9 +66,9 @@ export function EssaySubmissionPanel({ initialText, onSubmit }: Props) {
       <button
         type="submit"
         disabled={saving}
-        className="mt-4 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+        className="mt-6 rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-50"
       >
-        {saving ? "Submitting…" : "Submit essay and finish"}
+        {saving ? "Submitting…" : "Submit and finish"}
       </button>
     </form>
   );

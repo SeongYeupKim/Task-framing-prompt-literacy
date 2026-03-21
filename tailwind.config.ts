@@ -16,6 +16,16 @@ const config: Config = {
           700: "#1d4ed8",
           900: "#1e3a5f",
         },
+        student: {
+          canvas: "#eef2f6",
+          card: "#ffffff",
+          ink: "#1a2e3d",
+          muted: "#5a6d7d",
+          border: "#dfe6ee",
+        },
+      },
+      boxShadow: {
+        student: "0 1px 3px rgba(26, 46, 61, 0.06), 0 0 0 1px rgba(26, 46, 61, 0.04)",
       },
     },
   },
