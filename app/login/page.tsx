@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
+import { formatAuthError } from "@/lib/firebaseErrors";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,8 +21,8 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(getClientAuth(), email, password);
       router.replace("/study");
-    } catch {
-      setError("Invalid email or password.");
+    } catch (err) {
+      setError(formatAuthError(err));
     } finally {
       setLoading(false);
     }

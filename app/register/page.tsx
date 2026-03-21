@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
+import { formatAuthError } from "@/lib/firebaseErrors";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -24,8 +25,8 @@ export default function RegisterPage() {
     try {
       await createUserWithEmailAndPassword(getClientAuth(), email, password);
       router.replace("/study");
-    } catch {
-      setError("Could not create account. The email may already be in use.");
+    } catch (err) {
+      setError(formatAuthError(err));
     } finally {
       setLoading(false);
     }
