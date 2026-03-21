@@ -116,7 +116,7 @@ export default function StudyPage() {
   return (
     <div className="min-h-screen bg-student-canvas pb-16">
       <header className="sticky top-0 z-10 border-b border-student-border bg-student-card/95 backdrop-blur-sm">
-        <div className="mx-auto max-w-4xl px-4 py-4">
+        <div className="mx-auto max-w-[1920px] px-4 py-4">
           <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-student-border">
             <div
               className="h-full rounded-full bg-teal-500 transition-all duration-500"
@@ -143,10 +143,16 @@ export default function StudyPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 pt-8">
+      <main
+        className={`mx-auto px-3 pt-8 sm:px-4 ${
+          phase === "genai" || phase === "essay"
+            ? "max-w-[1920px]"
+            : "max-w-4xl"
+        }`}
+      >
         {phase === "training" && (
           <div className="space-y-8">
-            <TrainingPanel />
+            <TrainingPanel isControl={condition === "control"} />
             <div className="flex justify-center pb-8">
               <button
                 type="button"
@@ -181,46 +187,71 @@ export default function StudyPage() {
           />
         )}
 
-        {phase === "genai" && (
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
-            <GenAIInteractionPanel
-              messages={genaiMessages}
-              onMessagesChange={persistMessages}
-              onContinueToEssay={handleContinueToEssay}
-            />
-            <aside className="space-y-4 lg:sticky lg:top-28">
-              <div className="rounded-2xl border border-student-border bg-student-card p-6 shadow-student">
-                <h2 className="text-lg font-semibold text-student-ink">
-                  {GENAI_TASK.title}
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-student-ink">
-                  {GENAI_TASK.scenario}
-                </p>
-                <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
-                  Try to cover these in your essay
-                </h3>
-                <ul className="mt-2 space-y-2 text-sm leading-relaxed text-student-ink">
-                  {GENAI_TASK.taskConditions.map((c) => (
-                    <li key={c} className="flex gap-2">
-                      <span className="text-teal-600">•</span>
-                      <span>{c}</span>
-                    </li>
-                  ))}
-                </ul>
+        {(phase === "genai" || phase === "essay") && (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start xl:gap-5">
+            {/* Column 1: scenario + task conditions */}
+            <aside className="space-y-4 xl:col-span-3">
+              <div className="xl:sticky xl:top-28">
+                <div className="rounded-2xl border border-student-border bg-student-card p-5 shadow-student sm:p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
+                    Scenario
+                  </p>
+                  <h2 className="mt-1 text-lg font-semibold leading-snug text-student-ink">
+                    {GENAI_TASK.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-student-ink">
+                    {GENAI_TASK.scenario}
+                  </p>
+                  <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
+                    Task conditions
+                  </h3>
+                  <ul className="mt-2 max-h-[min(40vh,360px)] space-y-2 overflow-y-auto text-sm leading-relaxed text-student-ink">
+                    {GENAI_TASK.taskConditions.map((c) => (
+                      <li key={c} className="border-l-2 border-teal-400 pl-3">
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <p className="text-xs leading-relaxed text-student-muted">
-                Your messages are saved as you go. When you’re ready, go to the
-                next screen to write your essay.
-              </p>
+            </aside>
+
+            {/* Column 2: chat (wide) */}
+            <div className="xl:col-span-5">
+              <GenAIInteractionPanel
+                messages={genaiMessages}
+                onMessagesChange={persistMessages}
+              />
+            </div>
+
+            {/* Column 3: essay prompt or essay form */}
+            <aside className="space-y-4 xl:col-span-4">
+              <div className="xl:sticky xl:top-28">
+                {phase === "genai" && (
+                  <div className="rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student">
+                    <p className="text-sm leading-relaxed text-student-ink">
+                      When you’re ready to write, open the essay panel. Your
+                      chat stays in the middle so you can scroll back anytime.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void handleContinueToEssay()}
+                      className="mt-5 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
+                    >
+                      Open essay editor
+                    </button>
+                  </div>
+                )}
+                {phase === "essay" && (
+                  <EssaySubmissionPanel
+                    embedded
+                    initialText={essayDraft}
+                    onSubmit={handleEssaySubmit}
+                  />
+                )}
+              </div>
             </aside>
           </div>
-        )}
-
-        {phase === "essay" && (
-          <EssaySubmissionPanel
-            initialText={essayDraft}
-            onSubmit={handleEssaySubmit}
-          />
         )}
 
         {phase === "complete" && (

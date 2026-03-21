@@ -5,7 +5,6 @@ import type { EvalCaseId, EvaluationTaskSubmission } from "@/types/study";
 
 type CaseDef = {
   label: string;
-  sublabel?: string;
   prompts: string[];
 };
 
@@ -24,9 +23,30 @@ type Props = {
 
 const CASES: EvalCaseId[] = ["studentA", "studentB", "studentC"];
 
+/** Mock “texts to the AI” — each line as a sent bubble. */
+function PromptMessageThread({ prompts, label }: { prompts: string[]; label: string }) {
+  return (
+    <div className="mx-auto max-w-sm">
+      <p className="mb-2 text-center text-xs font-medium uppercase tracking-wide text-student-muted">
+        {label} — messages to the AI
+      </p>
+      <div className="rounded-3xl bg-slate-300/40 p-3 shadow-inner">
+        <div className="max-h-[min(420px,55vh)] space-y-2 overflow-y-auto pr-1">
+          {prompts.map((text, i) => (
+            <div key={i} className="flex justify-end">
+              <div className="max-w-[95%] rounded-2xl rounded-br-md bg-teal-600 px-3.5 py-2 text-[0.8125rem] leading-snug text-white shadow-sm">
+                {text}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CaseCard({
   label,
-  sublabel,
   prompts,
   rating,
   rationale,
@@ -34,7 +54,6 @@ function CaseCard({
   onRationale,
 }: {
   label: string;
-  sublabel?: string;
   prompts: string[];
   rating: number | null;
   rationale: string;
@@ -43,25 +62,11 @@ function CaseCard({
 }) {
   return (
     <div className="rounded-2xl border border-student-border bg-student-card p-5 shadow-student sm:p-6">
-      <div className="flex flex-wrap items-baseline gap-2">
-        <h3 className="text-lg font-semibold text-student-ink">{label}</h3>
-        {sublabel && (
-          <span className="rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800">
-            {sublabel}
-          </span>
-        )}
-      </div>
-      <p className="mt-1 text-sm text-student-muted">
-        These are the messages they sent to the AI, in order.
-      </p>
-      <ol className="mt-4 list-decimal space-y-2.5 pl-5 text-sm leading-relaxed text-student-ink marker:text-teal-700">
-        {prompts.map((p, i) => (
-          <li key={i}>{p}</li>
-        ))}
-      </ol>
+      <PromptMessageThread prompts={prompts} label={label} />
+
       <div className="mt-6 rounded-xl bg-student-canvas px-3 py-4">
         <p className="text-sm font-medium text-student-ink">
-          How strong are these prompts overall?
+          Overall, how strong are these prompts for this task?
         </p>
         <p className="mt-1 text-xs text-student-muted">
           1 = very weak · 6 = very strong
@@ -95,7 +100,7 @@ function CaseCard({
           onChange={(e) => onRationale(e.target.value)}
           rows={5}
           className="mt-2 w-full rounded-xl border border-student-border bg-white px-3 py-2.5 text-sm text-student-ink shadow-sm placeholder:text-student-muted/70 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-          placeholder="For example: how clear was the goal, audience, and length? What was missing or done well?"
+          placeholder="What worked or didn’t in how they framed the task?"
         />
       </div>
     </div>
@@ -161,17 +166,17 @@ export function EvaluationTaskView({
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8">
       <div className="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7">
-        <h2 className="text-xl font-semibold text-student-ink">{title}</h2>
-        <p className="mt-3 text-base leading-relaxed text-student-ink">
-          {scenario}
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
+          Scenario
         </p>
-        <h3 className="mt-5 text-sm font-semibold uppercase tracking-wide text-student-muted">
-          The final piece should meet these points
+        <h2 className="mt-1 text-xl font-semibold text-student-ink">{title}</h2>
+        <p className="mt-3 text-base leading-relaxed text-student-ink">{scenario}</p>
+        <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
+          Task conditions (the explanation should satisfy all of these)
         </h3>
         <ul className="mt-2 space-y-2 text-sm leading-relaxed text-student-ink">
           {taskConditions.map((c) => (
-            <li key={c} className="flex gap-2">
-              <span className="mt-0.5 text-teal-600">✓</span>
+            <li key={c} className="flex gap-2 border-l-2 border-teal-400 pl-3">
               <span>{c}</span>
             </li>
           ))}
@@ -180,11 +185,11 @@ export function EvaluationTaskView({
 
       <div className="rounded-2xl border border-student-border bg-student-card px-5 py-5 shadow-student sm:px-7">
         <h2 className="text-lg font-semibold text-student-ink">
-          Your job: rate three students
+          Rate three students’ prompts
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-student-muted">
-          For each student you’ll pick a number from 1 to 6 and write a short
-          explanation. Take your time.
+          Below are mock messages each student sent to the AI (like texts). For
+          each person, pick a number from 1 to 6 and explain your choice.
         </p>
       </div>
 
@@ -192,7 +197,6 @@ export function EvaluationTaskView({
         <CaseCard
           key={id}
           label={cases[id].label}
-          sublabel={cases[id].sublabel}
           prompts={cases[id].prompts}
           rating={ratings[id]}
           rationale={rationales[id]}

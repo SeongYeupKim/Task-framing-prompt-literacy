@@ -1,8 +1,39 @@
 "use client";
 
-import { TRAINING_SECTIONS } from "@/lib/studyContent";
+import {
+  TRAINING_SECTIONS,
+  getTrainingClosingParagraphs,
+  type TextChunk,
+} from "@/lib/studyContent";
 
-export function TrainingPanel() {
+function renderChunks(chunks: TextChunk[]) {
+  return chunks.map((c, i) => {
+    if (typeof c === "string") {
+      return <span key={i}>{c}</span>;
+    }
+    return (
+      <strong key={i} className="font-semibold text-student-ink">
+        {c.b}
+      </strong>
+    );
+  });
+}
+
+function ParagraphBlock({ p }: { p: string | TextChunk[] }) {
+  if (typeof p === "string") {
+    return <p>{p}</p>;
+  }
+  return <p className="leading-relaxed">{renderChunks(p)}</p>;
+}
+
+type Props = {
+  /** Control group skips evaluation activities; show different Part 3 text. */
+  isControl: boolean;
+};
+
+export function TrainingPanel({ isControl }: Props) {
+  const closing = getTrainingClosingParagraphs(isControl);
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="rounded-2xl border border-student-border bg-student-card px-5 py-4 shadow-student sm:px-7 sm:py-5">
@@ -23,7 +54,7 @@ export function TrainingPanel() {
 
           <div className="mt-4 space-y-4 text-base leading-relaxed text-student-ink">
             {s.paragraphs.map((p, j) => (
-              <p key={j}>{p}</p>
+              <ParagraphBlock key={j} p={p} />
             ))}
 
             {s.bullets && s.bullets.length > 0 && (
@@ -66,6 +97,17 @@ export function TrainingPanel() {
           </div>
         </section>
       ))}
+
+      <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-7">
+        <h2 className="text-xl font-semibold tracking-tight text-student-ink">
+          Part 3: What happens next in this session?
+        </h2>
+        <div className="mt-4 space-y-4 text-base leading-relaxed text-student-ink">
+          {closing.map((p, j) => (
+            <ParagraphBlock key={j} p={p} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

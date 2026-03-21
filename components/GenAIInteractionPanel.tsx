@@ -2,18 +2,17 @@
 
 import { useCallback, useRef, useState } from "react";
 import type { ChatMessage } from "@/types/study";
-import { GENAI_TASK } from "@/lib/studyContent";
 
 type Props = {
   messages: ChatMessage[];
   onMessagesChange: (messages: ChatMessage[]) => void;
-  onContinueToEssay: () => void;
+  className?: string;
 };
 
 export function GenAIInteractionPanel({
   messages,
   onMessagesChange,
-  onContinueToEssay,
+  className = "",
 }: Props) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,81 +68,80 @@ export function GenAIInteractionPanel({
   }
 
   return (
-    <div className="flex h-[min(70vh,640px)] flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student">
+    <div
+      className={`flex min-h-[min(78vh,820px)] flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student ${className}`}
+    >
       <div className="border-b border-student-border bg-teal-50/50 px-4 py-4 sm:px-5">
         <h2 className="text-base font-semibold text-student-ink">
           Chat with the assistant
         </h2>
         <p className="mt-1 text-xs text-student-muted">
-          Topic: {GENAI_TASK.title}. Ask questions, request outlines, or get
-          feedback. Send as many messages as you need.
+          Send as many messages as you need. Scroll up to reread earlier replies.
         </p>
       </div>
-      <div className="flex-1 space-y-3 overflow-y-auto bg-student-canvas/40 p-4">
-        {messages.length === 0 && (
-          <p className="rounded-xl bg-white/80 px-3 py-2 text-sm text-student-muted">
-            Type a message below to start—for example, “Help me outline my
-            essay” or “What’s one example of exercise helping memory?”
+      <div className="flex min-h-0 flex-1 flex-col bg-student-canvas/40">
+        <div className="flex-1 space-y-3 overflow-y-auto p-4">
+          {messages.length === 0 && (
+            <p className="rounded-xl bg-white/90 px-3 py-2 text-sm text-student-muted">
+              Type a message below to start—for example, “Help me outline my
+              essay” or “What’s one way exercise could affect attention?”
+            </p>
+          )}
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  m.role === "user"
+                    ? "rounded-br-md bg-teal-600 text-white shadow-sm"
+                    : "border border-student-border bg-white text-student-ink shadow-sm"
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{m.content}</p>
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <p className="text-xs text-student-muted">Assistant is replying…</p>
+          )}
+          <div ref={bottomRef} />
+        </div>
+        {error && (
+          <p
+            className="border-t border-red-100 bg-red-50 px-4 py-2 text-xs text-red-700"
+            role="alert"
+          >
+            {error}
           </p>
         )}
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.role === "user"
-                  ? "bg-teal-600 text-white shadow-sm"
-                  : "border border-student-border bg-white text-student-ink shadow-sm"
-              }`}
+        <div className="border-t border-student-border bg-white p-3 sm:p-4">
+          <div className="flex gap-2">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  void send();
+                }
+              }}
+              rows={3}
+              className="min-h-[4.5rem] flex-1 resize-y rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              placeholder="Type your message… (Enter to send, Shift+Enter for new line)"
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => void send()}
+              disabled={loading || !input.trim()}
+              className="self-end rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
             >
-              <p className="whitespace-pre-wrap">{m.content}</p>
-            </div>
+              Send
+            </button>
           </div>
-        ))}
-        {loading && (
-          <p className="text-xs text-student-muted">Assistant is replying…</p>
-        )}
-        <div ref={bottomRef} />
-      </div>
-      {error && (
-        <p className="border-t border-red-100 bg-red-50 px-4 py-2 text-xs text-red-700" role="alert">
-          {error}
-        </p>
-      )}
-      <div className="border-t border-student-border bg-white p-3 sm:p-4">
-        <div className="flex gap-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                void send();
-              }
-            }}
-            rows={2}
-            className="flex-1 resize-none rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-            placeholder="Type your message… (Enter to send)"
-            disabled={loading}
-          />
-          <button
-            type="button"
-            onClick={() => void send()}
-            disabled={loading || !input.trim()}
-            className="self-end rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
-          >
-            Send
-          </button>
         </div>
-        <button
-          type="button"
-          onClick={onContinueToEssay}
-          className="mt-3 w-full rounded-xl border-2 border-teal-200 bg-teal-50 py-3 text-sm font-semibold text-teal-900 hover:bg-teal-100"
-        >
-          I’m done — go to my essay
-        </button>
       </div>
     </div>
   );

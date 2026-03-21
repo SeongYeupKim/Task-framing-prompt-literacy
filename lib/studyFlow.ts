@@ -30,7 +30,7 @@ export function phaseLabel(phase: StudyPhase): string {
     case "eval2":
       return "Rate example prompts (2)";
     case "genai":
-      return "Chat with the assistant";
+      return "Chat with the AI";
     case "essay":
       return "Write your essay";
     case "complete":
