@@ -4,6 +4,10 @@
 
 Next.js app for a randomized three-condition study: **training** → optional **evaluation tasks** → **GenAI chat** → **essay**, with Firebase Auth + Firestore and OpenAI chat API (server-side).
 
+**New to Firebase / `.env`?** Follow the full walkthrough: **[SETUP.md](./SETUP.md)**.
+
+**Deploy to Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)** (env vars on Vercel + Firebase authorized domains).
+
 ## Setup
 
 1. **Install**

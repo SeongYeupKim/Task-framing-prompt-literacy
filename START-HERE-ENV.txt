@@ -1,0 +1,30 @@
+================================================================================
+  CAN'T FIND ".env.local"?  (The name starts with a dot — it's easy to miss)
+================================================================================
+
+Do this — no need to find the file in the sidebar:
+
+  1) Open Terminal (Spotlight: type "Terminal", press Enter).
+
+  2) Copy this line, paste into Terminal, press Enter:
+
+cd "/Users/seongyeupkim/Library/Mobile Documents/com~apple~CloudDocs/Docs/_Research/_Individual research/*2026/*0. Prompt literacy/task-framing-study"
+
+  (If your folder is in a different place, drag the "task-framing-study" folder
+   into the Terminal window after typing: cd )
+
+  3) Paste this and press Enter:
+
+npm run setup:env
+
+  This will:
+    - Create ".env.local" if it doesn't exist yet
+    - Open it in TextEdit so you can type your API key and Firebase values
+
+  4) Save in TextEdit (Cmd+S), close TextEdit.
+
+  5) Start the website:
+
+npm run dev
+
+================================================================================

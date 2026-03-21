@@ -1,0 +1,20 @@
+# ---------------------------------------------------------------------------
+# HOW TO USE THIS FILE
+# 1) Fill in your keys below (same format as .env.example).
+# 2) Save, then duplicate this file and rename the copy to exactly:  .env.local
+#    OR in Terminal (from this folder):  cp local-env-template.txt .env.local
+# Next.js only reads ".env.local" (with the dot), not this filename.
+# ---------------------------------------------------------------------------
+
+# OpenAI (server only — never expose to client)
+OPENAI_API_KEY=
+# Model id (e.g. gpt-4o-mini). Use your project’s approved model name.
+OPENAI_MODEL=gpt-4o-mini
+
+# Firebase (client — safe to expose with proper Firestore rules)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=

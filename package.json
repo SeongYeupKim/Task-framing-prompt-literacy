@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "setup:env": "node scripts/setup-env.js",
+    "check:env": "node scripts/check-env.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

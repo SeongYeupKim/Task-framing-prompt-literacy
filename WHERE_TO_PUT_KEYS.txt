@@ -1,0 +1,21 @@
+================================================================================
+  YOUR SECRETS GO IN ONLY ONE FILE
+================================================================================
+
+File name:  .env.local
+Location:   task-framing-study folder (same folder as package.json)
+
+EASIEST WAY (you don't need to find the file in Cursor):
+
+  1) Open Terminal
+  2) cd into the task-framing-study folder
+  3) Run:   npm run setup:env
+
+  That creates .env.local if needed and opens it in TextEdit.
+
+Full steps: see START-HERE-ENV.txt in this folder.
+
+Do NOT put secrets in the parent "Prompt literacy" folder — only
+task-framing-study/.env.local is used.
+
+================================================================================
