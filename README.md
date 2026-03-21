@@ -6,7 +6,7 @@ Next.js app for a randomized three-condition study: **training** → optional **
 
 **New to Firebase / `.env`?** Follow the full walkthrough: **[SETUP.md](./SETUP.md)**.
 
-**Deploy to Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)** (env vars on Vercel + Firebase authorized domains).
+**Deploy to Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)** — set project name **`taskframing`** for **`https://taskframing.vercel.app`**, add env vars + Firebase authorized domain.
 
 ## Setup
 

@@ -1,50 +1,57 @@
-# Deploy to Vercel (fix “doesn’t work” on live URL)
+# Deploy to Vercel
 
 Your app **must** have the **same environment variables on Vercel** as on your Mac (`.env.local` is **not** uploaded to GitHub).
+
+**GitHub repo:** [SeongYeupKim/Task-framing-prompt-literacy](https://github.com/SeongYeupKim/Task-framing-prompt-literacy)  
+The Next.js app lives at the **repository root** (where `package.json` is). On Vercel, leave **Root Directory** empty unless you use a monorepo.
+
+---
+
+## Target URL: `https://taskframing.vercel.app`
+
+Vercel gives you **`https://<project-name>.vercel.app`**. The name is set in the **Vercel dashboard**, not in Git.
+
+1. **[vercel.com](https://vercel.com)** → open your project (or import the GitHub repo first).
+2. **Settings** → **General** → **Project Name**.
+3. Set the name to **`taskframing`** → **Save**.
+
+If that name is already taken on Vercel, try e.g. `taskframing-study` or `task-framing-psu` — your URL will match: `https://<that-name>.vercel.app`.
+
+4. After the first successful deploy, open **`https://taskframing.vercel.app`** (or your chosen name).
+
+5. **Firebase → Authentication → Settings → Authorized domains** → **Add domain** →  
+   **`taskframing.vercel.app`** (no `https://`) so **Register / Login** works on production.
 
 ---
 
 ## 1. Push latest code to GitHub
 
-From the `task-framing-study` folder:
-
 ```bash
+cd task-framing-study
 git add -A
 git status
-git commit -m "Update: setup scripts, docs, env check"
+git commit -m "Your message"
 git push origin main
 ```
 
-If `git push` asks for login, use GitHub Desktop or a [Personal Access Token](https://github.com/settings/tokens).
+---
+
+## 2. Import / connect on Vercel
+
+1. **Add New…** → **Project** → **Import** `Task-framing-prompt-literacy`.
+2. **Framework preset:** Next.js (auto).
+3. **Root Directory:** leave **empty** (repo root = app).
+4. **Deploy** (build may fail until env vars are added — add them and **Redeploy**).
 
 ---
 
-## 2. Import / redeploy on Vercel
+## 3. Environment variables (required)
 
-1. Go to **[vercel.com](https://vercel.com)** → log in.
-2. **Add New…** → **Project** → **Import** your repo:  
-   `SeongYeupKim/Task-framing-prompt-literacy`
-3. Framework: **Next.js** (auto-detected). Root directory: **`task-framing-study`** if the repo contains that subfolder — see below.
+**Settings** → **Environment Variables** — add **every** line from your local `.env.local`:
 
-### If your GitHub repo root **is** `task-framing-study` (only app files at top level)
-
-- Root directory: **`.`** (leave default).
-
-### If your GitHub repo has the app **inside** a folder
-
-- In Vercel project **Settings → General → Root Directory** → set to **`task-framing-study`** → Save → **Redeploy**.
-
----
-
-## 3. Add environment variables (required)
-
-Vercel → your project → **Settings** → **Environment Variables**.
-
-Add **every** variable from your local `.env.local` (same names, same values):
-
-| Name | Notes |
-|------|--------|
-| `OPENAI_API_KEY` | **Sensitive** — Production (and Preview if you want previews to work) |
+| Name | Environment |
+|------|-------------|
+| `OPENAI_API_KEY` | Production (+ Preview if you use preview URLs) |
 | `OPENAI_MODEL` | e.g. `gpt-4o-mini` |
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | |
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | |
@@ -53,42 +60,48 @@ Add **every** variable from your local `.env.local` (same names, same values):
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | |
 
-- Enable **Production** (and **Preview** / **Development** if you test those).
-- **Save** → **Deployments** → open latest deployment → **⋯** → **Redeploy** (so new env vars apply).
+**Save** → **Deployments** → **⋯** → **Redeploy**.
 
-**Missing `OPENAI_API_KEY` on Vercel** is the most common reason chat fails on the live site while localhost works.
+Missing **`OPENAI_API_KEY`** on Vercel is the #1 reason chat works locally but not online.
 
 ---
 
-## 4. Firebase: allow your Vercel domain
+## 4. Firebase: authorized domain
 
-Otherwise **login / register** fails on `https://….vercel.app`.
-
-1. **[Firebase Console](https://console.firebase.google.com)** → your project.
-2. **Authentication** → **Settings** tab → **Authorized domains**.
-3. **Add domain** → enter your Vercel host, e.g. `your-project.vercel.app` (no `https://`).
-4. Save.
+Add your exact Vercel hostname, e.g. **`taskframing.vercel.app`**, under **Authentication → Settings → Authorized domains**.
 
 ---
 
 ## 5. Firestore rules
 
-Same as local: publish rules from `firestore.rules` in this repo (Firestore → **Rules** → Publish).
+Publish the same rules as local: copy **`firestore.rules`** → Firebase **Firestore → Rules** → **Publish**.
 
 ---
 
-## 6. Quick test after deploy
+## 6. Smoke test
 
-1. Open `https://YOUR-PROJECT.vercel.app`
-2. **Register** a new test account.
-3. If errors: Vercel → **Deployments** → click deployment → **Build Logs** / **Runtime Logs** for errors.
+1. Open `https://taskframing.vercel.app` (or your project URL).
+2. **Register** → **/study** → send one chat message.
+3. Errors: **Deployments** → build / **Runtime Logs** (no API keys in screenshots).
 
 ---
 
-## Checklist if “it doesn’t work”
+## Checklist if something fails
 
-- [ ] All env vars added on Vercel (especially `OPENAI_API_KEY`).
-- [ ] Redeploy after changing env vars.
-- [ ] **Root directory** in Vercel = folder that contains `package.json`.
-- [ ] Firebase **Authorized domains** includes `*.vercel.app` or your exact hostname.
-- [ ] Firestore rules published.
+- [ ] Env vars set on Vercel + **Redeploy** after changes.
+- [ ] **Project name** = `taskframing` if you want `taskframing.vercel.app`.
+- [ ] Firebase **Authorized domains** includes that hostname.
+- [ ] **Root directory** = empty (this repo layout).
+
+---
+
+## CLI (optional)
+
+```bash
+npm i -g vercel
+cd task-framing-study
+vercel login
+vercel --prod
+```
+
+Link the project to the same GitHub repo in the dashboard so pushes auto-deploy.
