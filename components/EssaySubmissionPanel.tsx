@@ -42,27 +42,59 @@ export function EssaySubmissionPanel({
     <form
       onSubmit={(e) => void handleSubmit(e)}
       className={`rounded-2xl border border-student-border bg-student-card shadow-student ${
-        embedded ? "flex max-h-[min(85vh,900px)] flex-col p-5" : "mx-auto max-w-3xl p-6 sm:p-8"
+        embedded
+          ? "flex h-full min-h-0 max-h-full flex-col overflow-hidden p-5"
+          : "mx-auto max-w-3xl p-6 sm:p-8"
       }`}
     >
-      <div className={embedded ? "min-h-0 flex-1 overflow-y-auto" : ""}>
+      <div
+        className={
+          embedded
+            ? "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5"
+            : ""
+        }
+      >
         <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
           Your essay
         </p>
         <h2 className="mt-1 text-lg font-semibold text-student-ink">
           {GENAI_TASK.title}
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-student-ink">
-          Write your own explanation. You can use ideas from the chat in the
-          middle—scroll there if you need to. Aim for about{" "}
-          <span className="font-medium">300 words</span> and cover the task
-          points from the first column as best you can.
-        </p>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed text-student-ink">
+          <p>
+            <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
+              Write in your own words.
+            </span>{" "}
+            You may use ideas from the chat in the middle column—scroll there
+            anytime to reread the assistant’s replies.
+          </p>
+          <p>
+            Aim for about{" "}
+            <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
+              ~300 words
+            </span>{" "}
+            and address the{" "}
+            <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
+              task conditions
+            </span>{" "}
+            listed in the first column (accuracy, examples, reasoning, and
+            audience-appropriate explanation).
+          </p>
+          <p className="text-student-muted">
+            When you submit, your{" "}
+            <span className="font-bold text-student-ink underline decoration-teal-600 decoration-2 underline-offset-2">
+              essay and full chat log
+            </span>{" "}
+            are saved together for the study.
+          </p>
+        </div>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          rows={embedded ? 14 : 18}
-          className="mt-4 w-full rounded-xl border border-student-border bg-white px-3 py-3 text-sm leading-relaxed text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          rows={embedded ? 10 : 18}
+          className={`mt-4 w-full rounded-xl border border-student-border bg-white px-3 py-3 text-sm leading-relaxed text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${
+            embedded ? "min-h-[11rem] resize-y" : ""
+          }`}
           placeholder="Start typing your essay…"
         />
         <p className="mt-2 text-xs text-student-muted">

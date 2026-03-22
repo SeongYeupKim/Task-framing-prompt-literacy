@@ -5,6 +5,7 @@ export function getNextPhaseAfter(
   condition: StudyCondition,
   completed: StudyPhase
 ): StudyPhase | null {
+  if (completed === "ai_acceptance") return "training";
   if (completed === "training") {
     if (condition === "control") return "genai";
     return "eval1";
@@ -23,6 +24,8 @@ export function getNextPhaseAfter(
 /** Short label for the header (student-friendly). */
 export function phaseLabel(phase: StudyPhase): string {
   switch (phase) {
+    case "ai_acceptance":
+      return "AI acceptance";
     case "training":
       return "Read the introduction";
     case "eval1":

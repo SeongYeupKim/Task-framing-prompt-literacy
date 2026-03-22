@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
 import { formatAuthError } from "@/lib/firebaseErrors";
+import { isPennStateEmail } from "@/lib/psuEmail";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,10 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!isPennStateEmail(email)) {
+      setError("Please sign in with your Penn State email (ending in @psu.edu).");
+      return;
+    }
     setLoading(true);
     try {
       await signInWithEmailAndPassword(getClientAuth(), email, password);
@@ -35,6 +40,14 @@ export default function LoginPage() {
         <p className="mt-2 text-sm text-student-muted">
           Use the email and password you registered with.
         </p>
+        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
+          <p className="font-semibold text-teal-900">University email</p>
+          <p className="mt-1 text-teal-900/90">
+            Sign in with your <strong>Penn State email</strong> (
+            <code className="rounded bg-white/80 px-1 py-0.5 text-xs">@psu.edu</code>
+            ).
+          </p>
+        </div>
         <form onSubmit={(e) => void handleSubmit(e)} className="mt-8 space-y-4">
           <div>
             <label className="text-sm font-medium text-student-ink">Email</label>
@@ -42,6 +55,7 @@ export default function LoginPage() {
               type="email"
               autoComplete="email"
               required
+              placeholder="you123@psu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"

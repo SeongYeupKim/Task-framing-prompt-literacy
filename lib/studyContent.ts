@@ -96,8 +96,12 @@ export function getTrainingClosingParagraphs(isControl: boolean): (string | Text
 /** Sleep task — task conditions match study materials. */
 export const EVAL1_SCENARIO = {
   title: "How Sleep Affects Learning",
-  scenario:
-    "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning. As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations. Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT and two source texts: Text A focuses on the scientific explanation of sleep, including how sleep supports brain functions such as memory consolidation, attention, and information processing. It includes some technical ideas about how the brain works during sleep. Text B focuses on practical learning outcomes, explaining how sleep affects students’ daily academic experiences, such as concentration in class, completing assignments, and overall academic performance.",
+  /** Paragraphs for the scenario (no source-text details). */
+  scenario: [
+    "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning.",
+    "As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations.",
+    "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
+  ],
   taskConditions: [
     "Avoid misinformation: Make sure the explanation is based on the evidence.",
     "Conceptual connection: Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
@@ -121,7 +125,7 @@ export const EVAL1_SCENARIO = {
     studentB: {
       label: "Student B",
       prompts: [
-        "Using these two texts, explain how sleep affects learning for students with different reading levels.",
+        "Explain how sleep affects learning for students with different reading levels.",
         "Focus on how sleep supports brain processes like memory and attention and how those lead to outcomes like focus and grades.",
         "Make sure the explanation shows how these ideas are connected, not just listed.",
         "Write it as a clear paragraph (about 250–300 words) using language that is easy to understand but still accurate.",
@@ -143,8 +147,11 @@ export const EVAL1_SCENARIO = {
 
 export const EVAL2_SCENARIO = {
   title: "Should You Use Smartphones While Studying?",
-  scenario:
-    "Three students are working as youth advisors for a local community center that runs after-school study programs. The center is preparing a short guide for students called “Smart Study Habits,” which will be shared during orientation sessions to help students improve how they study. As part of this guide, the students have been asked to develop a short explanation titled: “Should You Use Smartphones While Studying?” This explanation will be presented to 9th-grade students with mixed reading abilities during an orientation session. Some students are confident readers, while others may find complex or abstract explanations difficult to follow. Therefore, the explanation needs to be clear, engaging, and easy to understand, while still being accurate and thoughtful. To complete this task, the students are provided with ChatGPT and two source texts: Text A explains how smartphones can negatively affect learning, focusing on distraction, multitasking, and reduced attention. It also includes some cognitive explanations about how attention and working memory are disrupted. Text B explains how smartphones can support learning when used effectively, such as accessing educational resources, organizing tasks, and supporting self-regulated learning.",
+  scenario: [
+    "Three students are working as youth advisors for a local community center that runs after-school study programs. The center is preparing a short guide for students called “Smart Study Habits,” which will be shared during orientation sessions to help students improve how they study.",
+    "As part of this guide, the students have been asked to develop a short explanation titled: “Should You Use Smartphones While Studying?” This explanation will be presented to 9th-grade students with mixed reading abilities during an orientation session. Some students are confident readers, while others may find complex or abstract explanations difficult to follow.",
+    "Therefore, the explanation needs to be clear, engaging, and easy to understand, while still being accurate and thoughtful. To complete this task, the students are provided with ChatGPT.",
+  ],
   taskConditions: [
     "Avoid misinformation: Ensure the explanation is based on evidence.",
     "Conceptual balance: Present both the benefits and drawbacks of smartphone use for studying.",
@@ -159,7 +166,7 @@ export const EVAL2_SCENARIO = {
     studentA: {
       label: "Student A",
       prompts: [
-        "Using the two texts, explain the effectiveness of smartphones in studying.",
+        "Explain the effectiveness of smartphones in studying.",
         "Can you explain both negative effects (e.g., distraction, reduced attention) and positive uses (e.g., learning tools, organization)?",
         "Focus on explaining under what conditions smartphones help or harm learning, rather than simply saying they are good or bad.",
         "Write the explanation to help students make better decisions about their own study habits.",

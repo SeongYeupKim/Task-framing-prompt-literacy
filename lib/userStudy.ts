@@ -1,10 +1,4 @@
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import { getClientDb } from "@/lib/firebase";
 import type {
@@ -46,11 +40,11 @@ export async function ensureUserStudyDoc(user: User): Promise<{
     await setDoc(ref, {
       email: user.email ?? "",
       condition,
-      phase: "training" as StudyPhase,
+      phase: "ai_acceptance" as StudyPhase,
       createdAt: now,
       updatedAt: now,
     });
-    return { condition, phase: "training" };
+    return { condition, phase: "ai_acceptance" };
   }
 
   const data = snap.data() as {
@@ -59,7 +53,7 @@ export async function ensureUserStudyDoc(user: User): Promise<{
   };
   return {
     condition: data.condition ?? "control",
-    phase: data.phase ?? "training",
+    phase: data.phase ?? "ai_acceptance",
   };
 }
 
@@ -68,6 +62,18 @@ export async function updateUserPhase(uid: string, phase: StudyPhase) {
   const ref = doc(db, COLLECTION, uid);
   await updateDoc(ref, {
     phase,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+/** Saves 20 Likert values (1–5) and advances to the training / introduction phase. */
+export async function saveAiAcceptance(uid: string, responses: number[]) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  await updateDoc(ref, {
+    aiAcceptanceResponses: responses,
+    aiAcceptanceCompletedAt: new Date().toISOString(),
+    phase: "training",
     updatedAt: new Date().toISOString(),
   });
 }
@@ -103,11 +109,20 @@ export async function saveGenaiMessages(uid: string, messages: ChatMessage[]) {
   });
 }
 
-export async function saveEssay(uid: string, essayText: string) {
+/**
+ * Saves final essay and a snapshot of the GenAI chat log in one write
+ * so analysis can pair submission with the full conversation.
+ */
+export async function saveEssay(
+  uid: string,
+  essayText: string,
+  genaiMessages: ChatMessage[]
+) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
   await updateDoc(ref, {
     essayText,
+    genaiMessages,
     essaySubmittedAt: new Date().toISOString(),
     phase: "complete",
     updatedAt: new Date().toISOString(),

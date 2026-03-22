@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { EvalCaseId, EvaluationTaskSubmission } from "@/types/study";
+import { TaskConditionLine } from "@/components/TaskConditionLine";
 
 type CaseDef = {
   label: string;
@@ -11,7 +12,8 @@ type CaseDef = {
 type Props = {
   taskKey: "eval1" | "eval2";
   title: string;
-  scenario: string;
+  /** One or more paragraphs for the scenario */
+  scenario: string[];
   taskConditions: string[];
   cases: {
     studentA: CaseDef;
@@ -30,11 +32,11 @@ function PromptMessageThread({ prompts, label }: { prompts: string[]; label: str
       <p className="mb-2 text-center text-xs font-medium uppercase tracking-wide text-student-muted">
         {label} — messages to the AI
       </p>
-      <div className="rounded-3xl bg-slate-300/40 p-3 shadow-inner">
-        <div className="max-h-[min(420px,55vh)] space-y-2 overflow-y-auto pr-1">
+      <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
+        <div className="max-h-[min(420px,55vh)] space-y-2.5 overflow-y-auto pr-1">
           {prompts.map((text, i) => (
             <div key={i} className="flex justify-end">
-              <div className="max-w-[95%] rounded-2xl rounded-br-md bg-teal-600 px-3.5 py-2 text-[0.8125rem] leading-snug text-white shadow-sm">
+              <div className="max-w-[95%] rounded-2xl rounded-br-md border border-stone-200 bg-white px-3.5 py-2.5 text-[0.9375rem] leading-relaxed text-neutral-900 shadow-sm">
                 {text}
               </div>
             </div>
@@ -170,14 +172,21 @@ export function EvaluationTaskView({
           Scenario
         </p>
         <h2 className="mt-1 text-xl font-semibold text-student-ink">{title}</h2>
-        <p className="mt-3 text-base leading-relaxed text-student-ink">{scenario}</p>
-        <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
+        <div className="mt-3 space-y-3 text-base leading-relaxed text-student-ink">
+          {scenario.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
+        <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-student-muted">
           Task conditions (the explanation should satisfy all of these)
         </h3>
-        <ul className="mt-2 space-y-2 text-sm leading-relaxed text-student-ink">
+        <ul className="mt-3 space-y-3 text-student-ink">
           {taskConditions.map((c) => (
-            <li key={c} className="flex gap-2 border-l-2 border-teal-400 pl-3">
-              <span>{c}</span>
+            <li
+              key={c}
+              className="border-l-[3px] border-teal-500 pl-4 leading-relaxed"
+            >
+              <TaskConditionLine text={c} />
             </li>
           ))}
         </ul>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
 import { formatAuthError } from "@/lib/firebaseErrors";
+import { isPennStateEmail } from "@/lib/psuEmail";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +20,10 @@ export default function RegisterPage() {
     setError(null);
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (!isPennStateEmail(email)) {
+      setError("Please use your Penn State email address (ending in @psu.edu).");
       return;
     }
     setLoading(true);
@@ -42,6 +47,14 @@ export default function RegisterPage() {
           You’ll get a study path at random. Your responses are used only for
           this research.
         </p>
+        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
+          <p className="font-semibold text-teal-900">University email</p>
+          <p className="mt-1 text-teal-900/90">
+            Register and sign in with your <strong>Penn State email</strong>{" "}
+            (must end in <code className="rounded bg-white/80 px-1 py-0.5 text-xs">@psu.edu</code>
+            ).
+          </p>
+        </div>
         <form onSubmit={(e) => void handleSubmit(e)} className="mt-8 space-y-4">
           <div>
             <label className="text-sm font-medium text-student-ink">Email</label>
@@ -49,6 +62,7 @@ export default function RegisterPage() {
               type="email"
               autoComplete="email"
               required
+              placeholder="you123@psu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"

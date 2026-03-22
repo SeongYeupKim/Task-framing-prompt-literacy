@@ -2,7 +2,7 @@
 
 **Repository:** [github.com/SeongYeupKim/Task-framing-prompt-literacy](https://github.com/SeongYeupKim/Task-framing-prompt-literacy)
 
-Next.js app for a randomized three-condition study: **training** → optional **evaluation tasks** → **GenAI chat** → **essay**, with Firebase Auth + Firestore and OpenAI chat API (server-side).
+Next.js app for a randomized three-condition study: **AI acceptance (Likert)** → **training** → optional **evaluation tasks** → **GenAI chat** → **essay**, with Firebase Auth + Firestore and OpenAI chat API (server-side). Participants **register and sign in with a Penn State `@psu.edu` email** (enforced on the auth forms).
 
 **New to Firebase / `.env`?** Follow the full walkthrough: **[SETUP.md](./SETUP.md)**.
 
@@ -51,13 +51,14 @@ Next.js app for a randomized three-condition study: **training** → optional **
 
 | Condition   | Flow |
 |------------|------|
-| `control`  | Training → GenAI → Essay → Complete |
-| `two_eval` | Training → Evaluation 1 → GenAI → Essay → Complete |
-| `four_eval`| Training → Evaluation 1 → Evaluation 2 → GenAI → Essay → Complete |
+| `control`  | AI acceptance → Training → GenAI → Essay → Complete |
+| `two_eval` | AI acceptance → Training → Evaluation 1 → GenAI → Essay → Complete |
+| `four_eval`| AI acceptance → Training → Evaluation 1 → Evaluation 2 → GenAI → Essay → Complete |
 
 ## Data stored (per user document `users/{uid}`)
 
 - `condition`, `phase`, timestamps  
+- `aiAcceptanceResponses`: array of **20** integers (1–5 Likert), `aiAcceptanceCompletedAt`  
 - `eval1` / `eval2`: ratings 1–6 and rationales for Students A/B/C  
 - `genaiMessages`: full chat log  
 - `essayText`, `essaySubmittedAt`

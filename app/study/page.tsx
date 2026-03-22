@@ -11,15 +11,19 @@ import {
   saveEvaluationSubmission,
   saveEssay,
   saveGenaiMessages,
+  saveAiAcceptance,
   updateUserPhase,
 } from "@/lib/userStudy";
 import { getNextPhaseAfter, phaseLabel } from "@/lib/studyFlow";
 import { getPhaseProgress } from "@/lib/studyProgress";
 import { EVAL1_SCENARIO, EVAL2_SCENARIO, GENAI_TASK } from "@/lib/studyContent";
+import { AiAcceptanceSurvey } from "@/components/AiAcceptanceSurvey";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { EvaluationTaskView } from "@/components/EvaluationTaskView";
 import { GenAIInteractionPanel } from "@/components/GenAIInteractionPanel";
 import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
+import { TaskConditionLine } from "@/components/TaskConditionLine";
+import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
   ChatMessage,
   EvaluationTaskSubmission,
@@ -35,6 +39,7 @@ export default function StudyPage() {
   const [phase, setPhase] = useState<StudyPhase | null>(null);
   const [genaiMessages, setGenaiMessages] = useState<ChatMessage[]>([]);
   const [essayDraft, setEssayDraft] = useState("");
+  const [aiAcceptanceDone, setAiAcceptanceDone] = useState(false);
 
   useEffect(() => {
     const auth = getClientAuth();
@@ -49,11 +54,18 @@ export default function StudyPage() {
       setPhase(info.phase);
       const doc = await getUserStudyDoc(user.uid);
       if (doc?.genaiMessages?.length) {
-        setGenaiMessages(doc.genaiMessages);
+        setGenaiMessages(
+          doc.genaiMessages.map((m) =>
+            m.role === "assistant"
+              ? { ...m, content: stripMarkdownForChat(m.content) }
+              : m
+          )
+        );
       }
       if (doc?.essayText) {
         setEssayDraft(doc.essayText);
       }
+      setAiAcceptanceDone(!!doc?.aiAcceptanceCompletedAt);
       setReady(true);
     });
   }, [router]);
@@ -61,6 +73,13 @@ export default function StudyPage() {
   async function handleLogout() {
     await signOut(getClientAuth());
     router.replace("/");
+  }
+
+  async function handleAiAcceptanceSubmit(responses: number[]) {
+    if (!uid) return;
+    await saveAiAcceptance(uid, responses);
+    setAiAcceptanceDone(true);
+    setPhase("training");
   }
 
   async function handleTrainingDone() {
@@ -98,7 +117,7 @@ export default function StudyPage() {
 
   async function handleEssaySubmit(text: string) {
     if (!uid) return;
-    await saveEssay(uid, text);
+    await saveEssay(uid, text, genaiMessages);
     setPhase("complete");
   }
 
@@ -111,7 +130,15 @@ export default function StudyPage() {
     );
   }
 
-  const { step, total } = getPhaseProgress(condition, phase);
+  const showAiAcceptance =
+    !aiAcceptanceDone &&
+    (phase === "ai_acceptance" || phase === "training");
+
+  const effectivePhase: StudyPhase = showAiAcceptance
+    ? "ai_acceptance"
+    : phase!;
+
+  const { step, total } = getPhaseProgress(condition, effectivePhase);
 
   return (
     <div className="min-h-screen bg-student-canvas pb-16">
@@ -129,7 +156,7 @@ export default function StudyPage() {
                 Step {step} of {total}
               </p>
               <p className="mt-0.5 text-lg font-semibold text-student-ink">
-                {phaseLabel(phase)}
+                {phaseLabel(effectivePhase)}
               </p>
             </div>
             <button
@@ -150,7 +177,11 @@ export default function StudyPage() {
             : "max-w-4xl"
         }`}
       >
-        {phase === "training" && (
+        {showAiAcceptance && (
+          <AiAcceptanceSurvey onSubmit={handleAiAcceptanceSubmit} />
+        )}
+
+        {!showAiAcceptance && phase === "training" && (
           <div className="space-y-8">
             <TrainingPanel isControl={condition === "control"} />
             <div className="flex justify-center pb-8">
@@ -169,7 +200,7 @@ export default function StudyPage() {
           <EvaluationTaskView
             taskKey="eval1"
             title={EVAL1_SCENARIO.title}
-            scenario={EVAL1_SCENARIO.scenario}
+            scenario={[...EVAL1_SCENARIO.scenario]}
             taskConditions={[...EVAL1_SCENARIO.taskConditions]}
             cases={EVAL1_SCENARIO.cases}
             onSubmit={handleEvalSubmit}
@@ -180,7 +211,7 @@ export default function StudyPage() {
           <EvaluationTaskView
             taskKey="eval2"
             title={EVAL2_SCENARIO.title}
-            scenario={EVAL2_SCENARIO.scenario}
+            scenario={[...EVAL2_SCENARIO.scenario]}
             taskConditions={[...EVAL2_SCENARIO.taskConditions]}
             cases={EVAL2_SCENARIO.cases}
             onSubmit={handleEvalSubmit}
@@ -188,27 +219,37 @@ export default function StudyPage() {
         )}
 
         {(phase === "genai" || phase === "essay") && (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start xl:gap-5">
-            {/* Column 1: scenario + task conditions */}
-            <aside className="space-y-4 xl:col-span-3">
-              <div className="xl:sticky xl:top-28">
-                <div className="rounded-2xl border border-student-border bg-student-card p-5 shadow-student sm:p-6">
+          <div
+            className={`grid grid-cols-1 gap-6 xl:grid-cols-3 xl:grid-rows-1 xl:items-stretch xl:gap-5 xl:min-h-0 ${
+              /* Same row height on large screens; each column scrolls inside */
+              "xl:h-[calc(100vh-10rem)] xl:max-h-[calc(100vh-10rem)]"
+            }`}
+          >
+            {/* Column 1: scenario + task conditions (scroll inside) */}
+            <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student p-5 sm:p-6">
+                <div className="shrink-0">
                   <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
                     Scenario
                   </p>
                   <h2 className="mt-1 text-lg font-semibold leading-snug text-student-ink">
                     {GENAI_TASK.title}
                   </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-student-ink">
+                </div>
+                <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+                  <p className="text-sm leading-relaxed text-student-ink">
                     {GENAI_TASK.scenario}
                   </p>
                   <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
                     Task conditions
                   </h3>
-                  <ul className="mt-2 max-h-[min(40vh,360px)] space-y-2 overflow-y-auto text-sm leading-relaxed text-student-ink">
+                  <ul className="mt-2 space-y-3 text-student-ink">
                     {GENAI_TASK.taskConditions.map((c) => (
-                      <li key={c} className="border-l-2 border-teal-400 pl-3">
-                        {c}
+                      <li
+                        key={c}
+                        className="border-l-[3px] border-teal-500 pl-3 leading-relaxed"
+                      >
+                        <TaskConditionLine text={c} />
                       </li>
                     ))}
                   </ul>
@@ -216,22 +257,23 @@ export default function StudyPage() {
               </div>
             </aside>
 
-            {/* Column 2: chat (wide) */}
-            <div className="xl:col-span-5">
+            {/* Column 2: chat — fixed column height; messages scroll inside */}
+            <div className="flex min-h-[min(52vh,560px)] min-w-0 flex-col xl:min-h-0 xl:h-full">
               <GenAIInteractionPanel
                 messages={genaiMessages}
                 onMessagesChange={persistMessages}
+                className="h-full min-h-0 flex-1"
               />
             </div>
 
-            {/* Column 3: essay prompt or essay form */}
-            <aside className="space-y-4 xl:col-span-4">
-              <div className="xl:sticky xl:top-28">
+            {/* Column 3: essay prompt or essay form (same height; scroll inside) */}
+            <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                 {phase === "genai" && (
-                  <div className="rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student">
+                  <div className="flex h-full min-h-[min(52vh,280px)] flex-col justify-center overflow-y-auto rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student xl:h-full xl:min-h-0">
                     <p className="text-sm leading-relaxed text-student-ink">
                       When you’re ready to write, open the essay panel. Your
-                      chat stays in the middle so you can scroll back anytime.
+                      chat stays in the middle column—scroll there anytime.
                     </p>
                     <button
                       type="button"
@@ -243,11 +285,13 @@ export default function StudyPage() {
                   </div>
                 )}
                 {phase === "essay" && (
-                  <EssaySubmissionPanel
-                    embedded
-                    initialText={essayDraft}
-                    onSubmit={handleEssaySubmit}
-                  />
+                  <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+                    <EssaySubmissionPanel
+                      embedded
+                      initialText={essayDraft}
+                      onSubmit={handleEssaySubmit}
+                    />
+                  </div>
                 )}
               </div>
             </aside>

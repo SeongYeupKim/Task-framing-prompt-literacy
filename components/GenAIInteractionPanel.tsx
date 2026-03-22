@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import type { ChatMessage } from "@/types/study";
+import { stripMarkdownForChat } from "@/lib/chatPlainText";
 
 type Props = {
   messages: ChatMessage[];
@@ -53,9 +54,10 @@ export function GenAIInteractionPanel({
       if (!res.ok) {
         throw new Error(data.error || "Request failed");
       }
+      const cleaned = stripMarkdownForChat(String(data.message ?? ""));
       const assistantMsg: ChatMessage = {
         role: "assistant",
-        content: data.message as string,
+        content: cleaned,
         createdAt: new Date().toISOString(),
       };
       onMessagesChange([...next, assistantMsg]);
@@ -69,20 +71,21 @@ export function GenAIInteractionPanel({
 
   return (
     <div
-      className={`flex min-h-[min(78vh,820px)] flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student ${className}`}
+      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student ${className}`}
     >
-      <div className="border-b border-student-border bg-teal-50/50 px-4 py-4 sm:px-5">
+      <div className="shrink-0 border-b border-student-border bg-teal-50/50 px-4 py-3.5 sm:px-5">
         <h2 className="text-base font-semibold text-student-ink">
-          Chat with the assistant
+          Chat with the AI
         </h2>
-        <p className="mt-1 text-xs text-student-muted">
-          Send as many messages as you need. Scroll up to reread earlier replies.
+        <p className="mt-1 text-xs leading-snug text-student-muted">
+          Send as many messages as you need. This column stays the same height as
+          the scenario and essay—scroll inside here to read older messages.
         </p>
       </div>
       <div className="flex min-h-0 flex-1 flex-col bg-student-canvas/40">
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
           {messages.length === 0 && (
-            <p className="rounded-xl bg-white/90 px-3 py-2 text-sm text-student-muted">
+            <p className="rounded-xl bg-white/90 px-3 py-2.5 text-[0.9375rem] leading-relaxed text-student-muted">
               Type a message below to start—for example, “Help me outline my
               essay” or “What’s one way exercise could affect attention?”
             </p>
@@ -93,13 +96,17 @@ export function GenAIInteractionPanel({
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-[0.9375rem] leading-relaxed ${
                   m.role === "user"
-                    ? "rounded-br-md bg-teal-600 text-white shadow-sm"
-                    : "border border-student-border bg-white text-student-ink shadow-sm"
+                    ? "rounded-br-md border border-teal-700 bg-white text-neutral-900 shadow-sm"
+                    : "border border-stone-200 bg-white text-neutral-900 shadow-sm"
                 }`}
               >
-                <p className="whitespace-pre-wrap">{m.content}</p>
+                <p className="whitespace-pre-wrap">
+                  {m.role === "assistant"
+                    ? stripMarkdownForChat(m.content)
+                    : m.content}
+                </p>
               </div>
             </div>
           ))}

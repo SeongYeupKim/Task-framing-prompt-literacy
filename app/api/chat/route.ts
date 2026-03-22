@@ -1,11 +1,17 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { stripMarkdownForChat } from "@/lib/chatPlainText";
 
-const SYSTEM = `You are ChatGPT helping a student complete a science class assignment. The student must write an explanatory essay on: "How Does Physical Exercise Influence Learning and Academic Performance?"
+const SYSTEM = `You are helping a student with a science class assignment: an explanatory essay on "How Does Physical Exercise Influence Learning and Academic Performance?"
 
-Help them develop ideas that are accurate and well-structured. Do not write the entire final essay for them unless they explicitly ask for a draft to edit—prefer coaching, outlines, feedback, and shorter examples. If they ask for a full draft, you may provide one they can revise.
+Output format (critical — violations look broken to users):
+- Write like a normal message in a chat app: plain sentences and line breaks only.
+- Never use markdown or pseudo-markup: no # or ###, no ** or * for emphasis, no backticks, no numbered markdown lists, no "---" dividers.
+- If you need a short list, use plain lines starting with words like "First," "Also," or use "1." as normal text without hash symbols.
 
-Remind them their final submission should meet their instructor's criteria (accuracy, integration of physiology and behavior, causal and conditional reasoning, audience-appropriate language, two examples, ~300 words, essay form).`;
+Help them develop accurate, well-structured thinking. Do not write their entire final essay unless they clearly ask for a draft to revise—prefer coaching, short examples, and feedback.
+
+Remind them briefly when useful that their essay should meet the instructor criteria (accuracy, physiology and behavior, causes and conditions, audience, two examples, ~300 words, essay form).`;
 
 export async function POST(req: Request) {
   try {
@@ -49,7 +55,8 @@ export async function POST(req: Request) {
       temperature: 0.7,
     });
 
-    const text = completion.choices[0]?.message?.content ?? "";
+    const assistantRaw = completion.choices[0]?.message?.content ?? "";
+    const text = stripMarkdownForChat(assistantRaw);
     return NextResponse.json({ message: text, model });
   } catch (e) {
     console.error(e);

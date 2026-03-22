@@ -2,9 +2,17 @@ import type { StudyCondition, StudyPhase } from "@/types/study";
 
 /** Phases each participant actually sees (order matters). */
 const FLOW: Record<StudyCondition, StudyPhase[]> = {
-  control: ["training", "genai", "essay", "complete"],
-  two_eval: ["training", "eval1", "genai", "essay", "complete"],
-  four_eval: ["training", "eval1", "eval2", "genai", "essay", "complete"],
+  control: ["ai_acceptance", "training", "genai", "essay", "complete"],
+  two_eval: ["ai_acceptance", "training", "eval1", "genai", "essay", "complete"],
+  four_eval: [
+    "ai_acceptance",
+    "training",
+    "eval1",
+    "eval2",
+    "genai",
+    "essay",
+    "complete",
+  ],
 };
 
 export function getPhaseProgress(
