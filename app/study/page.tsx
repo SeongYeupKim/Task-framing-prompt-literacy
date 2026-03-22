@@ -131,6 +131,14 @@ export default function StudyPage() {
     setPhase("complete");
   }
 
+  /** Scroll to top when the study step changes (SPA navigation). */
+  useEffect(() => {
+    if (!ready || !phase) return;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [phase, ready, aiAcceptanceDone]);
+
   if (!ready || !uid || !condition || !phase) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-student-canvas px-6 text-student-muted">
@@ -182,7 +190,10 @@ export default function StudyPage() {
 
       <main
         className={`mx-auto px-3 pt-8 sm:px-4 ${
-          phase === "genai" || phase === "essay"
+          phase === "genai" ||
+          phase === "essay" ||
+          phase === "eval1" ||
+          phase === "eval2"
             ? "max-w-[1920px]"
             : "max-w-4xl"
         }`}

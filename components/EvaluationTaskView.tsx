@@ -33,7 +33,7 @@ function PromptMessageThread({ prompts, label }: { prompts: string[]; label: str
         {label} — messages to the AI
       </p>
       <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
-        <div className="max-h-[min(420px,55vh)] space-y-2.5 overflow-y-auto pr-1">
+        <div className="max-h-[min(360px,45vh)] space-y-2.5 overflow-y-auto pr-1 lg:max-h-[min(320px,40vh)]">
           {prompts.map((text, i) => (
             <div key={i} className="flex justify-end">
               <div className="max-w-[95%] rounded-2xl rounded-br-md border border-stone-200 bg-white px-3.5 py-2.5 text-[0.9375rem] leading-relaxed text-neutral-900 shadow-sm">
@@ -166,10 +166,13 @@ export function EvaluationTaskView({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-8">
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto w-full max-w-[min(100%,1680px)] space-y-8 px-1 sm:px-2"
+    >
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-8 xl:gap-12">
         {/* Left: scenario + task conditions */}
-        <div className="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7 lg:sticky lg:top-24">
+        <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7 lg:sticky lg:top-24">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
             Scenario
           </p>
