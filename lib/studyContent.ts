@@ -200,15 +200,12 @@ export const EVAL2_SCENARIO = {
 
 export const GENAI_TASK = {
   title: "How Does Physical Exercise Influence Learning and Academic Performance?",
-  scenario:
-    "You are preparing for a science class assignment where you are asked to write an explanatory essay on a topic related to human learning and performance. Your instructor has assigned the following topic: “How Does Physical Exercise Influence Learning and Academic Performance?” You are expected to write a short explanatory essay that demonstrates your understanding of how exercise affects the brain, behavior, and learning outcomes. You may already have some prior knowledge from class, but you are encouraged to use ChatGPT as a tool to help you develop and refine your explanation.",
   taskConditions: [
     "Accuracy: The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
     "Conceptual integration: Explain both physiological processes (e.g., brain function, attention, memory) and behavioral effects (e.g., motivation, focus), and how they are related.",
     "Causal reasoning: Clearly explain how and why exercise influences learning and academic performance.",
-    "Conditional understanding: Address how different factors (e.g., type, intensity, or timing of exercise) may influence its effects.",
     "Purpose alignment: Help the reader understand how exercise can be used to support their own learning.",
-    "Audience awareness: Write for a general student audience — avoid overly technical language; do not oversimplify key ideas.",
+    "Audience awareness: Write for 12th-grade students.",
     "Use of examples: Include at least two concrete examples to illustrate how exercise affects learning in real situations.",
     "Length requirement: Approximately 300 words.",
     "Organization: Present the explanation as a clear, well-organized essay (not a list of points).",

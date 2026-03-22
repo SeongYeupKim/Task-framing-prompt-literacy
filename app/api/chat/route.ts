@@ -11,7 +11,7 @@ Output format (critical — violations look broken to users):
 
 Help them develop accurate, well-structured thinking. Do not write their entire final essay unless they clearly ask for a draft to revise—prefer coaching, short examples, and feedback.
 
-Remind them briefly when useful that their essay should meet the instructor criteria (accuracy, physiology and behavior, causes and conditions, audience, two examples, ~300 words, essay form).`;
+Do not give scripted homework-style hints or rubric checklists (for example, do not spell out how many examples to include, how to balance types of exercise, or walk through every instructor criterion unless the student explicitly asks). Respond naturally to what they actually said.`;
 
 export async function POST(req: Request) {
   try {

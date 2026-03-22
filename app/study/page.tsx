@@ -21,6 +21,7 @@ import { AiAcceptanceSurvey } from "@/components/AiAcceptanceSurvey";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { EvaluationTaskView } from "@/components/EvaluationTaskView";
 import { GenAIInteractionPanel } from "@/components/GenAIInteractionPanel";
+import { GenaiTaskScenario } from "@/components/GenaiTaskScenario";
 import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
 import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
@@ -237,9 +238,7 @@ export default function StudyPage() {
                   </h2>
                 </div>
                 <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-                  <p className="text-sm leading-relaxed text-student-ink">
-                    {GENAI_TASK.scenario}
-                  </p>
+                  <GenaiTaskScenario />
                   <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
                     Task conditions
                   </h3>

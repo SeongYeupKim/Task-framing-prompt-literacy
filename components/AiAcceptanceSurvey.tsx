@@ -33,72 +33,92 @@ export function AiAcceptanceSurvey({ onSubmit }: Props) {
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="mx-auto max-w-3xl space-y-8 pb-12"
+      className="mx-auto max-w-5xl space-y-6 pb-12"
     >
       <div className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-8">
         <h2 className="text-xl font-semibold text-student-ink">
           AI in learning — your views
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-student-muted">
-          Before we begin, please rate how much you agree with each statement.
-          Use the scale from <strong className="text-student-ink">1</strong>{" "}
-          (strongly disagree) to <strong className="text-student-ink">5</strong>{" "}
-          (strongly agree). There are no right or wrong answers.
+          Rate each statement using the matrix below:{" "}
+          <strong className="text-student-ink">1</strong> = strongly disagree
+          through <strong className="text-student-ink">5</strong> = strongly
+          agree. Select one number per row. There are no wrong answers.
         </p>
       </div>
 
-      <div className="space-y-6">
-        {AI_ACCEPTANCE_ITEMS.map((item, index) => (
-          <div
-            key={index}
-            className="rounded-2xl border border-student-border bg-white px-4 py-5 shadow-sm sm:px-6"
-          >
-            <p className="text-sm font-medium text-student-ink">
-              <span className="mr-2 text-student-muted">{index + 1}.</span>
-              {item}
-            </p>
-            <fieldset className="mt-4">
-              <legend className="sr-only">Agreement for statement {index + 1}</legend>
-              <div className="flex flex-wrap gap-2 sm:gap-3">
-                {LIKERT_SCALE.map(({ value, label }) => (
-                  <label
-                    key={value}
-                    className={`flex min-h-[44px] min-w-[2.75rem] cursor-pointer flex-1 flex-col items-center justify-center rounded-xl border-2 px-2 py-2 text-center text-xs font-medium transition sm:min-w-0 sm:flex-1 sm:px-3 ${
-                      answers[index] === value
-                        ? "border-teal-600 bg-teal-600 text-white shadow-sm"
-                        : "border-student-border bg-student-canvas text-student-ink hover:border-teal-400"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name={`item-${index}`}
-                      className="sr-only"
-                      checked={answers[index] === value}
-                      onChange={() => {
-                        setAnswers((prev) => {
-                          const next = [...prev];
-                          next[index] = value;
-                          return next;
-                        });
-                      }}
-                    />
-                    <span className="text-base font-semibold tabular-nums">
-                      {value}
-                    </span>
-                    <span className="mt-0.5 hidden leading-tight sm:block">
-                      {label}
-                    </span>
-                  </label>
+      <div className="overflow-x-auto rounded-2xl border border-student-border bg-white shadow-sm">
+        <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-student-border bg-student-canvas/80">
+              <th
+                scope="col"
+                className="sticky left-0 z-10 min-w-[220px] max-w-[min(50vw,340px)] bg-student-canvas/95 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-student-muted backdrop-blur-sm sm:min-w-[260px]"
+              >
+                Statement
+              </th>
+              {LIKERT_SCALE.map(({ value, label }) => (
+                <th
+                  key={value}
+                  scope="col"
+                  className="w-14 min-w-[3.25rem] px-1 py-2 text-center align-bottom text-xs font-semibold text-student-ink sm:w-16"
+                >
+                  <span className="block tabular-nums text-base text-teal-700">
+                    {value}
+                  </span>
+                  <span className="mt-1 hidden leading-tight text-[10px] font-normal text-student-muted sm:block">
+                    {label}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {AI_ACCEPTANCE_ITEMS.map((item, index) => (
+              <tr
+                key={index}
+                className="border-b border-student-border/80 odd:bg-white even:bg-student-canvas/30"
+              >
+                <th
+                  scope="row"
+                  className="sticky left-0 z-[1] max-w-[min(50vw,340px)] bg-inherit px-3 py-2.5 pr-2 text-left align-top text-[0.8125rem] font-normal leading-snug text-student-ink"
+                >
+                  <span className="mr-1.5 font-semibold text-student-muted tabular-nums">
+                    {index + 1}.
+                  </span>
+                  {item}
+                </th>
+                {LIKERT_SCALE.map(({ value }) => (
+                  <td key={value} className="px-1 py-2 text-center align-middle">
+                    <label className="flex cursor-pointer items-center justify-center">
+                      <input
+                        type="radio"
+                        name={`ai-acc-${index}`}
+                        value={value}
+                        checked={answers[index] === value}
+                        onChange={() => {
+                          setAnswers((prev) => {
+                            const next = [...prev];
+                            next[index] = value;
+                            return next;
+                          });
+                        }}
+                        className="h-4 w-4 accent-teal-600"
+                      />
+                      <span className="sr-only">
+                        Statement {index + 1}, {value}
+                      </span>
+                    </label>
+                  </td>
                 ))}
-              </div>
-              <p className="mt-2 flex justify-between text-[10px] text-student-muted sm:hidden">
-                <span>1 disagree</span>
-                <span>5 agree</span>
-              </p>
-            </fieldset>
-          </div>
-        ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      <p className="text-center text-xs text-student-muted sm:hidden">
+        Scroll horizontally to see all columns · 1 = disagree · 5 = agree
+      </p>
 
       {error && (
         <p className="text-sm text-red-600" role="alert">
@@ -106,7 +126,7 @@ export function AiAcceptanceSurvey({ onSubmit }: Props) {
         </p>
       )}
 
-      <div className="flex min-h-[52px] flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+      <div className="flex justify-center">
         <button
           type="submit"
           disabled={!complete || saving}
