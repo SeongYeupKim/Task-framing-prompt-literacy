@@ -12,12 +12,14 @@ import {
   saveEssay,
   saveGenaiMessages,
   saveAiAcceptance,
+  saveDemographics,
   updateUserPhase,
 } from "@/lib/userStudy";
 import { getNextPhaseAfter, phaseLabel } from "@/lib/studyFlow";
 import { getPhaseProgress } from "@/lib/studyProgress";
 import { EVAL1_SCENARIO, EVAL2_SCENARIO, GENAI_TASK } from "@/lib/studyContent";
 import { AiAcceptanceSurvey } from "@/components/AiAcceptanceSurvey";
+import { DemographicsSurvey } from "@/components/DemographicsSurvey";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { EvaluationTaskView } from "@/components/EvaluationTaskView";
 import { GenAIInteractionPanel } from "@/components/GenAIInteractionPanel";
@@ -27,6 +29,7 @@ import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
   ChatMessage,
+  DemographicsSubmission,
   EvaluationTaskSubmission,
   StudyCondition,
   StudyPhase,
@@ -119,6 +122,12 @@ export default function StudyPage() {
   async function handleEssaySubmit(text: string) {
     if (!uid) return;
     await saveEssay(uid, text, genaiMessages);
+    setPhase("demographics");
+  }
+
+  async function handleDemographicsSubmit(data: DemographicsSubmission) {
+    if (!uid) return;
+    await saveDemographics(uid, data);
     setPhase("complete");
   }
 
@@ -295,6 +304,10 @@ export default function StudyPage() {
               </div>
             </aside>
           </div>
+        )}
+
+        {phase === "demographics" && (
+          <DemographicsSurvey onSubmit={handleDemographicsSubmit} />
         )}
 
         {phase === "complete" && (

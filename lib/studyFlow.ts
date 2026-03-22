@@ -17,7 +17,8 @@ export function getNextPhaseAfter(
   }
   if (completed === "eval2") return "genai";
   if (completed === "genai") return "essay";
-  if (completed === "essay") return "complete";
+  if (completed === "essay") return "demographics";
+  if (completed === "demographics") return "complete";
   return null;
 }
 
@@ -36,6 +37,8 @@ export function phaseLabel(phase: StudyPhase): string {
       return "Chat with the AI";
     case "essay":
       return "Write your essay";
+    case "demographics":
+      return "Demographics";
     case "complete":
       return "You’re done";
     default:

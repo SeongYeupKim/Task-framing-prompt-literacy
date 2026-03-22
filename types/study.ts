@@ -9,6 +9,7 @@ export type StudyPhase =
   | "eval2"
   | "genai"
   | "essay"
+  | "demographics"
   | "complete";
 
 export type EvalCaseId = "studentA" | "studentB" | "studentC";
@@ -38,6 +39,16 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+export interface DemographicsSubmission {
+  psuEmail: string;
+  ageYears: string;
+  gender: string[];
+  raceEthnicity: string[];
+  nameForCredit: string;
+  followUpInterview: boolean;
+  submittedAt: string;
+}
+
 export interface UserStudyDoc {
   email?: string;
   condition: StudyCondition;
@@ -51,6 +62,8 @@ export interface UserStudyDoc {
   genaiMessages?: ChatMessage[];
   essayText?: string;
   essaySubmittedAt?: string;
+  demographics?: DemographicsSubmission;
+  demographicsSubmittedAt?: string;
   updatedAt?: string;
   createdAt?: string;
 }

@@ -3,6 +3,7 @@ import type { User } from "firebase/auth";
 import { getClientDb } from "@/lib/firebase";
 import type {
   ChatMessage,
+  DemographicsSubmission,
   EvaluationTaskSubmission,
   StudyCondition,
   StudyPhase,
@@ -124,6 +125,17 @@ export async function saveEssay(
     essayText,
     genaiMessages,
     essaySubmittedAt: new Date().toISOString(),
+    phase: "demographics",
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function saveDemographics(uid: string, data: DemographicsSubmission) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  await updateDoc(ref, {
+    demographics: data,
+    demographicsSubmittedAt: data.submittedAt,
     phase: "complete",
     updatedAt: new Date().toISOString(),
   });

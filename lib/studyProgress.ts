@@ -2,8 +2,16 @@ import type { StudyCondition, StudyPhase } from "@/types/study";
 
 /** Phases each participant actually sees (order matters). */
 const FLOW: Record<StudyCondition, StudyPhase[]> = {
-  control: ["ai_acceptance", "training", "genai", "essay", "complete"],
-  two_eval: ["ai_acceptance", "training", "eval1", "genai", "essay", "complete"],
+  control: ["ai_acceptance", "training", "genai", "essay", "demographics", "complete"],
+  two_eval: [
+    "ai_acceptance",
+    "training",
+    "eval1",
+    "genai",
+    "essay",
+    "demographics",
+    "complete",
+  ],
   four_eval: [
     "ai_acceptance",
     "training",
@@ -11,6 +19,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "eval2",
     "genai",
     "essay",
+    "demographics",
     "complete",
   ],
 };
