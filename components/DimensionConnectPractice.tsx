@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Fragment,
   useCallback,
   useLayoutEffect,
   useMemo,
@@ -132,14 +133,18 @@ export function DimensionConnectPractice({
         remove that link.
       </p>
 
-      <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-        <div className="space-y-3">
-          {dimensions.map((dim) => {
-            const linked = matching[dim.key];
-            const isSel = selectedDim === dim.key;
-            return (
+      {/* One grid row per index so left/right row heights match (easier line matching). */}
+      <div className="relative grid grid-cols-1 gap-y-3 lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16 lg:gap-y-3">
+        {dimensions.map((dim, idx) => {
+          const ex = examples[idx];
+          if (!ex) return null;
+          const n = idx + 1;
+          const linked = matching[dim.key];
+          const isSel = selectedDim === dim.key;
+          const isLinked = dimensions.some((d) => matching[d.key] === ex.id);
+          return (
+            <Fragment key={dim.key}>
               <div
-                key={dim.key}
                 ref={(el) => {
                   leftRefs.current[dim.key] = el;
                 }}
@@ -152,7 +157,7 @@ export function DimensionConnectPractice({
                     onDimensionActivate(dim.key);
                   }
                 }}
-                className={`min-h-[3rem] cursor-pointer rounded-lg border-2 bg-white px-3 py-3 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                className={`flex min-h-[3rem] h-full cursor-pointer items-center justify-center rounded-lg border-2 bg-white px-3 py-3 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
                   isSel
                     ? "border-teal-600 ring-2 ring-teal-400"
                     : linked
@@ -164,17 +169,7 @@ export function DimensionConnectPractice({
                   {dim.title}
                 </span>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="space-y-3">
-          {examples.map((ex, idx) => {
-            const n = idx + 1;
-            const isLinked = dimensions.some((d) => matching[d.key] === ex.id);
-            return (
               <div
-                key={ex.id}
                 ref={(el) => {
                   rightRefs.current[ex.id] = el;
                 }}
@@ -187,7 +182,7 @@ export function DimensionConnectPractice({
                     onExampleActivate(ex.id);
                   }
                 }}
-                className={`min-h-[3rem] cursor-pointer rounded-lg border-2 bg-white px-3 py-3 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                className={`flex min-h-[3rem] h-full cursor-pointer flex-col justify-center rounded-lg border-2 bg-white px-3 py-3 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
                   isLinked
                     ? "border-teal-700 bg-teal-50/70"
                     : "border-student-border hover:border-teal-300"
@@ -200,9 +195,9 @@ export function DimensionConnectPractice({
                   {ex.prompt}
                 </p>
               </div>
-            );
-          })}
-        </div>
+            </Fragment>
+          );
+        })}
       </div>
     </div>
   );
