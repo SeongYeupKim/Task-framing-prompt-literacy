@@ -212,7 +212,8 @@ export const INSTRUCTION_RECAP_BULLETS: string[] = [
 
 /**
  * Exercise / learning scenario and requirements — shared by eval practice (Step 4)
- * and the main GenAI + essay task so wording stays aligned (no category labels).
+ * and the main GenAI + essay task. Requirements are plain sentences only (no rubric
+ * labels like “Accuracy:” or “Conceptual connection”) so students read criteria, not jargon.
  */
 export const EXERCISE_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
   "You are preparing for a science class assignment where you are asked to write an explanatory essay on a topic related to human learning and performance. Your instructor has assigned the following topic: “How Does Physical Exercise Influence Learning and Academic Performance?”",
@@ -221,14 +222,14 @@ export const EXERCISE_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
 
 /** Single source for eval practice (Step 4) and the main GenAI essay task — all conditions. */
 export const EXERCISE_LEARNING_TASK_REQUIREMENTS: string[] = [
-  "Accuracy: The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
-  "Causal reasoning: Clearly explain how and why exercise influences learning and academic performance.",
-  "Conditional understanding: Address how different factors (e.g., type, intensity, or timing of exercise) may influence its effects.",
-  "Purpose alignment: Help the reader understand how exercise can be used to support their own learning.",
-  "Audience awareness: Write for a general student audience—avoid overly technical language; do not oversimplify key ideas.",
-  "Use of examples: Include at least two concrete examples that illustrate how exercise affects learning in real situations.",
-  "Length requirement: Approximately 250–300 words.",
-  "Organization: Present the explanation as a clear, well-organized essay (not a list of points).",
+  "The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
+  "Clearly explain how and why exercise influences learning and academic performance, including how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
+  "Address how different factors (e.g., type, intensity, or timing of exercise) may influence its effects.",
+  "Help the reader understand how exercise can be used to support their own learning.",
+  "Write for a general student audience—avoid overly technical language; do not oversimplify key ideas.",
+  "Include at least two concrete examples that illustrate how exercise affects learning in real situations.",
+  "Write approximately 250–300 words.",
+  "Present the explanation as a clear, well-organized essay (not a list of points).",
 ];
 
 export const EVAL1_SCENARIO = {
