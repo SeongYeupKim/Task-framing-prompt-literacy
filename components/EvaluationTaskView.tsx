@@ -35,8 +35,8 @@ function PromptMessageThread({ prompts, label }: { prompts: string[]; label: str
       <p className="mb-2 text-center text-xs font-medium uppercase tracking-wide text-student-muted">
         {label} — messages to the AI
       </p>
-      <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
-        <div className="max-h-[min(360px,45vh)] space-y-2.5 overflow-y-auto pr-1 lg:max-h-[min(320px,40vh)]">
+        <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
+        <div className="space-y-2.5">
           {prompts.map((text, i) => (
             <div key={i} className="flex justify-end">
               <div className="max-w-[95%] rounded-2xl rounded-br-md border border-stone-200 bg-white px-3.5 py-2.5 text-[0.9375rem] leading-relaxed text-neutral-900 shadow-sm">
@@ -179,58 +179,57 @@ export function EvaluationTaskView({
           <InstructionRecapCollapsible />
         </div>
       )}
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-8 xl:gap-12">
-        {/* Left: scenario + task conditions */}
-        <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7 lg:sticky lg:top-24">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
-            Scenario
-          </p>
-          <h2 className="mt-1 text-xl font-semibold text-student-ink">{title}</h2>
-          <div className="mt-3 space-y-3 text-base leading-relaxed text-student-ink">
-            {scenario.map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-          </div>
-          <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-student-muted">
-            Task conditions (the explanation should satisfy all of these)
-          </h3>
-          <ul className="mt-3 space-y-3 text-student-ink">
-            {taskConditions.map((c) => (
-              <li
-                key={c}
-                className="border-l-[3px] border-teal-500 pl-4 leading-relaxed"
-              >
-                <TaskConditionLine text={c} />
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        {/* Right: evaluation of student prompts */}
-        <div className="min-w-0 space-y-6">
-          <div className="rounded-2xl border border-student-border bg-student-card px-5 py-5 shadow-student sm:px-7">
-            <h2 className="text-lg font-semibold text-student-ink">
-              Rate three students’ prompts
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-student-muted">
-              Below are mock messages each student sent to the AI (like texts).
-              For each person, pick a number from 1 to 6 and explain your
-              choice.
-            </p>
-          </div>
-
-          {CASES.map((id) => (
-            <CaseCard
-              key={id}
-              label={cases[id].label}
-              prompts={cases[id].prompts}
-              rating={ratings[id]}
-              rationale={rationales[id]}
-              onRating={(v) => setRatings((r) => ({ ...r, [id]: v }))}
-              onRationale={(v) => setRationales((r) => ({ ...r, [id]: v }))}
-            />
+      {/* Full width: scenario + task requirements */}
+      <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
+          Scenario
+        </p>
+        <h2 className="mt-1 text-xl font-semibold text-student-ink">{title}</h2>
+        <div className="mt-3 space-y-3 text-base font-medium leading-relaxed text-student-ink">
+          {scenario.map((para, i) => (
+            <p key={i}>{para}</p>
           ))}
         </div>
+        <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-student-muted">
+          Task requirements (the explanation should satisfy all of these)
+        </h3>
+        <ul className="mt-3 space-y-3 text-student-ink">
+          {taskConditions.map((c) => (
+            <li
+              key={c}
+              className="border-l-[3px] border-teal-500 pl-4 leading-relaxed"
+            >
+              <TaskConditionLine text={c} />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="rounded-2xl border border-student-border bg-student-card px-5 py-5 shadow-student sm:px-7">
+        <h2 className="text-lg font-semibold text-student-ink">
+          Rate three students’ prompts
+        </h2>
+        <p className="mt-2 text-sm font-medium leading-relaxed text-student-muted">
+          Below are mock messages each student sent to the AI (like texts). The
+          three students are shown side by side on wider screens so you can
+          compare them. For each person, pick a number from 1 to 6 and explain
+          your choice.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start lg:gap-6 xl:gap-8">
+        {CASES.map((id) => (
+          <CaseCard
+            key={id}
+            label={cases[id].label}
+            prompts={cases[id].prompts}
+            rating={ratings[id]}
+            rationale={rationales[id]}
+            onRating={(v) => setRatings((r) => ({ ...r, [id]: v }))}
+            onRationale={(v) => setRationales((r) => ({ ...r, [id]: v }))}
+          />
+        ))}
       </div>
 
       {error && (

@@ -210,7 +210,7 @@ export const INSTRUCTION_RECAP_BULLETS: string[] = [
   "Success — how you’ll tell if the answer is good enough.",
 ];
 
-/** Sleep task — task conditions match study materials. */
+/** Sleep task — task requirements match study materials (no category labels). */
 export const EVAL1_SCENARIO = {
   title: "How Sleep Affects Learning",
   /** Paragraphs for the scenario (no source-text details). */
@@ -220,13 +220,13 @@ export const EVAL1_SCENARIO = {
     "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
   ],
   taskConditions: [
-    "Avoid misinformation: Make sure the explanation is based on the evidence.",
-    "Conceptual connection: Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
-    "Purpose alignment: Help students understand why sleep matters for their own learning, not just present factual information.",
-    "Audience awareness: Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
-    "Use of example: Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
-    "Length constraint: Approximately 250–300 words.",
-    "Organization: Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
+    "Make sure the explanation is based on the evidence.",
+    "Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
+    "Help students understand why sleep matters for their own learning, not just present factual information.",
+    "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
+    "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
+    "Approximately 250–300 words.",
+    "Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
   ],
   cases: {
     studentA: {
