@@ -74,24 +74,97 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
   },
 ];
 
-/** Part 3 depends on whether the participant will see evaluation activities. */
-export function getTrainingClosingParagraphs(isControl: boolean): (string | TextChunk[])[] {
-  if (isControl) {
-    return [
-      "In your session, you will go straight from this introduction to a new explanation task where you chat with the AI and then write your own response.",
-      "You will not be asked to rate other students’ prompts. Focus on using what you read here when you plan your own messages to the AI.",
-      "Your chat and your writing are saved only for this research study.",
-    ];
-  }
-  return [
-    [
-      "Depending on your session, you may be asked to ",
-      { b: "evaluate example prompts" },
-      " from other students and explain why they are stronger or weaker.",
-    ],
-    "Later you will chat with the AI on a new topic and then write your own response. Your chat and your writing are saved only for this research study.",
-  ];
-}
+/** Six dimensions for matching practice (keys stable for Firestore). Order = display order. */
+export const INSTRUCTION_DIMENSIONS: {
+  key: string;
+  title: string;
+  detail: string;
+}[] = [
+  { key: "goal", title: "Goal", detail: "What are you trying to accomplish?" },
+  {
+    key: "content",
+    title: "Content",
+    detail: "What topics or ideas must be included?",
+  },
+  {
+    key: "task_conditions",
+    title: "Task conditions",
+    detail:
+      "Length, level, format, or other limits—what has to be true about the answer?",
+  },
+  {
+    key: "audience",
+    title: "Audience",
+    detail: "Who is the answer for?",
+  },
+  {
+    key: "format",
+    title: "Format",
+    detail: "Paragraph, list, essay, etc.?",
+  },
+  {
+    key: "success",
+    title: "Success",
+    detail: "How will you judge if the answer is good enough?",
+  },
+];
+
+/**
+ * Example prompts for the matching task only (not the same wording as Part 2 examples).
+ * Each maps to exactly one dimension key for answer key.
+ */
+export const INSTRUCTION_MATCHING_POOL: {
+  id: string;
+  dimensionKey: string;
+  prompt: string;
+}[] = [
+  {
+    id: "mx1",
+    dimensionKey: "goal",
+    prompt:
+      "I need a short explanation my teammates can use during lab—tell the model the outcome should help us prep our poster, not write the poster for us.",
+  },
+  {
+    id: "mx2",
+    dimensionKey: "content",
+    prompt:
+      "Be sure to tie executive function to both working memory and inhibition when you answer—don’t focus on only one of those.",
+  },
+  {
+    id: "mx3",
+    dimensionKey: "task_conditions",
+    prompt:
+      "Keep it under 200 words, cite one source in MLA, and don’t use bullet points.",
+  },
+  {
+    id: "mx4",
+    dimensionKey: "audience",
+    prompt:
+      "Assume the reader is a first-year college athlete who hasn’t taken cognitive psychology—skip abbreviations like PFC.",
+  },
+  {
+    id: "mx5",
+    dimensionKey: "format",
+    prompt:
+      "Structure the reply as: (1) definition, (2) why it matters for studying, (3) one limitation—use those exact headings.",
+  },
+  {
+    id: "mx6",
+    dimensionKey: "success",
+    prompt:
+      "I’ll only use the answer if it compares two study strategies and names one trade-off for each.",
+  },
+];
+
+/** Short bullets for the collapsible recap (intervention conditions only). */
+export const INSTRUCTION_RECAP_BULLETS: string[] = [
+  "Goal — what you want the AI to help you accomplish.",
+  "Content — topics and ideas that must appear in the answer.",
+  "Task conditions — length, level, format, and other limits.",
+  "Audience — who will read or use the answer.",
+  "Format — paragraph, list, essay, etc.",
+  "Success — how you’ll tell if the answer is good enough.",
+];
 
 /** Sleep task — task conditions match study materials. */
 export const EVAL1_SCENARIO = {

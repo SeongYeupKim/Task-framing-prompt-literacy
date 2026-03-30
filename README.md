@@ -2,72 +2,42 @@
 
 **Repository:** [github.com/SeongYeupKim/Task-framing-prompt-literacy](https://github.com/SeongYeupKim/Task-framing-prompt-literacy)
 
-Next.js app for a randomized three-condition study: **AI acceptance (Likert)** → **training** → optional **evaluation tasks** → **GenAI chat** → **essay** → **demographics** → **complete**, with Firebase Auth + Firestore and OpenAI chat API (server-side). Participants **register and sign in with a Penn State `@psu.edu` email** (enforced on the auth forms).
+Next.js app for a **three-arm** design: **control (pure)** vs **instruction only** vs **instruction + one evaluation practice**, then a common **GenAI chat → essay** task, **demographics**, **complete**. Firebase Auth + Firestore, OpenAI chat API (server-side). Participants use a Penn State **`@psu.edu`** email (enforced on auth forms).
 
-**New to Firebase / `.env`?** Follow the full walkthrough: **[SETUP.md](./SETUP.md)**.
-
-**Deploy to Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)** — set project name **`taskframing`** for **`https://taskframing.vercel.app`**, add env vars + Firebase authorized domain.
+**New to Firebase / `.env`?** **[SETUP.md](./SETUP.md)** · **Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)**
 
 ## Setup
 
-1. **Install**
-
-   ```bash
-   cd task-framing-study
-   npm install
-   ```
-
-2. **Environment**
-
-   Copy `.env.example` to `.env.local` and fill in:
-
-   - **Firebase** (from Firebase Console → Project settings → Your apps):  
-     `NEXT_PUBLIC_FIREBASE_*`
-   - **OpenAI** (server only):  
-     `OPENAI_API_KEY`  
-     `OPENAI_MODEL` — use the model ID enabled on your key (e.g. `gpt-4o-mini`).  
-     *Replace with your approved project model name if different.*
-
-3. **Firebase**
-
-   - Enable **Authentication** → Email/Password.
-   - Enable **Firestore** (production mode), then deploy rules:
-
-     ```bash
-     firebase deploy --only firestore:rules
-     ```
-
-     Or paste `firestore.rules` in the Firebase Console.
-
-4. **Run**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
+1. **Install:** `cd task-framing-study && npm install`
+2. **Environment:** copy `.env.example` → `.env.local` (Firebase `NEXT_PUBLIC_*`, `OPENAI_API_KEY`, `OPENAI_MODEL`).
+3. **Firebase:** Email/Password auth; Firestore + rules.
+4. **Run:** `npm run dev` → http://localhost:3000
 
 ## Conditions (random at first `/study` load)
 
-| Condition   | Flow |
-|------------|------|
-| `control`  | AI acceptance → Training → GenAI → Essay → Demographics → Complete |
-| `two_eval` | AI acceptance → Training → Evaluation 1 → GenAI → Essay → Demographics → Complete |
-| `four_eval`| AI acceptance → Training → Evaluation 1 → Evaluation 2 → GenAI → Essay → Demographics → Complete |
+Firestore stores `control` | `instruction` | `instruction_eval`. Legacy documents may still show `two_eval` / `four_eval`; they are **normalized in the app** to `instruction` / `instruction_eval`.
 
-## Data stored (per user document `users/{uid}`)
+| Condition | Flow |
+|-----------|------|
+| **`control`** | AI acceptance → **guide (main task)** → GenAI → Essay → Demographics → Complete |
+| **`instruction`** | AI acceptance → **Instruction (Part 1 self-explanation + Part 2 matching)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
+| **`instruction_eval`** | AI acceptance → **Instruction** → **guide (evaluation)** → **Eval 1 (sleep topic only)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
+
+Intervention arms get a **collapsible “brief instruction reminder”** during the **final task** (and, for `instruction_eval`, also during **Eval 1**).
+
+## Data stored (`users/{uid}`)
 
 - `condition`, `phase`, timestamps  
-- `aiAcceptanceResponses`: array of **20** integers (1–5 Likert), `aiAcceptanceCompletedAt`  
-- `eval1` / `eval2`: ratings 1–6 and rationales for Students A/B/C  
-- `genaiMessages`: full chat log  
-- `essayText`, `essaySubmittedAt`  
-- `demographics` (PSU email, age, gender, race/ethnicity, name for credit, follow-up intent), `demographicsSubmittedAt`
+- `aiAcceptanceResponses` (20× Likert 1–5), `aiAcceptanceCompletedAt`  
+- **Instruction:** `instructionSelfExplanation`, `instructionMatchingByDimension`, `instructionCompletedAt`, `trainingCompletedAt`  
+- `eval1` (ratings 1–6 + rationales A/B/C); `eval2` deprecated  
+- `genaiMessages`, `essayText`, `essaySubmittedAt`  
+- `demographics`, `demographicsSubmittedAt`
 
 ## Security
 
-- Never commit `.env.local` or API keys.
-- OpenAI key stays on the server (`/api/chat` only).
+- Never commit `.env.local` or API keys.  
+- OpenAI key server-side only (`/api/chat`).
 
 ## License
 

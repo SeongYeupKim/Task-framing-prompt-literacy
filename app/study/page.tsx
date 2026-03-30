@@ -7,17 +7,22 @@ import { getClientAuth } from "@/lib/firebase";
 import {
   ensureUserStudyDoc,
   getUserStudyDoc,
-  markTrainingComplete,
   saveEvaluationSubmission,
   saveEssay,
   saveGenaiMessages,
   saveAiAcceptance,
   saveDemographics,
+  saveInstructionCompletion,
   updateUserPhase,
 } from "@/lib/userStudy";
 import { getNextPhaseAfter, phaseLabel } from "@/lib/studyFlow";
 import { getPhaseProgress } from "@/lib/studyProgress";
-import { EVAL1_SCENARIO, EVAL2_SCENARIO, GENAI_TASK } from "@/lib/studyContent";
+import {
+  normalizeCondition,
+  phaseAfterAiAcceptance,
+  showInstructionRecap,
+} from "@/lib/studyConditions";
+import { EVAL1_SCENARIO, GENAI_TASK } from "@/lib/studyContent";
 import { AiAcceptanceSurvey } from "@/components/AiAcceptanceSurvey";
 import { DemographicsSurvey } from "@/components/DemographicsSurvey";
 import { TrainingPanel } from "@/components/TrainingPanel";
@@ -26,11 +31,14 @@ import { GenAIInteractionPanel } from "@/components/GenAIInteractionPanel";
 import { GenaiTaskScenario } from "@/components/GenaiTaskScenario";
 import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
 import { TaskConditionLine } from "@/components/TaskConditionLine";
+import { InstructionRecapCollapsible } from "@/components/InstructionRecapCollapsible";
+import { TaskIntroPanel } from "@/components/TaskIntroPanel";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
   ChatMessage,
   DemographicsSubmission,
   EvaluationTaskSubmission,
+  InstructionPracticeData,
   StudyCondition,
   StudyPhase,
 } from "@/types/study";
@@ -54,9 +62,12 @@ export default function StudyPage() {
       }
       setUid(user.uid);
       const info = await ensureUserStudyDoc(user);
-      setCondition(info.condition);
-      setPhase(info.phase);
       const doc = await getUserStudyDoc(user.uid);
+      const cond = normalizeCondition(
+        String(doc?.condition ?? info.condition ?? "control")
+      );
+      setCondition(cond);
+      setPhase(info.phase);
       if (doc?.genaiMessages?.length) {
         setGenaiMessages(
           doc.genaiMessages.map((m) =>
@@ -80,26 +91,36 @@ export default function StudyPage() {
   }
 
   async function handleAiAcceptanceSubmit(responses: number[]) {
-    if (!uid) return;
+    if (!uid || !condition) return;
     await saveAiAcceptance(uid, responses);
     setAiAcceptanceDone(true);
-    setPhase("training");
+    setPhase(phaseAfterAiAcceptance(condition));
   }
 
-  async function handleTrainingDone() {
+  async function handleInstructionComplete(data: InstructionPracticeData) {
     if (!uid || !condition) return;
     const next = getNextPhaseAfter(condition, "training");
     if (!next) return;
-    await markTrainingComplete(uid);
-    await updateUserPhase(uid, next);
+    await saveInstructionCompletion(uid, data, next);
     setPhase(next);
+  }
+
+  async function handleTaskIntroEvalContinue() {
+    if (!uid) return;
+    await updateUserPhase(uid, "eval1");
+    setPhase("eval1");
+  }
+
+  async function handleTaskIntroFinalContinue() {
+    if (!uid) return;
+    await updateUserPhase(uid, "genai");
+    setPhase("genai");
   }
 
   async function handleEvalSubmit(sub: EvaluationTaskSubmission) {
     if (!uid || !condition) return;
     await saveEvaluationSubmission(uid, sub);
-    const completed: StudyPhase = sub.taskKey === "eval1" ? "eval1" : "eval2";
-    const next = getNextPhaseAfter(condition, completed);
+    const next = getNextPhaseAfter(condition, "eval1");
     if (!next) return;
     await updateUserPhase(uid, next);
     setPhase(next);
@@ -131,7 +152,6 @@ export default function StudyPage() {
     setPhase("complete");
   }
 
-  /** Scroll to top when the study step changes (SPA navigation). */
   useEffect(() => {
     if (!ready || !phase) return;
     window.scrollTo(0, 0);
@@ -157,6 +177,15 @@ export default function StudyPage() {
     : phase!;
 
   const { step, total } = getPhaseProgress(condition, effectivePhase);
+
+  const recapFinal = showInstructionRecap(condition, phase);
+  const recapEval = showInstructionRecap(condition, "eval1");
+
+  const wideMain =
+    phase === "genai" ||
+    phase === "essay" ||
+    phase === "eval1" ||
+    phase === "task_intro_eval";
 
   return (
     <div className="min-h-screen bg-student-canvas pb-16">
@@ -190,12 +219,7 @@ export default function StudyPage() {
 
       <main
         className={`mx-auto px-3 pt-8 sm:px-4 ${
-          phase === "genai" ||
-          phase === "essay" ||
-          phase === "eval1" ||
-          phase === "eval2"
-            ? "max-w-[1920px]"
-            : "max-w-4xl"
+          wideMain ? "max-w-[1920px]" : "max-w-4xl"
         }`}
       >
         {showAiAcceptance && (
@@ -203,18 +227,14 @@ export default function StudyPage() {
         )}
 
         {!showAiAcceptance && phase === "training" && (
-          <div className="space-y-8">
-            <TrainingPanel isControl={condition === "control"} />
-            <div className="flex justify-center pb-8">
-              <button
-                type="button"
-                onClick={() => void handleTrainingDone()}
-                className="rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
+          <TrainingPanel onComplete={handleInstructionComplete} />
+        )}
+
+        {phase === "task_intro_eval" && (
+          <TaskIntroPanel
+            variant="eval"
+            onContinue={handleTaskIntroEvalContinue}
+          />
         )}
 
         {phase === "eval1" && (
@@ -225,95 +245,95 @@ export default function StudyPage() {
             taskConditions={[...EVAL1_SCENARIO.taskConditions]}
             cases={EVAL1_SCENARIO.cases}
             onSubmit={handleEvalSubmit}
+            showInstructionRecap={recapEval}
           />
         )}
 
-        {phase === "eval2" && (
-          <EvaluationTaskView
-            taskKey="eval2"
-            title={EVAL2_SCENARIO.title}
-            scenario={[...EVAL2_SCENARIO.scenario]}
-            taskConditions={[...EVAL2_SCENARIO.taskConditions]}
-            cases={EVAL2_SCENARIO.cases}
-            onSubmit={handleEvalSubmit}
+        {phase === "task_intro_final" && (
+          <TaskIntroPanel
+            variant={
+              condition === "control" ? "final_control" : "final_instruction"
+            }
+            onContinue={handleTaskIntroFinalContinue}
           />
         )}
 
         {(phase === "genai" || phase === "essay") && (
-          <div
-            className={`grid grid-cols-1 gap-6 xl:grid-cols-3 xl:grid-rows-1 xl:items-stretch xl:gap-5 xl:min-h-0 ${
-              /* Same row height on large screens; each column scrolls inside */
-              "xl:h-[calc(100vh-10rem)] xl:max-h-[calc(100vh-10rem)]"
-            }`}
-          >
-            {/* Column 1: scenario + task conditions (scroll inside) */}
-            <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student p-5 sm:p-6">
-                <div className="shrink-0">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
-                    Scenario
-                  </p>
-                  <h2 className="mt-1 text-lg font-semibold leading-snug text-student-ink">
-                    {GENAI_TASK.title}
-                  </h2>
-                </div>
-                <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-                  <GenaiTaskScenario />
-                  <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
-                    Task conditions
-                  </h3>
-                  <ul className="mt-2 space-y-3 text-student-ink">
-                    {GENAI_TASK.taskConditions.map((c) => (
-                      <li
-                        key={c}
-                        className="border-l-[3px] border-teal-500 pl-3 leading-relaxed"
-                      >
-                        <TaskConditionLine text={c} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+          <div className="space-y-4">
+            {recapFinal && (
+              <div className="max-w-3xl">
+                <InstructionRecapCollapsible />
               </div>
-            </aside>
-
-            {/* Column 2: chat — fixed column height; messages scroll inside */}
-            <div className="flex min-h-[min(52vh,560px)] min-w-0 flex-col xl:min-h-0 xl:h-full">
-              <GenAIInteractionPanel
-                messages={genaiMessages}
-                onMessagesChange={persistMessages}
-                className="h-full min-h-0 flex-1"
-              />
-            </div>
-
-            {/* Column 3: essay prompt or essay form (same height; scroll inside) */}
-            <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                {phase === "genai" && (
-                  <div className="flex h-full min-h-[min(52vh,280px)] flex-col justify-center overflow-y-auto rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student xl:h-full xl:min-h-0">
-                    <p className="text-sm leading-relaxed text-student-ink">
-                      When you’re ready to write, open the essay panel. Your
-                      chat stays in the middle column—scroll there anytime.
+            )}
+            <div
+              className={`grid grid-cols-1 gap-6 xl:grid-cols-3 xl:grid-rows-1 xl:items-stretch xl:gap-5 xl:min-h-0 xl:h-[calc(100vh-10rem)] xl:max-h-[calc(100vh-10rem)]`}
+            >
+              <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student p-5 sm:p-6">
+                  <div className="shrink-0">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
+                      Scenario
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => void handleContinueToEssay()}
-                      className="mt-5 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
-                    >
-                      Open essay editor
-                    </button>
+                    <h2 className="mt-1 text-lg font-semibold leading-snug text-student-ink">
+                      {GENAI_TASK.title}
+                    </h2>
                   </div>
-                )}
-                {phase === "essay" && (
-                  <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-                    <EssaySubmissionPanel
-                      embedded
-                      initialText={essayDraft}
-                      onSubmit={handleEssaySubmit}
-                    />
+                  <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+                    <GenaiTaskScenario />
+                    <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
+                      Task conditions
+                    </h3>
+                    <ul className="mt-2 space-y-3 text-student-ink">
+                      {GENAI_TASK.taskConditions.map((c) => (
+                        <li
+                          key={c}
+                          className="border-l-[3px] border-teal-500 pl-3 leading-relaxed"
+                        >
+                          <TaskConditionLine text={c} />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                )}
+                </div>
+              </aside>
+
+              <div className="flex min-h-[min(52vh,560px)] min-w-0 flex-col xl:min-h-0 xl:h-full">
+                <GenAIInteractionPanel
+                  messages={genaiMessages}
+                  onMessagesChange={persistMessages}
+                  className="h-full min-h-0 flex-1"
+                />
               </div>
-            </aside>
+
+              <aside className="flex min-h-0 min-w-0 flex-col xl:h-full">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  {phase === "genai" && (
+                    <div className="flex h-full min-h-[min(52vh,280px)] flex-col justify-center overflow-y-auto rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student xl:h-full xl:min-h-0">
+                      <p className="text-sm leading-relaxed text-student-ink">
+                        When you’re ready to write, open the essay panel. Your
+                        chat stays in the middle column—scroll there anytime.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => void handleContinueToEssay()}
+                        className="mt-5 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
+                      >
+                        Open essay editor
+                      </button>
+                    </div>
+                  )}
+                  {phase === "essay" && (
+                    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+                      <EssaySubmissionPanel
+                        embedded
+                        initialText={essayDraft}
+                        onSubmit={handleEssaySubmit}
+                      />
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </div>
           </div>
         )}
 

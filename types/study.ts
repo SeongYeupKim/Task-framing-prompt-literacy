@@ -1,12 +1,13 @@
-/** Assigned at registration / first session (equal random). */
-export type StudyCondition = "control" | "two_eval" | "four_eval";
+/** Assigned at registration / first session (equal random). Legacy: two_eval, four_eval. */
+export type StudyCondition = "control" | "instruction" | "instruction_eval";
 
 /** Linear progress through the study UI. */
 export type StudyPhase =
   | "ai_acceptance"
   | "training"
+  | "task_intro_eval"
   | "eval1"
-  | "eval2"
+  | "task_intro_final"
   | "genai"
   | "essay"
   | "demographics"
@@ -49,14 +50,24 @@ export interface DemographicsSubmission {
   submittedAt: string;
 }
 
+/** Saved when participant finishes instruction (both practice parts). */
+export interface InstructionPracticeData {
+  selfExplanation: string;
+  /** Maps dimension key (e.g. goal) to chosen matching example id (e.g. m3). */
+  matchingByDimension: Record<string, string>;
+}
+
 export interface UserStudyDoc {
   email?: string;
-  condition: StudyCondition;
+  condition: StudyCondition | string;
   phase: StudyPhase;
   /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
   aiAcceptanceResponses?: number[];
   aiAcceptanceCompletedAt?: string;
   trainingCompletedAt?: string;
+  instructionSelfExplanation?: string;
+  instructionMatchingByDimension?: Record<string, string>;
+  instructionCompletedAt?: string;
   eval1?: EvaluationTaskSubmission;
   eval2?: EvaluationTaskSubmission;
   genaiMessages?: ChatMessage[];
