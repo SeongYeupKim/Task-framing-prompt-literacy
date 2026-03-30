@@ -78,8 +78,8 @@ export function GenAIInteractionPanel({
           Chat with the AI
         </h2>
         <p className="mt-1 text-xs leading-snug text-student-muted">
-          Send as many messages as you need. This column stays the same height as
-          the scenario and essay—scroll inside here to read older messages.
+          Send as many messages as you need. The assignment and requirements are
+          in the section above—scroll inside this column to read older messages.
         </p>
       </div>
       <div className="flex min-h-0 flex-1 flex-col bg-student-canvas/40">
