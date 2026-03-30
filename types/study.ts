@@ -53,8 +53,10 @@ export interface DemographicsSubmission {
 /** Saved when participant finishes instruction (both practice parts). */
 export interface InstructionPracticeData {
   selfExplanation: string;
-  /** Maps dimension key (e.g. goal) to chosen matching example id (e.g. m3). */
+  /** Maps dimension key (e.g. goal) to chosen matching example id (e.g. mx3). */
   matchingByDimension: Record<string, string>;
+  /** Example ids in display order (Example 1 = top …); for analysis / replication. */
+  matchingExampleDisplayOrder?: string[];
 }
 
 export interface UserStudyDoc {
@@ -67,6 +69,7 @@ export interface UserStudyDoc {
   trainingCompletedAt?: string;
   instructionSelfExplanation?: string;
   instructionMatchingByDimension?: Record<string, string>;
+  instructionMatchingExampleDisplayOrder?: string[];
   instructionCompletedAt?: string;
   eval1?: EvaluationTaskSubmission;
   eval2?: EvaluationTaskSubmission;

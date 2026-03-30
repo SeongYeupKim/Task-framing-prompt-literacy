@@ -117,6 +117,12 @@ export async function saveInstructionCompletion(
   await updateDoc(ref, {
     instructionSelfExplanation: practice.selfExplanation,
     instructionMatchingByDimension: practice.matchingByDimension,
+    ...(practice.matchingExampleDisplayOrder !== undefined
+      ? {
+          instructionMatchingExampleDisplayOrder:
+            practice.matchingExampleDisplayOrder,
+        }
+      : {}),
     instructionCompletedAt: now,
     trainingCompletedAt: now,
     phase: nextPhase,

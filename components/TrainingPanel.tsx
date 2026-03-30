@@ -8,6 +8,7 @@ import {
   type TextChunk,
 } from "@/lib/studyContent";
 import type { InstructionPracticeData } from "@/types/study";
+import { DimensionConnectPractice } from "@/components/DimensionConnectPractice";
 
 function shuffle<T>(items: T[]): T[] {
   const a = [...items];
@@ -77,6 +78,7 @@ export function TrainingPanel({ onComplete }: Props) {
       await onComplete({
         selfExplanation: selfExplanation.trim(),
         matchingByDimension: { ...matching },
+        matchingExampleDisplayOrder: shuffledExamples.map((e) => e.id),
       });
     } catch {
       setError("Could not save. Try again.");
@@ -86,7 +88,9 @@ export function TrainingPanel({ onComplete }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 pb-8">
+    <div
+      className={`mx-auto space-y-8 pb-8 ${step === 2 ? "max-w-6xl" : "max-w-3xl"}`}
+    >
       <div className="rounded-2xl border border-teal-200 bg-teal-50/50 px-5 py-4 shadow-sm sm:px-7">
         <p className="text-sm font-medium text-teal-900">
           Instruction module — Part {step} of 2
@@ -94,7 +98,7 @@ export function TrainingPanel({ onComplete }: Props) {
         <p className="mt-1 text-sm text-teal-800/90">
           {step === 1
             ? "Read the explanation, then write what you took away in your own words."
-            : "Read about the six dimensions, then match each dimension to the example that fits it best."}
+            : "Read the definitions on the left, then connect each dimension to the example that fits it best."}
         </p>
       </div>
 
@@ -103,7 +107,7 @@ export function TrainingPanel({ onComplete }: Props) {
           <h2 className="text-xl font-semibold tracking-tight text-student-ink">
             Part 1: {TRAINING_SECTIONS[0].title}
           </h2>
-          <div className="mt-4 space-y-4 text-base leading-relaxed text-student-ink">
+          <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-student-ink">
             {TRAINING_SECTIONS[0].paragraphs.map((p, j) => (
               <ParagraphBlock key={j} p={p} />
             ))}
@@ -133,7 +137,7 @@ export function TrainingPanel({ onComplete }: Props) {
               value={selfExplanation}
               onChange={(e) => setSelfExplanation(e.target.value)}
               rows={6}
-              className="mt-2 w-full rounded-xl border border-student-border px-3 py-3 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="mt-2 w-full rounded-xl border border-student-border px-3 py-3 text-sm font-medium text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
               placeholder="Explain in your own words — this helps us know you engaged with the material."
             />
             <p className="mt-1 text-xs text-student-muted">
@@ -158,110 +162,91 @@ export function TrainingPanel({ onComplete }: Props) {
       )}
 
       {step === 2 && (
-      <>
-        <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-7">
-          <h2 className="text-xl font-semibold tracking-tight text-student-ink">
-            Part 2: {part2.title}
-          </h2>
-          <div className="mt-4 space-y-4 text-base leading-relaxed text-student-ink">
-            {part2.paragraphs.map((p, j) => (
-              <ParagraphBlock key={j} p={p} />
-            ))}
-            {part2.numbered && (
-              <ol className="mt-2 space-y-3">
-                {part2.numbered.map((item, j) => (
-                  <li
-                    key={j}
-                    className="flex gap-3 rounded-xl bg-teal-50/60 px-3 py-3 text-student-ink"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-600 text-xs font-semibold text-white">
-                      {j + 1}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="font-semibold text-student-ink">
-                        {item.title}
-                      </span>
-                      <span className="text-student-muted"> — {item.detail}</span>
-                    </span>
-                  </li>
+        <>
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 lg:items-start">
+            <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-7 sm:py-7">
+              <h2 className="text-xl font-semibold tracking-tight text-student-ink">
+                Part 2: {part2.title}
+              </h2>
+              <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-student-ink">
+                {part2.paragraphs.map((p, j) => (
+                  <ParagraphBlock key={j} p={p} />
                 ))}
-              </ol>
-            )}
-            {part2.note && (
-              <p className="rounded-xl bg-amber-50/90 px-4 py-3 text-[0.95rem] text-student-ink">
-                {part2.note}
-              </p>
-            )}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-7">
-          <h3 className="text-lg font-semibold text-student-ink">
-            Practice: match each dimension to one example
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed text-student-muted">
-            For each dimension, choose the example that best illustrates that
-            aspect of task framing. Each example below is used exactly once.
-          </p>
-
-          <div className="mt-6 space-y-6">
-            {INSTRUCTION_DIMENSIONS.map((dim) => (
-              <div key={dim.key} className="rounded-xl border border-student-border bg-white px-4 py-3">
-                <p className="text-sm font-semibold text-student-ink">
-                  {dim.title}
-                </p>
-                <p className="text-xs text-student-muted">{dim.detail}</p>
-                <label className="mt-2 block text-xs font-medium text-student-muted">
-                  Which example fits this dimension?
-                </label>
-                <select
-                  className="mt-1 w-full rounded-lg border border-student-border bg-student-canvas px-3 py-2 text-sm text-student-ink"
-                  value={matching[dim.key] ?? ""}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setMatching((prev) => ({ ...prev, [dim.key]: v }));
-                  }}
-                >
-                  <option value="">Choose an example…</option>
-                  {shuffledExamples.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.prompt.slice(0, 100)}
-                      {ex.prompt.length > 100 ? "…" : ""}
-                    </option>
-                  ))}
-                </select>
               </div>
-            ))}
-          </div>
+              <div className="mt-6 space-y-5">
+                {INSTRUCTION_DIMENSIONS.map((dim) => (
+                  <article
+                    key={dim.key}
+                    className="rounded-xl border-2 border-student-border bg-white px-4 py-4"
+                  >
+                    <h3 className="text-base font-semibold text-student-ink">
+                      {dim.title}
+                    </h3>
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-student-ink">
+                      {dim.instruction}
+                    </p>
+                  </article>
+                ))}
+              </div>
+              {part2.note && (
+                <p className="mt-6 rounded-xl bg-amber-50/90 px-4 py-3 text-sm font-medium text-student-ink">
+                  {part2.note}
+                </p>
+              )}
+            </section>
 
-          {error && (
-            <p className="mt-6 text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          )}
+            <div className="space-y-6">
+              <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-7 sm:py-7">
+                <h3 className="text-lg font-semibold text-student-ink">
+                  Practice: connect each dimension to one example
+                </h3>
+                <p className="mt-2 text-sm font-medium leading-relaxed text-student-ink">
+                  Each example below fits exactly one dimension. Use every example
+                  once—links appear between columns on larger screens.
+                </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setStep(1);
-                window.scrollTo(0, 0);
-              }}
-              className="rounded-2xl border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink hover:bg-student-canvas"
-            >
-              Back to Part 1
-            </button>
-            <button
-              type="button"
-              disabled={!allMatched || saving}
-              onClick={() => void handleFinish()}
-              className="rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-50"
-            >
-              {saving ? "Saving…" : "Finish instruction & continue"}
-            </button>
+                <div className="mt-6">
+                  <DimensionConnectPractice
+                    dimensions={INSTRUCTION_DIMENSIONS.map((d) => ({
+                      key: d.key,
+                      title: d.title,
+                    }))}
+                    examples={shuffledExamples}
+                    matching={matching}
+                    setMatching={setMatching}
+                  />
+                </div>
+
+                {error && (
+                  <p className="mt-6 text-sm font-medium text-red-600" role="alert">
+                    {error}
+                  </p>
+                )}
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep(1);
+                      window.scrollTo(0, 0);
+                    }}
+                    className="rounded-2xl border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink hover:bg-student-canvas"
+                  >
+                    Back to Part 1
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!allMatched || saving}
+                    onClick={() => void handleFinish()}
+                    className="rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-50"
+                  >
+                    {saving ? "Saving…" : "Finish instruction & continue"}
+                  </button>
+                </div>
+              </section>
+            </div>
           </div>
-        </section>
-      </>
+        </>
       )}
     </div>
   );
