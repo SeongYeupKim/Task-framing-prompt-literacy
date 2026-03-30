@@ -1,19 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
 import { formatAuthError } from "@/lib/firebaseErrors";
+import { readConsentAccepted } from "@/lib/consentStorage";
 import { isPennStateEmail } from "@/lib/psuEmail";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [gateReady, setGateReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!readConsentAccepted()) {
+      router.replace("/?from=auth");
+      return;
+    }
+    setGateReady(true);
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,6 +45,14 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!gateReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-student-canvas">
+        <p className="text-sm font-medium text-student-muted">Loading…</p>
+      </main>
+    );
   }
 
   return (

@@ -1,31 +1,50 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
+import { InformedConsentScreen } from "@/components/InformedConsentScreen";
+import { HomeLanding } from "@/components/HomeLanding";
+import { readConsentAccepted, writeConsentAccepted } from "@/lib/consentStorage";
 
 export default function HomePage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-student-canvas px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
-        <h1 className="text-center text-2xl font-semibold tracking-tight text-student-ink">
-          Learning session
-        </h1>
-        <p className="mt-3 text-center text-sm leading-relaxed text-student-muted">
-          Sign in if you already have an account. New participants can create
-          one below.
-        </p>
-        <div className="mt-8 flex flex-col gap-3">
-          <Link
-            href="/login"
-            className="rounded-2xl bg-teal-600 py-3.5 text-center text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-2xl border-2 border-teal-200 bg-teal-50 py-3.5 text-center text-base font-semibold text-teal-900 transition hover:bg-teal-100"
-          >
-            Create an account
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
+  const [mounted, setMounted] = useState(false);
+  const [consented, setConsented] = useState(false);
+  const [fromAuth, setFromAuth] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setConsented(readConsentAccepted());
+    setFromAuth(
+      typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("from") === "auth",
+    );
+  }, []);
+
+  if (!mounted) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-student-canvas">
+        <p className="text-sm font-medium text-student-muted">Loading…</p>
+      </main>
+    );
+  }
+
+  if (!consented) {
+    return (
+      <>
+        {fromAuth && (
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-950">
+            Please read the consent form below, then continue to sign in or
+            register.
+          </div>
+        )}
+        <InformedConsentScreen
+          onAccepted={() => {
+            writeConsentAccepted();
+            setConsented(true);
+          }}
+        />
+      </>
+    );
+  }
+
+  return <HomeLanding />;
 }
