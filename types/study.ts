@@ -3,6 +3,7 @@ export type StudyCondition = "control" | "instruction" | "instruction_eval";
 
 /** Linear progress through the study UI. */
 export type StudyPhase =
+  | "study_overview"
   | "ai_acceptance"
   | "training"
   | "task_intro_eval"
@@ -63,6 +64,8 @@ export interface UserStudyDoc {
   email?: string;
   condition: StudyCondition | string;
   phase: StudyPhase;
+  /** Shown once after login; timestamp when participant continued past overview. */
+  studyOverviewCompletedAt?: string;
   /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
   aiAcceptanceResponses?: number[];
   aiAcceptanceCompletedAt?: string;

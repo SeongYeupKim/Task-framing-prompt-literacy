@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getClientAuth } from "@/lib/firebase";
 import {
   ensureUserStudyDoc,
+  completeStudyOverview,
   getUserStudyDoc,
   saveEvaluationSubmission,
   saveEssay,
@@ -33,6 +34,7 @@ import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
 import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { InstructionRecapCollapsible } from "@/components/InstructionRecapCollapsible";
 import { TaskIntroPanel } from "@/components/TaskIntroPanel";
+import { StudyParticipationOverview } from "@/components/StudyParticipationOverview";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
   ChatMessage,
@@ -88,6 +90,12 @@ export default function StudyPage() {
   async function handleLogout() {
     await signOut(getClientAuth());
     router.replace("/");
+  }
+
+  async function handleStudyOverviewContinue() {
+    if (!uid) return;
+    await completeStudyOverview(uid);
+    setPhase("ai_acceptance");
   }
 
   async function handleAiAcceptanceSubmit(responses: number[]) {
@@ -223,6 +231,13 @@ export default function StudyPage() {
           wideMain ? "max-w-[1920px]" : "max-w-4xl"
         }`}
       >
+        {phase === "study_overview" && (
+          <StudyParticipationOverview
+            condition={condition}
+            onContinue={handleStudyOverviewContinue}
+          />
+        )}
+
         {showAiAcceptance && (
           <AiAcceptanceSurvey onSubmit={handleAiAcceptanceSubmit} />
         )}

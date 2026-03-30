@@ -46,16 +46,32 @@ export async function ensureUserStudyDoc(user: User): Promise<{
     await setDoc(ref, {
       email: user.email ?? "",
       condition,
-      phase: "ai_acceptance" as StudyPhase,
+      phase: "study_overview" as StudyPhase,
       createdAt: now,
       updatedAt: now,
     });
-    return { condition, phase: "ai_acceptance" };
+    return { condition, phase: "study_overview" };
   }
 
   const data = snap.data() as UserStudyDoc;
   const condition = normalizeCondition(String(data.condition ?? "control"));
-  let phase = (data.phase ?? "ai_acceptance") as StudyPhase;
+  let phase = (data.phase ?? "study_overview") as StudyPhase;
+
+  /**
+   * Pre–study_overview sessions: send anyone still at AI acceptance (pre-survey)
+   * to the overview once.
+   */
+  if (
+    phase === "ai_acceptance" &&
+    !data.studyOverviewCompletedAt &&
+    !data.aiAcceptanceCompletedAt
+  ) {
+    phase = "study_overview";
+    await updateDoc(ref, {
+      phase: "study_overview",
+      updatedAt: new Date().toISOString(),
+    });
+  }
 
   /** Control participants should never stay on legacy “training” after consent. */
   if (
@@ -88,6 +104,18 @@ export async function updateUserPhase(uid: string, phase: StudyPhase) {
   await updateDoc(ref, {
     phase,
     updatedAt: new Date().toISOString(),
+  });
+}
+
+/** After the participation overview screen; next step is AI acceptance. */
+export async function completeStudyOverview(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const now = new Date().toISOString();
+  await updateDoc(ref, {
+    studyOverviewCompletedAt: now,
+    phase: "ai_acceptance",
+    updatedAt: now,
   });
 }
 

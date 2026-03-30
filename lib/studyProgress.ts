@@ -3,6 +3,7 @@ import type { StudyCondition, StudyPhase } from "@/types/study";
 /** Phases each participant actually sees (order matters). */
 const FLOW: Record<StudyCondition, StudyPhase[]> = {
   control: [
+    "study_overview",
     "ai_acceptance",
     "task_intro_final",
     "genai",
@@ -11,6 +12,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "complete",
   ],
   instruction: [
+    "study_overview",
     "ai_acceptance",
     "training",
     "task_intro_final",
@@ -20,6 +22,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "complete",
   ],
   instruction_eval: [
+    "study_overview",
     "ai_acceptance",
     "training",
     "task_intro_eval",
