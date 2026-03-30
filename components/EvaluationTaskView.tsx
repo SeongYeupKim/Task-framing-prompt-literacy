@@ -35,7 +35,7 @@ function PromptMessageThread({ prompts, label }: { prompts: string[]; label: str
       <p className="mb-2 text-center text-xs font-medium uppercase tracking-wide text-student-muted">
         {label} — messages to the AI
       </p>
-        <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
+      <div className="rounded-3xl border border-stone-200/80 bg-stone-100/60 p-3 shadow-inner">
         <div className="space-y-2.5">
           {prompts.map((text, i) => (
             <div key={i} className="flex justify-end">

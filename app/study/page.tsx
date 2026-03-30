@@ -342,7 +342,7 @@ export default function StudyPage() {
                   <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
                     <GenaiTaskScenario />
                     <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-student-muted">
-                      Task conditions
+                      Task requirements
                     </h3>
                     <ul className="mt-2 space-y-3 text-student-ink">
                       {GENAI_TASK.taskConditions.map((c) => (

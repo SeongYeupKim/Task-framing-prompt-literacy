@@ -45,7 +45,7 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
           "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
       },
       {
-        title: "Task conditions",
+        title: "Task requirements",
         detail:
           "Length, level, format, or other limits—what has to be true about the answer?",
         example:
@@ -108,7 +108,7 @@ export const INSTRUCTION_DIMENSIONS: {
   },
   {
     key: "task_conditions",
-    title: "Task conditions",
+    title: "Task requirements",
     detail:
       "Length, level, format, or other limits—what has to be true about the answer?",
     instructionBullets: [
@@ -204,30 +204,36 @@ export const INSTRUCTION_MATCHING_POOL: {
 export const INSTRUCTION_RECAP_BULLETS: string[] = [
   "Goal — what you want the AI to help you accomplish.",
   "Content — topics and ideas that must appear in the answer.",
-  "Task conditions — length, level, format, and other limits.",
+  "Task requirements — length, level, format, and other limits.",
   "Audience — who will read or use the answer.",
   "Format — paragraph, list, essay, etc.",
   "Success — how you’ll tell if the answer is good enough.",
 ];
 
-/** Sleep task — task requirements match study materials (no category labels). */
+/**
+ * Sleep / learning scenario and requirements — shared by eval practice (Step 4)
+ * and the main GenAI + essay task so wording stays aligned (no category labels).
+ */
+export const SLEEP_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
+  "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning.",
+  "As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations.",
+  "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
+];
+
+export const SLEEP_LEARNING_TASK_REQUIREMENTS: string[] = [
+  "Make sure the explanation is based on the evidence.",
+  "Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
+  "Help students understand why sleep matters for their own learning, not just present factual information.",
+  "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
+  "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
+  "Approximately 250–300 words.",
+  "Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
+];
+
 export const EVAL1_SCENARIO = {
   title: "How Sleep Affects Learning",
-  /** Paragraphs for the scenario (no source-text details). */
-  scenario: [
-    "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning.",
-    "As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations.",
-    "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
-  ],
-  taskConditions: [
-    "Make sure the explanation is based on the evidence.",
-    "Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
-    "Help students understand why sleep matters for their own learning, not just present factual information.",
-    "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
-    "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
-    "Approximately 250–300 words.",
-    "Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
-  ],
+  scenario: SLEEP_LEARNING_SCENARIO_PARAGRAPHS,
+  taskConditions: SLEEP_LEARNING_TASK_REQUIREMENTS,
   cases: {
     studentA: {
       label: "Student A",
@@ -315,16 +321,9 @@ export const EVAL2_SCENARIO = {
   },
 };
 
+/** Main chat + essay task — same topic and task requirements as EVAL1 practice. */
 export const GENAI_TASK = {
-  title: "How Does Physical Exercise Influence Learning and Academic Performance?",
-  taskConditions: [
-    "Accuracy: The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
-    "Conceptual integration: Explain both physiological processes (e.g., brain function, attention, memory) and behavioral effects (e.g., motivation, focus), and how they are related.",
-    "Causal reasoning: Clearly explain how and why exercise influences learning and academic performance.",
-    "Purpose alignment: Help the reader understand how exercise can be used to support their own learning.",
-    "Audience awareness: Write for 12th-grade students.",
-    "Use of examples: Include at least two concrete examples to illustrate how exercise affects learning in real situations.",
-    "Length requirement: Approximately 300 words.",
-    "Organization: Present the explanation as a clear, well-organized essay (not a list of points).",
-  ],
+  title: "How Sleep Affects Learning",
+  scenarioParagraphs: SLEEP_LEARNING_SCENARIO_PARAGRAPHS,
+  taskConditions: SLEEP_LEARNING_TASK_REQUIREMENTS,
 };

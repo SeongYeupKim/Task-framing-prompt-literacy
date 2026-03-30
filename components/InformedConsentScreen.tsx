@@ -28,6 +28,9 @@ export function InformedConsentScreen({
         <p className="mt-2 text-center text-sm font-medium text-student-muted">
           Title of project: {INFORMED_CONSENT_TITLE}
         </p>
+        <p className="mt-3 text-center text-sm font-semibold text-teal-900">
+          Step 1 — finish this page before you sign in or create an account.
+        </p>
 
         <div className="mt-8 max-h-[min(60vh,520px)] space-y-6 overflow-y-auto pr-1 text-sm font-medium leading-relaxed text-student-ink sm:max-h-none sm:overflow-visible sm:text-base sm:leading-relaxed">
           {INFORMED_CONSENT_SECTIONS.map((section) => (

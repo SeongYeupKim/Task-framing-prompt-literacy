@@ -87,7 +87,8 @@ export function GenAIInteractionPanel({
           {messages.length === 0 && (
             <p className="rounded-xl bg-white/90 px-3 py-2.5 text-[0.9375rem] leading-relaxed text-student-muted">
               Type a message below to start—for example, “Help me outline my
-              essay” or “What’s one way exercise could affect attention?”
+              explanation” or “How might sleep connect to memory and school
+              performance?”
             </p>
           )}
           {messages.map((m, i) => (

@@ -71,14 +71,14 @@ export function EssaySubmissionPanel({
           <p>
             Aim for about{" "}
             <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
-              ~300 words
+              250–300 words
             </span>{" "}
             and address the{" "}
             <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
-              task conditions
+              task requirements
             </span>{" "}
-            listed in the first column (accuracy, examples, reasoning, and
-            audience-appropriate explanation).
+            listed in the first column (evidence, brain-and-learning links,
+            examples, audience, and organization).
           </p>
           <p className="text-student-muted">
             When you submit, your{" "}

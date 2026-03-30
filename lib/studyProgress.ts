@@ -41,14 +41,20 @@ const LEGACY_FLOW: Record<string, StudyPhase[]> = {
   four_eval: FLOW.instruction_eval,
 };
 
+/** +1: informed consent (before account / first visit) counts as step 1 in the header. */
+const CONSENT_STEP_OFFSET = 1;
+
 export function getPhaseProgress(
   condition: StudyCondition | string,
   phase: StudyPhase
 ): { step: number; total: number } {
   const list =
     FLOW[condition as StudyCondition] ?? LEGACY_FLOW[condition as string];
-  if (!list) return { step: 1, total: 8 };
+  if (!list) return { step: 1 + CONSENT_STEP_OFFSET, total: 8 + CONSENT_STEP_OFFSET };
   const idx = list.indexOf(phase);
-  if (idx < 0) return { step: 1, total: list.length };
-  return { step: idx + 1, total: list.length };
+  if (idx < 0) return { step: 1 + CONSENT_STEP_OFFSET, total: list.length + CONSENT_STEP_OFFSET };
+  return {
+    step: idx + 1 + CONSENT_STEP_OFFSET,
+    total: list.length + CONSENT_STEP_OFFSET,
+  };
 }
