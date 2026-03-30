@@ -192,14 +192,13 @@ export function TrainingPanel({ onComplete }: Props) {
                         </li>
                       ))}
                     </ul>
+                    <p className="mt-3 border-t border-student-border pt-3 text-sm font-medium leading-relaxed text-student-ink">
+                      <span className="font-semibold text-student-ink">Example: </span>
+                      {dim.example}
+                    </p>
                   </article>
                 ))}
               </div>
-              {part2.note && (
-                <p className="mt-6 rounded-xl bg-amber-50/90 px-4 py-3 text-sm font-medium text-student-ink">
-                  {part2.note}
-                </p>
-              )}
             </section>
 
             <div className="min-w-0 space-y-6">

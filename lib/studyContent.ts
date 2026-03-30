@@ -70,18 +70,19 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
           "e.g., It uses evidence, links brain ideas to school life, and meets length and example requirements.",
       },
     ],
-    note: "You don’t need fancy wording. You do need enough detail that the AI knows what “done” looks like.",
   },
 ];
 
 /**
- * Six dimensions: keys stable for Firestore. Left column uses short bullet explanations.
+ * Six dimensions: keys stable for Firestore. Left column: two bullets + one concrete example each.
  */
 export const INSTRUCTION_DIMENSIONS: {
   key: string;
   title: string;
   detail: string;
   instructionBullets: string[];
+  /** Short illustration of that dimension stated clearly (for the instruction column). */
+  example: string;
 }[] = [
   {
     key: "goal",
@@ -90,8 +91,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "It names what you want the AI to help you produce, decide, or plan—not just fancy wording.",
       "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
-      "If the goal is fuzzy, answers tend to be too long, too generic, or aimed at the wrong task.",
     ],
+    example:
+      "e.g., Explain how sleep affects memory so a classmate can use the idea when studying for exams.",
   },
   {
     key: "content",
@@ -100,8 +102,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "Content is what must show up in the answer: topics, ideas, evidence, or angles that belong in the response.",
       'It answers “what has to be in there?”—the substance, not the layout.',
-      "Naming content keeps the model aligned with your assignment instead of skipping or warping key ideas.",
     ],
+    example:
+      "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
   },
   {
     key: "task_conditions",
@@ -111,8 +114,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "These are the rules the answer must follow: length limits, level, citations, tone, language, or what to avoid.",
       "They describe what the final product must satisfy, not only what it talks about.",
-      "Stating them early avoids answers that are right in theory but wrong for your constraints.",
     ],
+    example:
+      "e.g., About 250–300 words; plain language for 9th graders; include two real-life examples.",
   },
   {
     key: "audience",
@@ -121,8 +125,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "Audience is who will read or use the answer—classmates, instructors, novices, or specialists.",
       "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
-      "If you skip audience, tone and difficulty often miss the people who will actually read the text.",
     ],
+    example:
+      "e.g., Other students who have mixed reading levels, not experts in neuroscience.",
   },
   {
     key: "format",
@@ -131,8 +136,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "Format is how the answer is organized: one paragraph vs. sections, bullets vs. prose, outline vs. essay.",
       "It should match how you will paste or present the text (slides, paper, study notes).",
-      "Without it, structure is easy to get wrong even when the ideas are fine.",
     ],
+    example:
+      "e.g., One coherent paragraph, not a bullet list of disconnected facts.",
   },
   {
     key: "success",
@@ -141,8 +147,9 @@ export const INSTRUCTION_DIMENSIONS: {
     instructionBullets: [
       "Success criteria are the checks you will use: e.g., two examples, both sides named, matches a rubric.",
       "They turn “good enough” into something you can actually verify.",
-      "If success stays vague, you and the model may disagree about whether the task is finished.",
     ],
+    example:
+      "e.g., It uses evidence, links brain ideas to school life, and meets length and example requirements.",
   },
 ];
 
