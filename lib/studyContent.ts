@@ -222,9 +222,7 @@ export const EXERCISE_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
 
 /** Single source for eval practice (Step 4) and the main GenAI essay task — all conditions. */
 export const EXERCISE_LEARNING_TASK_REQUIREMENTS: string[] = [
-  "The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
-  "Clearly explain how and why exercise influences learning and academic performance, including how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
-  "Address how different factors (e.g., type, intensity, or timing of exercise) may influence its effects.",
+  "Clearly explain how and why exercise influences learning and academic performance.",
   "Help the reader understand how exercise can be used to support their own learning.",
   "Write for a general student audience—avoid overly technical language; do not oversimplify key ideas.",
   "Include at least two concrete examples that illustrate how exercise affects learning in real situations.",
@@ -240,7 +238,7 @@ export const EVAL1_SCENARIO = {
     studentA: {
       label: "Student A",
       prompts: [
-        "Explain how physical exercise influences learning and academic performance, including how it may affect the brain, behavior, and outcomes like focus or grades.",
+        "Explain how physical exercise influences learning and academic performance.",
         "Write it for a general student audience so it’s clear and not too technical.",
         "Include two concrete real-life examples.",
         "Keep it around 250–300 words as a well-organized essay (not a bullet list).",
@@ -251,10 +249,10 @@ export const EVAL1_SCENARIO = {
       label: "Student B",
       prompts: [
         "Explain how exercise affects learning for students with different schedules or activity levels.",
-        "Focus on how factors like type, intensity, or timing of exercise might change its effects on learning.",
         "Make sure the explanation shows how these ideas connect, not just listed separately.",
         "Write it as a clear essay (about 250–300 words) using language that is easy to understand but still accurate.",
         "Include two examples from school or daily life that help explain why exercise matters for students’ learning.",
+        "Can you stress why this matters for students’ own study habits?",
       ],
     },
     studentC: {
