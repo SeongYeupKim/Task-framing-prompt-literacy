@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  EmailAuthProvider,
+  onAuthStateChanged,
+  reauthenticateWithCredential,
+  signOut,
+} from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { getClientAuth } from "@/lib/firebase";
 import {
@@ -14,8 +19,14 @@ import {
   saveAiAcceptance,
   saveDemographics,
   saveInstructionCompletion,
+  resetStudyFromBeginning,
   updateUserPhase,
 } from "@/lib/userStudy";
+import {
+  clearStudySessionMarkers,
+  markStudyCompletedInThisBrowserSession,
+  hasStudyCompleteSessionAck,
+} from "@/lib/studySessionMarkers";
 import { getNextPhaseAfter, phaseLabel } from "@/lib/studyFlow";
 import { getPhaseProgress } from "@/lib/studyProgress";
 import {
@@ -35,6 +46,7 @@ import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { InstructionRecapCollapsible } from "@/components/InstructionRecapCollapsible";
 import { TaskIntroPanel } from "@/components/TaskIntroPanel";
 import { StudyParticipationOverview } from "@/components/StudyParticipationOverview";
+import { StudyRestartGate } from "@/components/StudyRestartGate";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
   ChatMessage,
@@ -54,6 +66,10 @@ export default function StudyPage() {
   const [genaiMessages, setGenaiMessages] = useState<ChatMessage[]>([]);
   const [essayDraft, setEssayDraft] = useState("");
   const [aiAcceptanceDone, setAiAcceptanceDone] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [postCompleteUI, setPostCompleteUI] = useState<
+    "pending" | "gate" | "thanks"
+  >("pending");
 
   useEffect(() => {
     const auth = getClientAuth();
@@ -63,6 +79,7 @@ export default function StudyPage() {
         return;
       }
       setUid(user.uid);
+      setUserEmail(user.email ?? "");
       const info = await ensureUserStudyDoc(user);
       const doc = await getUserStudyDoc(user.uid);
       const cond = normalizeCondition(
@@ -87,9 +104,36 @@ export default function StudyPage() {
     });
   }, [router]);
 
+  useEffect(() => {
+    if (!ready || phase !== "complete") {
+      setPostCompleteUI("pending");
+      return;
+    }
+    setPostCompleteUI(
+      hasStudyCompleteSessionAck() ? "thanks" : "gate"
+    );
+  }, [ready, phase]);
+
   async function handleLogout() {
+    clearStudySessionMarkers();
     await signOut(getClientAuth());
     router.replace("/");
+  }
+
+  async function handleRestartWithPassword(password: string) {
+    const auth = getClientAuth();
+    const user = auth.currentUser;
+    if (!user?.email || !uid) {
+      throw new Error("Not signed in.");
+    }
+    const cred = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, cred);
+    await resetStudyFromBeginning(uid);
+    clearStudySessionMarkers();
+    setGenaiMessages([]);
+    setEssayDraft("");
+    setAiAcceptanceDone(false);
+    setPhase("study_overview");
   }
 
   async function handleStudyOverviewContinue() {
@@ -157,6 +201,7 @@ export default function StudyPage() {
   async function handleDemographicsSubmit(data: DemographicsSubmission) {
     if (!uid) return;
     await saveDemographics(uid, data);
+    markStudyCompletedInThisBrowserSession();
     setPhase("complete");
   }
 
@@ -357,7 +402,13 @@ export default function StudyPage() {
           <DemographicsSurvey onSubmit={handleDemographicsSubmit} />
         )}
 
-        {phase === "complete" && (
+        {phase === "complete" && postCompleteUI === "pending" && (
+          <p className="text-center text-sm font-medium text-student-muted">
+            Loading…
+          </p>
+        )}
+
+        {phase === "complete" && postCompleteUI === "thanks" && (
           <div className="mx-auto max-w-lg rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-emerald-50 px-8 py-10 text-center shadow-student">
             <p className="text-3xl" aria-hidden>
               ✓
@@ -365,7 +416,7 @@ export default function StudyPage() {
             <h1 className="mt-3 text-2xl font-semibold text-student-ink">
               Thank you
             </h1>
-            <p className="mt-3 text-sm leading-relaxed text-student-muted">
+            <p className="mt-3 text-sm font-medium leading-relaxed text-student-muted">
               Your responses are saved. You can close this tab or log out.
             </p>
             <button
@@ -376,6 +427,17 @@ export default function StudyPage() {
               Log out
             </button>
           </div>
+        )}
+
+        {phase === "complete" && postCompleteUI === "gate" && (
+          <StudyRestartGate
+            emailHint={userEmail}
+            onKeepSubmission={() => {
+              markStudyCompletedInThisBrowserSession();
+              setPostCompleteUI("thanks");
+            }}
+            onRestartWithPassword={(pw) => handleRestartWithPassword(pw)}
+          />
         )}
       </main>
     </div>

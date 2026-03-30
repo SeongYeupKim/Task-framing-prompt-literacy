@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteField, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import { getClientDb } from "@/lib/firebase";
 import {
@@ -216,5 +216,36 @@ export async function saveDemographics(
     demographicsSubmittedAt: data.submittedAt,
     phase: "complete",
     updatedAt: new Date().toISOString(),
+  });
+}
+
+/**
+ * Clears task responses and returns the participant to the start (overview).
+ * Preserves `condition`, `email`, `createdAt`. Requires recent password
+ * reauthentication on the client before calling.
+ */
+export async function resetStudyFromBeginning(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const now = new Date().toISOString();
+  await updateDoc(ref, {
+    phase: "study_overview" as StudyPhase,
+    studyOverviewCompletedAt: deleteField(),
+    aiAcceptanceResponses: deleteField(),
+    aiAcceptanceCompletedAt: deleteField(),
+    trainingCompletedAt: deleteField(),
+    instructionSelfExplanation: deleteField(),
+    instructionMatchingByDimension: deleteField(),
+    instructionMatchingExampleDisplayOrder: deleteField(),
+    instructionCompletedAt: deleteField(),
+    eval1: deleteField(),
+    eval2: deleteField(),
+    genaiMessages: deleteField(),
+    essayText: deleteField(),
+    essaySubmittedAt: deleteField(),
+    demographics: deleteField(),
+    demographicsSubmittedAt: deleteField(),
+    studyRestartedAt: now,
+    updatedAt: now,
   });
 }

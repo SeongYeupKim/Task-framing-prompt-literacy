@@ -81,6 +81,8 @@ export interface UserStudyDoc {
   essaySubmittedAt?: string;
   demographics?: DemographicsSubmission;
   demographicsSubmittedAt?: string;
+  /** Set when participant confirms password and restarts from study_overview. */
+  studyRestartedAt?: string;
   updatedAt?: string;
   createdAt?: string;
 }
