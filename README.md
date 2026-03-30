@@ -21,7 +21,7 @@ Firestore stores `control` | `instruction` | `instruction_eval`. Legacy document
 |-----------|------|
 | **`control`** | AI acceptance → **guide (main task)** → GenAI → Essay → Demographics → Complete |
 | **`instruction`** | AI acceptance → **Instruction (Part 1 self-explanation + Part 2 matching)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
-| **`instruction_eval`** | AI acceptance → **Instruction** → **guide (evaluation)** → **Eval 1 (sleep topic only)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
+| **`instruction_eval`** | AI acceptance → **Instruction** → **guide (evaluation)** → **Eval 1 (exercise & learning topic)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
 
 Intervention arms get a **collapsible “brief instruction reminder”** during the **final task** (and, for `instruction_eval`, also during **Eval 1**).
 

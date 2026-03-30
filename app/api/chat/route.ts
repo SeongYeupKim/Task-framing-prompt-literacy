@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 
-const SYSTEM = `You are helping a student with a science-related writing assignment: an explanatory piece on "How Sleep Affects Learning" and how it may relate to learning and school performance. Their instructors expect accurate, accessible explanations for a general student audience—similar to helping peers around 9th-grade reading level.
+const SYSTEM = `You are helping a student with a science-related writing assignment: an explanatory essay on how physical exercise influences learning and academic performance (brain, behavior, and outcomes like focus or grades). Their instructors expect scientifically grounded causal reasoning, attention to how factors like type, intensity, or timing can matter, and accessible explanations for a general student audience.
 
 Output format (critical — violations look broken to users):
 - Write like a normal message in a chat app: plain sentences and line breaks only.

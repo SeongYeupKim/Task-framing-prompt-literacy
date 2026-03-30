@@ -36,7 +36,7 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
         title: "Goal",
         detail: "What are you trying to accomplish?",
         example:
-          "e.g., Explain how sleep affects memory so a classmate can use the idea when studying for exams.",
+          "e.g., Explain how exercise might affect focus or memory so a classmate can use the idea when studying for exams.",
       },
       {
         title: "Content",
@@ -93,7 +93,7 @@ export const INSTRUCTION_DIMENSIONS: {
       "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
     ],
     example:
-      "e.g., Explain how sleep affects memory so a classmate can use the idea when studying for exams.",
+      "e.g., Explain how exercise might affect focus or memory so a classmate can use the idea when studying for exams.",
   },
   {
     key: "content",
@@ -211,56 +211,57 @@ export const INSTRUCTION_RECAP_BULLETS: string[] = [
 ];
 
 /**
- * Sleep / learning scenario and requirements — shared by eval practice (Step 4)
+ * Exercise / learning scenario and requirements — shared by eval practice (Step 4)
  * and the main GenAI + essay task so wording stays aligned (no category labels).
  */
-export const SLEEP_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
-  "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning.",
-  "As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations.",
-  "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
+export const EXERCISE_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
+  "You are preparing for a science class assignment where you are asked to write an explanatory essay on a topic related to human learning and performance. Your instructor has assigned the following topic: “How Does Physical Exercise Influence Learning and Academic Performance?”",
+  "You are expected to write a short explanatory essay that demonstrates your understanding of how exercise affects the brain, behavior, and learning outcomes. You may already have some prior knowledge from class, but you are encouraged to use ChatGPT as a tool to help you develop and refine your explanation.",
 ];
 
 /** Single source for eval practice (Step 4) and the main GenAI essay task — all conditions. */
-export const SLEEP_LEARNING_TASK_REQUIREMENTS: string[] = [
-  "Make sure the explanation is based on the evidence.",
-  "Help students understand why sleep matters for their own learning, not just present factual information.",
-  "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
-  "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
-  "Approximately 250–300 words.",
-  "Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
+export const EXERCISE_LEARNING_TASK_REQUIREMENTS: string[] = [
+  "Accuracy: The explanation should reflect scientifically valid ideas about how exercise affects the brain and learning.",
+  "Causal reasoning: Clearly explain how and why exercise influences learning and academic performance.",
+  "Conditional understanding: Address how different factors (e.g., type, intensity, or timing of exercise) may influence its effects.",
+  "Purpose alignment: Help the reader understand how exercise can be used to support their own learning.",
+  "Audience awareness: Write for a general student audience—avoid overly technical language; do not oversimplify key ideas.",
+  "Use of examples: Include at least two concrete examples that illustrate how exercise affects learning in real situations.",
+  "Length requirement: Approximately 250–300 words.",
+  "Organization: Present the explanation as a clear, well-organized essay (not a list of points).",
 ];
 
 export const EVAL1_SCENARIO = {
-  title: "How Sleep Affects Learning",
-  scenario: SLEEP_LEARNING_SCENARIO_PARAGRAPHS,
-  taskConditions: SLEEP_LEARNING_TASK_REQUIREMENTS,
+  title: "How Does Physical Exercise Influence Learning and Academic Performance?",
+  scenario: EXERCISE_LEARNING_SCENARIO_PARAGRAPHS,
+  taskConditions: EXERCISE_LEARNING_TASK_REQUIREMENTS,
   cases: {
     studentA: {
       label: "Student A",
       prompts: [
-        "Explain how sleep affects learning, including brain processes like memory and attention and how it impacts school performance.",
-        "Write it for students so it's clear and not too technical.",
-        "Include two examples from school situations.",
-        "Keep it around 250–300 words in one paragraph.",
-        "Can you make the connection between sleep and performance a bit clearer?",
+        "Explain how physical exercise influences learning and academic performance, including how it may affect the brain, behavior, and outcomes like focus or grades.",
+        "Write it for a general student audience so it’s clear and not too technical.",
+        "Include two concrete real-life examples.",
+        "Keep it around 250–300 words as a well-organized essay (not a bullet list).",
+        "Can you make the how-and-why links between exercise and performance a bit clearer?",
       ],
     },
     studentB: {
       label: "Student B",
       prompts: [
-        "Explain how sleep affects learning for students with different reading levels.",
-        "Focus on how sleep supports brain processes like memory and attention and how those lead to outcomes like focus and grades.",
-        "Make sure the explanation shows how these ideas are connected, not just listed.",
-        "Write it as a clear paragraph (about 250–300 words) using language that is easy to understand but still accurate.",
-        "Include two examples from school situations that help explain why sleep matters for students' learning.",
+        "Explain how exercise affects learning for students with different schedules or activity levels.",
+        "Focus on how factors like type, intensity, or timing of exercise might change its effects on learning.",
+        "Make sure the explanation shows how these ideas connect, not just listed separately.",
+        "Write it as a clear essay (about 250–300 words) using language that is easy to understand but still accurate.",
+        "Include two examples from school or daily life that help explain why exercise matters for students’ learning.",
       ],
     },
     studentC: {
       label: "Student C",
       prompts: [
-        "Explain how sleep affects learning outcomes for students.",
-        "Can you include something about how the brain works during sleep?",
-        "Also add how it affects school performance like grades and focus.",
+        "Explain how exercise influences learning and school performance.",
+        "Can you include something about how exercise might relate to the brain?",
+        "Also add how it might show up in behavior—like attention or energy in class.",
         "Your explanation is too hard. Make it easier to understand.",
         "Can you give two examples for this?",
       ],
@@ -323,7 +324,7 @@ export const EVAL2_SCENARIO = {
 
 /** Main chat + essay task — same topic and task requirements as EVAL1 practice. */
 export const GENAI_TASK = {
-  title: "How Sleep Affects Learning",
-  scenarioParagraphs: SLEEP_LEARNING_SCENARIO_PARAGRAPHS,
-  taskConditions: SLEEP_LEARNING_TASK_REQUIREMENTS,
+  title: "How Does Physical Exercise Influence Learning and Academic Performance?",
+  scenarioParagraphs: EXERCISE_LEARNING_SCENARIO_PARAGRAPHS,
+  taskConditions: EXERCISE_LEARNING_TASK_REQUIREMENTS,
 };
