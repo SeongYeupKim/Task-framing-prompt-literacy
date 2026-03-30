@@ -222,7 +222,6 @@ export const SLEEP_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
 
 export const SLEEP_LEARNING_TASK_REQUIREMENTS: string[] = [
   "Make sure the explanation is based on the evidence.",
-  "Clearly explain how brain processes (e.g., memory, attention) are connected to real-life learning outcomes (e.g., focus, grades).",
   "Help students understand why sleep matters for their own learning, not just present factual information.",
   "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
   "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",

@@ -12,12 +12,8 @@ export const PARTICIPATION_OVERVIEW_SHARED = {
     "Most people finish everything in about 30 minutes. You can pause as needed, but please complete the study in one sitting when possible.",
 } as const;
 
-const CONSENT_STEP =
-  "Informed consent (you completed this before creating an account or signing in).";
-
 function stepsControl(): string[] {
   return [
-    CONSENT_STEP,
     "A short questionnaire on your acceptance of AI tools.",
     "A brief orientation to the main writing task for your scenario.",
     "An interactive session where you use an AI chat tool with a study scenario and task instructions.",
@@ -28,7 +24,6 @@ function stepsControl(): string[] {
 
 function stepsInstruction(): string[] {
   return [
-    CONSENT_STEP,
     "A short questionnaire on your acceptance of AI tools.",
     "Instruction on task framing and features of effective AI prompts (reading material and a short practice activity).",
     "A brief orientation, then an interactive session where you use an AI chat tool with a study scenario.",
@@ -39,7 +34,6 @@ function stepsInstruction(): string[] {
 
 function stepsInstructionEval(): string[] {
   return [
-    CONSENT_STEP,
     "A short questionnaire on your acceptance of AI tools.",
     "Instruction on task framing and effective prompting (reading and a short matching practice).",
     "A practice activity where you read a scenario and rate example prompts for how well they frame the task.",
