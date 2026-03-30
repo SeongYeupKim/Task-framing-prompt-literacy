@@ -182,6 +182,7 @@ export default function StudyPage() {
   const recapEval = showInstructionRecap(condition, "eval1");
 
   const wideMain =
+    phase === "training" ||
     phase === "genai" ||
     phase === "essay" ||
     phase === "eval1" ||

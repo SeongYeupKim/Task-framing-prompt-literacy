@@ -75,56 +75,74 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
 ];
 
 /**
- * Six dimensions: keys stable for Firestore. Left-column instruction uses `instruction` (detailed).
+ * Six dimensions: keys stable for Firestore. Left column uses short bullet explanations.
  */
 export const INSTRUCTION_DIMENSIONS: {
   key: string;
   title: string;
   detail: string;
-  instruction: string;
+  instructionBullets: string[];
 }[] = [
   {
     key: "goal",
     title: "Goal",
     detail: "What are you trying to accomplish?",
-    instruction:
-      "The goal names the purpose of your request: what you want the AI to help you produce, decide, or plan before you worry about exact wording. A strong goal specifies the outcome (e.g., a short outline, a comparison, an explanation for a specific use) and often sets boundaries (e.g., “not a full draft” or “for my own notes only”). Without a clear goal, the model has to guess what “done” means, which often leads to answers that are too long, too generic, or aimed at the wrong task.",
+    instructionBullets: [
+      "It names what you want the AI to help you produce, decide, or plan—not just fancy wording.",
+      "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
+      "If the goal is fuzzy, answers tend to be too long, too generic, or aimed at the wrong task.",
+    ],
   },
   {
     key: "content",
     title: "Content",
     detail: "What topics or ideas must be included?",
-    instruction:
-      "Content means the topics, concepts, evidence, or angles that must appear in the answer. It answers “What has to be in there?”—not the shape of the answer, but the substance. For example, you might need certain mechanisms, definitions, contrasts, or sources reflected in the response. If content is vague, the AI may skip important ideas or emphasize something you did not intend; naming content explicitly keeps the answer aligned with your assignment or study goal.",
+    instructionBullets: [
+      "Content is what must show up in the answer: topics, ideas, evidence, or angles that belong in the response.",
+      'It answers “what has to be in there?”—the substance, not the layout.',
+      "Naming content keeps the model aligned with your assignment instead of skipping or warping key ideas.",
+    ],
   },
   {
     key: "task_conditions",
     title: "Task conditions",
     detail:
       "Length, level, format, or other limits—what has to be true about the answer?",
-    instruction:
-      "Task conditions are the rules and constraints the answer must satisfy: length or time limits, reading level, number of examples, citation style, language, tone, or what to avoid. They describe what must be true about the product, not just what it talks about. Stating conditions early reduces rework—otherwise you may get something that is conceptually fine but unusable because it is too technical, too long, or in the wrong format.",
+    instructionBullets: [
+      "These are the rules the answer must follow: length limits, level, citations, tone, language, or what to avoid.",
+      "They describe what the final product must satisfy, not only what it talks about.",
+      "Stating them early avoids answers that are right in theory but wrong for your constraints.",
+    ],
   },
   {
     key: "audience",
     title: "Audience",
     detail: "Who is the answer for?",
-    instruction:
-      "Audience is who will read or use the answer (e.g., classmates, instructor, younger students, specialists). It shapes explanations, examples, and jargon: experts can handle abbreviations and dense detail; novices need clearer definitions and familiar analogies. If the audience is unstated, the AI may sound too formal, too casual, or assume background knowledge your readers do not have.",
+    instructionBullets: [
+      "Audience is who will read or use the answer—classmates, instructors, novices, or specialists.",
+      "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
+      "If you skip audience, tone and difficulty often miss the people who will actually read the text.",
+    ],
   },
   {
     key: "format",
     title: "Format",
     detail: "Paragraph, list, essay, etc.?",
-    instruction:
-      "Format is how the answer should be organized and presented: one paragraph vs. sections with headings, bullet list vs. prose, script vs. outline, table vs. narrative, etc. Specifying format helps the model match how you will reuse the text (e.g., slides vs. essay vs. study sheet). Without format guidance, you may get a structure that is hard to paste into your assignment or study notes.",
+    instructionBullets: [
+      "Format is how the answer is organized: one paragraph vs. sections, bullets vs. prose, outline vs. essay.",
+      "It should match how you will paste or present the text (slides, paper, study notes).",
+      "Without it, structure is easy to get wrong even when the ideas are fine.",
+    ],
   },
   {
     key: "success",
     title: "Success",
     detail: "How will you judge if the answer is good enough?",
-    instruction:
-      "Success criteria are how you will evaluate whether the answer is acceptable: checks like “uses two examples,” “links cause to effect,” “mentions both sides,” “matches the rubric,” or “I can verify claims against my notes.” They make “good enough” concrete. If success is vague, you and the model may disagree on whether the response actually finished the job.",
+    instructionBullets: [
+      "Success criteria are the checks you will use: e.g., two examples, both sides named, matches a rubric.",
+      "They turn “good enough” into something you can actually verify.",
+      "If success stays vague, you and the model may disagree about whether the task is finished.",
+    ],
   },
 ];
 

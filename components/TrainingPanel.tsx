@@ -89,7 +89,9 @@ export function TrainingPanel({ onComplete }: Props) {
 
   return (
     <div
-      className={`mx-auto space-y-8 pb-8 ${step === 2 ? "max-w-6xl" : "max-w-3xl"}`}
+      className={`mx-auto w-full space-y-8 pb-8 ${
+        step === 2 ? "max-w-[min(100%,1680px)] px-1 sm:px-2" : "max-w-3xl"
+      }`}
     >
       <div className="rounded-2xl border border-teal-200 bg-teal-50/50 px-5 py-4 shadow-sm sm:px-7">
         <p className="text-sm font-medium text-teal-900">
@@ -163,8 +165,8 @@ export function TrainingPanel({ onComplete }: Props) {
 
       {step === 2 && (
         <>
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 lg:items-start">
-            <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-7 sm:py-7">
+          <div className="grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-14 lg:items-start">
+            <section className="min-w-0 rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-8">
               <h2 className="text-xl font-semibold tracking-tight text-student-ink">
                 Part 2: {part2.title}
               </h2>
@@ -182,9 +184,14 @@ export function TrainingPanel({ onComplete }: Props) {
                     <h3 className="text-base font-semibold text-student-ink">
                       {dim.title}
                     </h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-student-ink">
-                      {dim.instruction}
-                    </p>
+                    <ul className="mt-3 list-none space-y-2 text-sm font-medium leading-relaxed text-student-ink">
+                      {dim.instructionBullets.map((line, i) => (
+                        <li key={i} className="flex gap-2.5">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-600" />
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </article>
                 ))}
               </div>
@@ -195,8 +202,8 @@ export function TrainingPanel({ onComplete }: Props) {
               )}
             </section>
 
-            <div className="space-y-6">
-              <section className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-7 sm:py-7">
+            <div className="min-w-0 space-y-6">
+              <section className="min-w-0 rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-8">
                 <h3 className="text-lg font-semibold text-student-ink">
                   Practice: connect each dimension to one example
                 </h3>
