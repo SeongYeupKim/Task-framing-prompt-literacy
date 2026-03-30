@@ -65,7 +65,7 @@ export function EssaySubmissionPanel({
             <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
               Write in your own words.
             </span>{" "}
-            You may use ideas from the chat in the middle column—scroll there
+            You may use ideas from the chat on the left—scroll inside that panel
             anytime to reread the assistant’s replies.
           </p>
           <p>
@@ -77,8 +77,8 @@ export function EssaySubmissionPanel({
             <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
               task requirements
             </span>{" "}
-            listed in the first column (evidence, brain-and-learning links,
-            examples, audience, and organization).
+            listed in the scenario and requirements section above (evidence,
+            brain-and-learning links, examples, audience, and organization).
           </p>
           <p className="text-student-muted">
             When you submit, your{" "}
@@ -93,7 +93,7 @@ export function EssaySubmissionPanel({
           onChange={(e) => setText(e.target.value)}
           rows={embedded ? 10 : 18}
           className={`mt-4 w-full rounded-xl border border-student-border bg-white px-3 py-3 text-sm leading-relaxed text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${
-            embedded ? "min-h-[11rem] resize-y" : ""
+            embedded ? "min-h-[12rem] resize-none" : ""
           }`}
           placeholder="Start typing your essay…"
         />

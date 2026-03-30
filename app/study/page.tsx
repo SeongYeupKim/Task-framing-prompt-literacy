@@ -368,45 +368,47 @@ export default function StudyPage() {
               </ul>
             </div>
 
-            {/* Three columns below: chat | workflow | essay — no cramped sidebar scroll. */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-6 xl:gap-8">
-              <div className="flex min-h-[min(52vh,560px)] min-w-0 flex-col lg:min-h-[min(56vh,600px)]">
+            {/* Two equal columns: fixed height so the page doesn’t grow with chat; scroll inside each panel. */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-6 xl:gap-8">
+              <div className="min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))]">
                 <GenAIInteractionPanel
                   messages={genaiMessages}
                   onMessagesChange={persistMessages}
-                  className="h-full min-h-0 flex-1"
+                  className="h-full min-h-0"
                 />
               </div>
 
               {phase === "genai" && (
-                <>
-                  <div className="flex min-h-[min(40vh,320px)] flex-col justify-center rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 p-6 text-center shadow-student lg:min-h-0">
-                    <p className="text-sm font-medium leading-relaxed text-student-ink">
-                      When you’re ready to write, open the essay column. Your chat
-                      stays in the first column—scroll there anytime.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => void handleContinueToEssay()}
-                      className="mt-5 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
-                    >
-                      Open essay editor
-                    </button>
+                <div className="flex min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))] flex-col overflow-hidden rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 shadow-student">
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                    <div className="flex min-h-full flex-col justify-center p-6 text-center">
+                      <p className="text-sm font-medium leading-relaxed text-student-ink">
+                        When you’re ready to write, open the essay editor. Your chat
+                        stays on the left—scroll inside that panel anytime.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => void handleContinueToEssay()}
+                        className="mt-5 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
+                      >
+                        Open essay editor
+                      </button>
+                      <div className="mt-8 rounded-2xl border border-student-border bg-white/80 p-5 text-center shadow-sm">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
+                          Essay
+                        </p>
+                        <p className="mt-2 text-sm font-medium leading-relaxed text-student-muted">
+                          After you open the editor, your draft appears in this
+                          column on the right so you can work beside the chat.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex min-h-[min(36vh,280px)] flex-col justify-center rounded-2xl border border-student-border bg-student-canvas/80 p-5 text-center shadow-student lg:min-h-0">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
-                      Essay
-                    </p>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-student-muted">
-                      After you open the editor, your draft will appear in the
-                      third column so you can work beside the chat.
-                    </p>
-                  </div>
-                </>
+                </div>
               )}
 
               {phase === "essay" && (
-                <div className="flex min-h-0 flex-col lg:col-span-2">
+                <div className="min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))]">
                   <EssaySubmissionPanel
                     embedded
                     initialText={essayDraft}
