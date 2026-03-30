@@ -220,6 +220,7 @@ export const SLEEP_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
   "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
 ];
 
+/** Single source for eval practice (Step 4) and the main GenAI essay task — all conditions. */
 export const SLEEP_LEARNING_TASK_REQUIREMENTS: string[] = [
   "Make sure the explanation is based on the evidence.",
   "Help students understand why sleep matters for their own learning, not just present factual information.",

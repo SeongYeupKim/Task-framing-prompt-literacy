@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { getClientAuth } from "@/lib/firebase";
 import {
   ensureUserStudyDoc,
+  completeStudyConsent,
   completeStudyOverview,
   getUserStudyDoc,
   saveEvaluationSubmission,
@@ -45,6 +46,7 @@ import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
 import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { InstructionRecapCollapsible } from "@/components/InstructionRecapCollapsible";
 import { TaskIntroPanel } from "@/components/TaskIntroPanel";
+import { InformedConsentScreen } from "@/components/InformedConsentScreen";
 import { StudyParticipationOverview } from "@/components/StudyParticipationOverview";
 import { StudyRestartGate } from "@/components/StudyRestartGate";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
@@ -133,6 +135,12 @@ export default function StudyPage() {
     setGenaiMessages([]);
     setEssayDraft("");
     setAiAcceptanceDone(false);
+    setPhase("study_consent");
+  }
+
+  async function handleStudyConsentContinue() {
+    if (!uid) return;
+    await completeStudyConsent(uid);
     setPhase("study_overview");
   }
 
@@ -276,6 +284,13 @@ export default function StudyPage() {
           wideMain ? "max-w-[1920px]" : "max-w-4xl"
         }`}
       >
+        {phase === "study_consent" && (
+          <InformedConsentScreen
+            variant="study"
+            onAccepted={() => void handleStudyConsentContinue()}
+          />
+        )}
+
         {phase === "study_overview" && (
           <StudyParticipationOverview
             condition={condition}

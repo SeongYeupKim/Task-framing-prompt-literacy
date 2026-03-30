@@ -3,6 +3,7 @@ import type { StudyCondition, StudyPhase } from "@/types/study";
 /** Phases each participant actually sees (order matters). */
 const FLOW: Record<StudyCondition, StudyPhase[]> = {
   control: [
+    "study_consent",
     "study_overview",
     "ai_acceptance",
     "task_intro_final",
@@ -12,6 +13,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "complete",
   ],
   instruction: [
+    "study_consent",
     "study_overview",
     "ai_acceptance",
     "training",
@@ -22,6 +24,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "complete",
   ],
   instruction_eval: [
+    "study_consent",
     "study_overview",
     "ai_acceptance",
     "training",
@@ -41,20 +44,17 @@ const LEGACY_FLOW: Record<string, StudyPhase[]> = {
   four_eval: FLOW.instruction_eval,
 };
 
-/** +1: informed consent (before account / first visit) counts as step 1 in the header. */
-const CONSENT_STEP_OFFSET = 1;
-
 export function getPhaseProgress(
   condition: StudyCondition | string,
   phase: StudyPhase
 ): { step: number; total: number } {
   const list =
     FLOW[condition as StudyCondition] ?? LEGACY_FLOW[condition as string];
-  if (!list) return { step: 1 + CONSENT_STEP_OFFSET, total: 8 + CONSENT_STEP_OFFSET };
+  if (!list) return { step: 1, total: 9 };
   const idx = list.indexOf(phase);
-  if (idx < 0) return { step: 1 + CONSENT_STEP_OFFSET, total: list.length + CONSENT_STEP_OFFSET };
+  if (idx < 0) return { step: 1, total: list.length };
   return {
-    step: idx + 1 + CONSENT_STEP_OFFSET,
-    total: list.length + CONSENT_STEP_OFFSET,
+    step: idx + 1,
+    total: list.length,
   };
 }

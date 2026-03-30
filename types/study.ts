@@ -3,6 +3,7 @@ export type StudyCondition = "control" | "instruction" | "instruction_eval";
 
 /** Linear progress through the study UI. */
 export type StudyPhase =
+  | "study_consent"
   | "study_overview"
   | "ai_acceptance"
   | "training"
@@ -64,7 +65,9 @@ export interface UserStudyDoc {
   email?: string;
   condition: StudyCondition | string;
   phase: StudyPhase;
-  /** Shown once after login; timestamp when participant continued past overview. */
+  /** Informed consent completed on /study (first screen after sign-in). */
+  studyConsentCompletedAt?: string;
+  /** Participation guidance page completed; next is AI acceptance. */
   studyOverviewCompletedAt?: string;
   /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
   aiAcceptanceResponses?: number[];
@@ -81,7 +84,7 @@ export interface UserStudyDoc {
   essaySubmittedAt?: string;
   demographics?: DemographicsSubmission;
   demographicsSubmittedAt?: string;
-  /** Set when participant confirms password and restarts from study_overview. */
+  /** Set when participant confirms password and restarts from study_consent. */
   studyRestartedAt?: string;
   updatedAt?: string;
   createdAt?: string;

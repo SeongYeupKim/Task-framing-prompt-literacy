@@ -6,6 +6,9 @@ export function getNextPhaseAfter(
   condition: StudyCondition,
   completed: StudyPhase
 ): StudyPhase | null {
+  if (completed === "study_consent") {
+    return "study_overview";
+  }
   if (completed === "study_overview") {
     return "ai_acceptance";
   }
@@ -29,8 +32,10 @@ export function getNextPhaseAfter(
 /** Short label for the header (student-friendly). */
 export function phaseLabel(phase: StudyPhase): string {
   switch (phase) {
+    case "study_consent":
+      return "Informed consent";
     case "study_overview":
-      return "Before you begin";
+      return "Your session overview";
     case "ai_acceptance":
       return "AI acceptance";
     case "training":

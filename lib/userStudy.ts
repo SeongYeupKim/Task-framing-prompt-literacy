@@ -46,29 +46,81 @@ export async function ensureUserStudyDoc(user: User): Promise<{
     await setDoc(ref, {
       email: user.email ?? "",
       condition,
-      phase: "study_overview" as StudyPhase,
+      phase: "study_consent" as StudyPhase,
       createdAt: now,
       updatedAt: now,
     });
-    return { condition, phase: "study_overview" };
+    return { condition, phase: "study_consent" };
   }
 
   const data = snap.data() as UserStudyDoc;
   const condition = normalizeCondition(String(data.condition ?? "control"));
-  let phase = (data.phase ?? "study_overview") as StudyPhase;
+  let phase = (data.phase ?? "study_consent") as StudyPhase;
 
-  /**
-   * Pre–study_overview sessions: send anyone still at AI acceptance (pre-survey)
-   * to the overview once.
-   */
+  /** Orphan state: overview already saved but phase not advanced. */
   if (
-    phase === "ai_acceptance" &&
-    !data.studyOverviewCompletedAt &&
+    phase === "study_overview" &&
+    data.studyOverviewCompletedAt &&
     !data.aiAcceptanceCompletedAt
   ) {
-    phase = "study_overview";
+    phase = "ai_acceptance";
     await updateDoc(ref, {
-      phase: "study_overview",
+      phase: "ai_acceptance",
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  /** Existing sessions from before study_consent existed: backfill consent time. */
+  if (!data.studyConsentCompletedAt) {
+    const progressedPastConsent =
+      !!data.studyOverviewCompletedAt ||
+      !!data.aiAcceptanceCompletedAt ||
+      phase === "training" ||
+      phase === "task_intro_eval" ||
+      phase === "eval1" ||
+      phase === "task_intro_final" ||
+      phase === "genai" ||
+      phase === "essay" ||
+      phase === "demographics" ||
+      phase === "complete";
+    if (progressedPastConsent) {
+      const ts = data.studyOverviewCompletedAt ?? data.createdAt ?? now;
+      await updateDoc(ref, {
+        studyConsentCompletedAt: ts,
+        updatedAt: new Date().toISOString(),
+      });
+      (data as UserStudyDoc).studyConsentCompletedAt = ts;
+    }
+  }
+
+  /**
+   * Pre-survey AI acceptance: require consent, then overview, in order.
+   */
+  if (phase === "ai_acceptance" && !data.aiAcceptanceCompletedAt) {
+    if (!data.studyConsentCompletedAt) {
+      phase = "study_consent";
+      await updateDoc(ref, {
+        phase: "study_consent",
+        updatedAt: new Date().toISOString(),
+      });
+    } else if (!data.studyOverviewCompletedAt) {
+      phase = "study_overview";
+      await updateDoc(ref, {
+        phase: "study_overview",
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  /** Overview text not completed yet: always show consent first. */
+  if (
+    phase === "study_overview" &&
+    !data.studyOverviewCompletedAt &&
+    !data.studyConsentCompletedAt
+  ) {
+    phase = "study_consent";
+    await updateDoc(ref, {
+      phase: "study_consent",
       updatedAt: new Date().toISOString(),
     });
   }
@@ -96,6 +148,18 @@ export async function ensureUserStudyDoc(user: User): Promise<{
   }
 
   return { condition, phase };
+}
+
+/** After in-app informed consent; next is participation guidance. */
+export async function completeStudyConsent(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const now = new Date().toISOString();
+  await updateDoc(ref, {
+    studyConsentCompletedAt: now,
+    phase: "study_overview",
+    updatedAt: now,
+  });
 }
 
 export async function updateUserPhase(uid: string, phase: StudyPhase) {
@@ -229,7 +293,8 @@ export async function resetStudyFromBeginning(uid: string) {
   const ref = doc(db, COLLECTION, uid);
   const now = new Date().toISOString();
   await updateDoc(ref, {
-    phase: "study_overview" as StudyPhase,
+    phase: "study_consent" as StudyPhase,
+    studyConsentCompletedAt: deleteField(),
     studyOverviewCompletedAt: deleteField(),
     aiAcceptanceResponses: deleteField(),
     aiAcceptanceCompletedAt: deleteField(),
