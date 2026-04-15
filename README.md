@@ -34,10 +34,22 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 - `genaiMessages`, `essayText`, `essaySubmittedAt`  
 - `demographics`, `demographicsSubmittedAt`
 
+## Researcher export (`/admin`)
+
+Password-protected dashboard to download all `users` documents, including full **`genaiMessages`** (every user turn and assistant reply with `createdAt`).
+
+**Vercel / server env (never commit):**
+
+- **`ADMIN_EXPORT_SECRET`** — long random string; enter it as the password on `/admin`.
+- **`FIREBASE_SERVICE_ACCOUNT_JSON`** — full JSON of a [Firebase service account](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) private key (single line in Vercel). The account must be able to read Firestore (default “Firebase Admin SDK” service account works).
+
+Exports: **JSON** (complete nested data), **CSV** (one row per participant; nested fields as JSON strings), **.txt** (human-readable chat logs per UID).
+
 ## Security
 
 - Never commit `.env.local` or API keys.  
 - OpenAI key server-side only (`/api/chat`).
+- Treat **`ADMIN_EXPORT_SECRET`** and the **service account JSON** like root access to participant data; rotate if exposed.
 
 ## License
 

@@ -59,6 +59,8 @@ git push origin main
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | |
+| `ADMIN_EXPORT_SECRET` | Long random password for **`/admin`** exports (Production). |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | One-line JSON of the Firebase **service account** private key (for researcher export API). Example: `jq -c . your-key.json` then paste. |
 
 **Save** → **Deployments** → **⋯** → **Redeploy**.
 
