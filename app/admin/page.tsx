@@ -31,14 +31,25 @@ export default function AdminDashboardPage() {
         error?: string;
         hint?: string;
         vercelEnv?: string | null;
+        credentialEnv?: {
+          hasFullJson: boolean;
+          hasProjectId: boolean;
+          hasClientEmail: boolean;
+          hasPrivateKey: boolean;
+        };
       };
       if (!res.ok) {
         setError(json.error || `Request failed (${res.status})`);
+        const cred = json.credentialEnv;
+        const credLine = cred
+          ? `Server checks (no secrets shown): FIREBASE_SERVICE_ACCOUNT_JSON seen=${cred.hasFullJson}; split vars seen: projectId=${cred.hasProjectId}, clientEmail=${cred.hasClientEmail}, privateKey=${cred.hasPrivateKey}. If all are false, add the variables to this Vercel project for Production and redeploy.`
+          : null;
         const parts = [
           json.hint,
           json.vercelEnv != null
             ? `Vercel deployment environment: ${json.vercelEnv}`
             : null,
+          credLine,
         ].filter(Boolean);
         setErrorDetail(parts.length ? parts.join("\n\n") : null);
         return;
@@ -74,6 +85,76 @@ export default function AdminDashboardPage() {
           student message and assistant reply with timestamps). Use only on
           secure devices; exports contain identifiable study data.
         </p>
+
+        <details className="mt-6 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
+          <summary className="cursor-pointer font-semibold">
+            First-time setup: Firebase credentials on Vercel
+          </summary>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
+            <li>
+              Open{" "}
+              <a
+                className="font-medium text-teal-800 underline"
+                href="https://console.firebase.google.com"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Firebase Console
+              </a>{" "}
+              → your study project → ⚙️ <strong>Project settings</strong> →{" "}
+              <strong>Service accounts</strong>.
+            </li>
+            <li>
+              Click <strong>Generate new private key</strong> → download the{" "}
+              <code className="rounded bg-white/90 px-1">.json</code> file.
+            </li>
+            <li>
+              In{" "}
+              <strong>
+                Vercel → this project → Settings → Environment Variables
+              </strong>
+              , under <strong>Production</strong>, add <em>either</em>:
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>
+                  <code className="rounded bg-white/90 px-1">
+                    FIREBASE_SERVICE_ACCOUNT_JSON
+                  </code>{" "}
+                  = entire file as <strong>one line</strong> (terminal:{" "}
+                  <code className="rounded bg-white/90 px-1">
+                    jq -c . your-key.json
+                  </code>
+                  ), <em>or</em>
+                </li>
+                <li>
+                  Three variables:{" "}
+                  <code className="rounded bg-white/90 px-1">
+                    FIREBASE_ADMIN_PROJECT_ID
+                  </code>
+                  ,{" "}
+                  <code className="rounded bg-white/90 px-1">
+                    FIREBASE_ADMIN_CLIENT_EMAIL
+                  </code>
+                  ,{" "}
+                  <code className="rounded bg-white/90 px-1">
+                    FIREBASE_ADMIN_PRIVATE_KEY
+                  </code>{" "}
+                  (copy from the same JSON; for the private key use{" "}
+                  <code className="rounded bg-white/90 px-1">\n</code> where
+                  line breaks were).
+                </li>
+              </ul>
+            </li>
+            <li>
+              Save variables, then <strong>Redeploy</strong> (Deployments → ⋯
+              → Redeploy). Preview-only variables will{" "}
+              <strong>not</strong> work on{" "}
+              <code className="rounded bg-white/90 px-1">
+                taskframing.vercel.app
+              </code>{" "}
+              unless you also enable them for Production.
+            </li>
+          </ol>
+        </details>
 
         <div className="mt-8 rounded-2xl border border-student-border bg-student-card p-6 shadow-student">
           <label className="block text-sm font-semibold text-student-ink">

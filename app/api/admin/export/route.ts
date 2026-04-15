@@ -4,7 +4,10 @@ import {
   deepSerializeFirestore,
   getAdminFirestore,
 } from "@/lib/firebaseAdmin";
-import { getAdminExportSecret } from "@/lib/serverEnv";
+import {
+  getAdminExportSecret,
+  getFirebaseCredentialEnvPresence,
+} from "@/lib/serverEnv";
 
 const COLLECTION = "users";
 
@@ -78,6 +81,19 @@ export async function POST(req: Request) {
       e instanceof Error
         ? e.message
         : "Export failed. Check FIREBASE_SERVICE_ACCOUNT_JSON and permissions.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const isFirebaseConfig =
+      message.includes("Firebase Admin") ||
+      message.includes("FIREBASE_SERVICE_ACCOUNT") ||
+      message.includes("FIREBASE_ADMIN");
+    return NextResponse.json(
+      {
+        error: message,
+        vercelEnv: process.env.VERCEL_ENV ?? null,
+        ...(isFirebaseConfig
+          ? { credentialEnv: getFirebaseCredentialEnvPresence() }
+          : {}),
+      },
+      { status: 500 },
+    );
   }
 }

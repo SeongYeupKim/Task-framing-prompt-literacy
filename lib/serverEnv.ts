@@ -13,20 +13,91 @@ function envFromKeyB64(keyB64: string): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
+/** Second lookup path: key built from char codes (bundler cannot fold to undefined). */
+function envChar(...codes: readonly number[]): string | undefined {
+  const k = String.fromCharCode(...codes);
+  const v = process.env[k];
+  return typeof v === "string" ? v : undefined;
+}
+
 /** ADMIN_EXPORT_SECRET (and typo ADIM_EXPORT_SECRET) */
 export function getAdminExportSecret(): string {
-  const primary = envFromKeyB64("QURNSU5fRVhQT1JUX1NFQ1JFVA==")?.trim();
+  const primary =
+    envFromKeyB64("QURNSU5fRVhQT1JUX1NFQ1JFVA==")?.trim() ??
+    envChar(
+      65, 68, 77, 73, 78, 95, 69, 88, 80, 79, 82, 84, 95, 83, 69, 67, 82, 69,
+      84,
+    )?.trim();
   if (primary) return primary;
-  const typo = envFromKeyB64("QURJTV9FWFBPUlRfU0VDUkVU")?.trim();
+  const typo =
+    envFromKeyB64("QURJTV9FWFBPUlRfU0VDUkVU")?.trim() ??
+    envChar(
+      65, 68, 73, 77, 95, 69, 88, 80, 79, 82, 84, 95, 83, 69, 67, 82, 69, 84,
+    )?.trim();
   if (typo) return typo;
   return "";
 }
 
+function readFirebaseServiceAccountJsonRaw(): string {
+  const raw =
+    envFromKeyB64("RklSRUJBU0VfU0VSVklDRV9BQ0NPVU5UX0pTT04=") ??
+    envChar(
+      70, 73, 82, 69, 66, 65, 83, 69, 95, 83, 69, 82, 86, 73, 67, 69, 95, 65,
+      67, 67, 79, 85, 78, 84, 95, 74, 83, 79, 78,
+    );
+  return raw?.trim().replace(/^\uFEFF/, "") ?? "";
+}
+
 /** Full service account JSON (one line), if set */
 export function getFirebaseServiceAccountJson(): string {
+  return readFirebaseServiceAccountJsonRaw();
+}
+
+function readAdminProjectId(): string {
   return (
-    envFromKeyB64("RklSRUJBU0VfU0VSVklDRV9BQ0NPVU5UX0pTT04=")?.trim() ?? ""
-  );
+    envFromKeyB64("RklSRUJBU0VfQURNSU5fUFJPSkVDVF9JRA==") ??
+    envChar(
+      70, 73, 82, 69, 66, 65, 83, 69, 95, 65, 68, 77, 73, 78, 95, 80, 82, 79,
+      74, 69, 67, 84, 95, 73, 68,
+    )
+  )?.trim() ?? "";
+}
+
+function readAdminClientEmail(): string {
+  return (
+    envFromKeyB64("RklSRUJBU0VfQURNSU5fQ0xJRU5UX0VNQUlM") ??
+    envChar(
+      70, 73, 82, 69, 66, 65, 83, 69, 95, 65, 68, 77, 73, 78, 95, 67, 76, 73,
+      69, 78, 84, 95, 69, 77, 65, 73, 76,
+    )
+  )?.trim() ?? "";
+}
+
+function readAdminPrivateKeyRaw(): string {
+  return (
+    envFromKeyB64("RklSRUJBU0VfQURNSU5fUFJJVkFURV9LRVk=") ??
+    envChar(
+      70, 73, 82, 69, 66, 65, 83, 69, 95, 65, 68, 77, 73, 78, 95, 80, 82, 73,
+      86, 65, 84, 69, 95, 75, 69, 89,
+    )
+  )?.trim() ?? "";
+}
+
+/** Safe booleans for support / admin UI (no secret values). */
+export function getFirebaseCredentialEnvPresence(): {
+  hasFullJson: boolean;
+  hasProjectId: boolean;
+  hasClientEmail: boolean;
+  hasPrivateKey: boolean;
+} {
+  const json = readFirebaseServiceAccountJsonRaw();
+  const pk = readAdminPrivateKeyRaw();
+  return {
+    hasFullJson: json.length > 0,
+    hasProjectId: readAdminProjectId().length > 0,
+    hasClientEmail: readAdminClientEmail().length > 0,
+    hasPrivateKey: pk.length > 0,
+  };
 }
 
 /**
@@ -36,7 +107,7 @@ export function getFirebaseServiceAccountJson(): string {
  *   (easier in Vercel; for private_key, paste the PEM with newline characters as the two-char sequence \n).
  */
 export function resolveFirebaseServiceAccount(): ServiceAccount {
-  const jsonRaw = getFirebaseServiceAccountJson();
+  const jsonRaw = readFirebaseServiceAccountJsonRaw();
   if (jsonRaw) {
     try {
       return JSON.parse(jsonRaw) as ServiceAccount;
@@ -47,12 +118,9 @@ export function resolveFirebaseServiceAccount(): ServiceAccount {
     }
   }
 
-  const projectId =
-    envFromKeyB64("RklSRUJBU0VfQURNSU5fUFJPSkVDVF9JRA==")?.trim() ?? "";
-  const clientEmail =
-    envFromKeyB64("RklSRUJBU0VfQURNSU5fQ0xJRU5UX0VNQUlM")?.trim() ?? "";
-  let privateKey =
-    envFromKeyB64("RklSRUJBU0VfQURNSU5fUFJJVkFURV9LRVk=")?.trim() ?? "";
+  const projectId = readAdminProjectId();
+  const clientEmail = readAdminClientEmail();
+  let privateKey = readAdminPrivateKeyRaw();
 
   if (privateKey) {
     privateKey = privateKey.replace(/\\n/g, "\n");
