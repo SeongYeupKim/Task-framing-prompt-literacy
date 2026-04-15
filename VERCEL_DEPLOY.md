@@ -78,6 +78,10 @@ Add your exact Vercel hostname, e.g. **`taskframing.vercel.app`**, under **Authe
 
 Publish the same rules as local: copy **`firestore.rules`** → Firebase **Firestore → Rules** → **Publish**.
 
+**Or use the CLI** (from the repo root, once per machine: `npx firebase-tools login`):  
+`npx firebase-tools deploy --only firestore:rules`  
+This repo includes **`firebase.json`** and **`.firebaserc`** (default project id). If your Firebase project id differs, edit **`.firebaserc`** before deploying.
+
 ---
 
 ## 6. Smoke test
