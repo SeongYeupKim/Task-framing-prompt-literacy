@@ -1,3 +1,5 @@
+import type { StudyCondition } from "@/types/study";
+
 /** Training text chunks: plain string, or { b: "bold" } */
 export type TextChunk = string | { b: string };
 
@@ -45,7 +47,7 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
           "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
       },
       {
-        title: "Task requirements",
+        title: "Task constraints",
         detail:
           "Length, level, format, or other limits—what has to be true about the answer?",
         example:
@@ -67,23 +69,23 @@ export const TRAINING_SECTIONS: TrainingSection[] = [
         title: "Success",
         detail: "How will you judge if the answer is good enough?",
         example:
-          "e.g., It uses evidence, links brain ideas to school life, and meets length and example requirements.",
+          "e.g., It uses evidence, links brain ideas to school life, and meets length and example constraints.",
       },
     ],
   },
 ];
 
-/**
- * Six dimensions: keys stable for Firestore. Left column: two bullets + one concrete example each.
- */
-export const INSTRUCTION_DIMENSIONS: {
+/** Six dimensions: keys stable for Firestore. Part 2 examples differ by condition (classroom topic). */
+export type InstructionDimension = {
   key: string;
   title: string;
   detail: string;
   instructionBullets: string[];
-  /** Short illustration of that dimension stated clearly (for the instruction column). */
   example: string;
-}[] = [
+};
+
+/** Condition 1 (`instruction`): Earth science / weather unit examples. */
+const INSTRUCTION_DIMENSIONS_CONDITION1: InstructionDimension[] = [
   {
     key: "goal",
     title: "Goal",
@@ -93,7 +95,7 @@ export const INSTRUCTION_DIMENSIONS: {
       "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
     ],
     example:
-      "e.g., Explain how exercise might affect focus or memory so a classmate can use the idea when studying for exams.",
+      "e.g., Explain how pressure systems relate to local weather patterns so my lab partner can review before our class presentation.",
   },
   {
     key: "content",
@@ -104,11 +106,11 @@ export const INSTRUCTION_DIMENSIONS: {
       'It answers “what has to be in there?”—the substance, not the layout.',
     ],
     example:
-      "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
+      "e.g., Must include both a warm-front and a cold-front example—not only fair-weather or “sunny day” descriptions.",
   },
   {
     key: "task_conditions",
-    title: "Task requirements",
+    title: "Task constraints",
     detail:
       "Length, level, format, or other limits—what has to be true about the answer?",
     instructionBullets: [
@@ -116,7 +118,7 @@ export const INSTRUCTION_DIMENSIONS: {
       "They describe what the final product must satisfy, not only what it talks about.",
     ],
     example:
-      "e.g., About 250–300 words; plain language for 9th graders; include two real-life examples.",
+      "e.g., Cap at 200 words, use SI units where we learned them, and mention our class handout once by name.",
   },
   {
     key: "audience",
@@ -127,7 +129,7 @@ export const INSTRUCTION_DIMENSIONS: {
       "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
     ],
     example:
-      "e.g., Other students who have mixed reading levels, not experts in neuroscience.",
+      "e.g., Classmates who missed the weather-map lab—use everyday terms before any technical vocabulary.",
   },
   {
     key: "format",
@@ -138,7 +140,7 @@ export const INSTRUCTION_DIMENSIONS: {
       "It should match how you will paste or present the text (slides, paper, study notes).",
     ],
     example:
-      "e.g., One coherent paragraph, not a bullet list of disconnected facts.",
+      "e.g., One continuous short essay with no subheadings—my teacher asked for flowing prose only.",
   },
   {
     key: "success",
@@ -149,9 +151,88 @@ export const INSTRUCTION_DIMENSIONS: {
       "They turn “good enough” into something you can actually verify.",
     ],
     example:
-      "e.g., It uses evidence, links brain ideas to school life, and meets length and example requirements.",
+      "e.g., I’ll use it only if it ties at least one pattern to a forecast we could check on a real weather report.",
   },
 ];
+
+/** Condition 2 (`instruction_eval`): creative writing / literature workshop examples. */
+const INSTRUCTION_DIMENSIONS_CONDITION2: InstructionDimension[] = [
+  {
+    key: "goal",
+    title: "Goal",
+    detail: "What are you trying to accomplish?",
+    instructionBullets: [
+      "It names what you want the AI to help you produce, decide, or plan—not just fancy wording.",
+      "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
+    ],
+    example:
+      "e.g., Help me state a theme for my short-story draft that I can defend in workshop tomorrow.",
+  },
+  {
+    key: "content",
+    title: "Content",
+    detail: "What topics or ideas must be included?",
+    instructionBullets: [
+      "Content is what must show up in the answer: topics, ideas, evidence, or angles that belong in the response.",
+      'It answers “what has to be in there?”—the substance, not the layout.',
+    ],
+    example:
+      "e.g., Connect imagery from my opening scene to the ending—don’t summarize the whole plot beat by beat.",
+  },
+  {
+    key: "task_conditions",
+    title: "Task constraints",
+    detail:
+      "Length, level, format, or other limits—what has to be true about the answer?",
+    instructionBullets: [
+      "These are the rules the answer must follow: length limits, level, citations, tone, language, or what to avoid.",
+      "They describe what the final product must satisfy, not only what it talks about.",
+    ],
+    example:
+      "e.g., No more than three paragraphs, present tense for literary analysis, and no quotes longer than one line.",
+  },
+  {
+    key: "audience",
+    title: "Audience",
+    detail: "Who is the answer for?",
+    instructionBullets: [
+      "Audience is who will read or use the answer—classmates, instructors, novices, or specialists.",
+      "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
+    ],
+    example:
+      "e.g., Peers who haven’t read my draft—introduce characters by role (e.g., narrator, sibling), not only by name.",
+  },
+  {
+    key: "format",
+    title: "Format",
+    detail: "Paragraph, list, essay, etc.?",
+    instructionBullets: [
+      "Format is how the answer is organized: one paragraph vs. sections, bullets vs. prose, outline vs. essay.",
+      "It should match how you will paste or present the text (slides, paper, study notes).",
+    ],
+    example:
+      "e.g., Prose paragraphs only—if the answer comes back as a bullet list, I can’t paste it into my workshop submission.",
+  },
+  {
+    key: "success",
+    title: "Success",
+    detail: "How will you judge if the answer is good enough?",
+    instructionBullets: [
+      "Success criteria are the checks you will use: e.g., two examples, both sides named, matches a rubric.",
+      "They turn “good enough” into something you can actually verify.",
+    ],
+    example:
+      "e.g., I’ll keep it only if it names one risk of interpreting the theme too literally.",
+  },
+];
+
+/** Part 2 dimension cards + examples: `instruction` vs `instruction_eval` use different classroom topics. */
+export function instructionDimensionsForCondition(
+  c: StudyCondition,
+): InstructionDimension[] {
+  if (c === "instruction_eval") return INSTRUCTION_DIMENSIONS_CONDITION2;
+  return INSTRUCTION_DIMENSIONS_CONDITION1;
+}
 
 /**
  * Example prompts for the matching task only (not the same wording as Part 2 examples).
@@ -204,19 +285,19 @@ export const INSTRUCTION_MATCHING_POOL: {
 export const INSTRUCTION_RECAP_BULLETS: string[] = [
   "Goal — what you want the AI to help you accomplish.",
   "Content — topics and ideas that must appear in the answer.",
-  "Task requirements — length, level, format, and other limits.",
+  "Task constraints — length, level, format, and other limits.",
   "Audience — who will read or use the answer.",
   "Format — paragraph, list, essay, etc.",
   "Success — how you’ll tell if the answer is good enough.",
 ];
 
 /**
- * Exercise / learning scenario and requirements — main GenAI + essay task (all conditions).
+ * Exercise / learning scenario and task constraints — main GenAI + essay task (all conditions).
  * Requirements are plain sentences only (no rubric labels like “Accuracy:”) so students read criteria, not jargon.
  */
 export const EXERCISE_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
   "You are preparing for a science class assignment where you are asked to write an explanatory essay on a topic related to human learning and performance. Your instructor has assigned the following topic: “How Does Physical Exercise Influence Learning and Academic Performance?”",
-  "You are expected to write a short explanatory essay that demonstrates your understanding of how exercise affects the brain, behavior, and learning outcomes. You may already have some prior knowledge from class, but you are encouraged to use ChatGPT as a tool to help you develop and refine your explanation.",
+  "You are expected to write a short explanatory essay that demonstrates your understanding of how exercise affects the brain, behavior, and learning outcomes. You may already have some prior knowledge from class, but you are encouraged to use the AI chatbot below as a tool to help you develop and refine your explanation.",
 ];
 
 export const EXERCISE_LEARNING_TASK_REQUIREMENTS: string[] = [

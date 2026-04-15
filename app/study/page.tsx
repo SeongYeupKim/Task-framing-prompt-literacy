@@ -303,7 +303,10 @@ export default function StudyPage() {
         )}
 
         {!showAiAcceptance && phase === "training" && (
-          <TrainingPanel onComplete={handleInstructionComplete} />
+          <TrainingPanel
+            condition={condition}
+            onComplete={handleInstructionComplete}
+          />
         )}
 
         {phase === "task_intro_eval" && (
@@ -342,7 +345,7 @@ export default function StudyPage() {
               </div>
             )}
 
-            {/* Full-width scenario + requirements (same pattern as eval task). */}
+            {/* Full-width scenario + task constraints (same pattern as eval task). */}
             <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7">
               <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
                 Scenario
@@ -354,7 +357,7 @@ export default function StudyPage() {
                 <GenaiTaskScenario />
               </div>
               <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-student-muted">
-                Task requirements (the explanation should satisfy all of these)
+                Task constraints (the explanation should satisfy all of these)
               </h3>
               <ul className="mt-3 space-y-3 text-student-ink">
                 {GENAI_TASK.taskConditions.map((c) => (

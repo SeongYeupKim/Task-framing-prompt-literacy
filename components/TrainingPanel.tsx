@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import {
   TRAINING_SECTIONS,
-  INSTRUCTION_DIMENSIONS,
+  instructionDimensionsForCondition,
   INSTRUCTION_MATCHING_POOL,
   type TextChunk,
 } from "@/lib/studyContent";
-import type { InstructionPracticeData } from "@/types/study";
+import type { InstructionPracticeData, StudyCondition } from "@/types/study";
 import { DimensionConnectPractice } from "@/components/DimensionConnectPractice";
 
 function shuffle<T>(items: T[]): T[] {
@@ -40,25 +40,31 @@ function ParagraphBlock({ p }: { p: string | TextChunk[] }) {
 }
 
 type Props = {
+  condition: StudyCondition;
   onComplete: (data: InstructionPracticeData) => Promise<void>;
 };
 
 const part2 = TRAINING_SECTIONS[1];
 
-export function TrainingPanel({ onComplete }: Props) {
+export function TrainingPanel({ condition, onComplete }: Props) {
   const [step, setStep] = useState<1 | 2>(1);
   const [selfExplanation, setSelfExplanation] = useState("");
   const [matching, setMatching] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const dimensions = useMemo(
+    () => instructionDimensionsForCondition(condition),
+    [condition],
+  );
+
   const shuffledExamples = useMemo(() => shuffle(INSTRUCTION_MATCHING_POOL), []);
 
   const part1Complete = selfExplanation.trim().length >= 40;
   const allMatched =
-    INSTRUCTION_DIMENSIONS.every((d) => matching[d.key]?.length > 0) &&
+    dimensions.every((d) => matching[d.key]?.length > 0) &&
     (() => {
-      const ids = INSTRUCTION_DIMENSIONS.map((d) => matching[d.key]);
+      const ids = dimensions.map((d) => matching[d.key]);
       return new Set(ids).size === ids.length;
     })();
 
@@ -68,7 +74,7 @@ export function TrainingPanel({ onComplete }: Props) {
       setError("Choose one example for each dimension, using each example exactly once.");
       return;
     }
-    const ids = INSTRUCTION_DIMENSIONS.map((d) => matching[d.key]);
+    const ids = dimensions.map((d) => matching[d.key]);
     if (new Set(ids).size !== ids.length) {
       setError("Each example can only be selected once.");
       return;
@@ -176,7 +182,7 @@ export function TrainingPanel({ onComplete }: Props) {
                 ))}
               </div>
               <div className="mt-6 space-y-5">
-                {INSTRUCTION_DIMENSIONS.map((dim) => (
+                {dimensions.map((dim) => (
                   <article
                     key={dim.key}
                     className="rounded-xl border-2 border-student-border bg-white px-4 py-4"
@@ -213,7 +219,7 @@ export function TrainingPanel({ onComplete }: Props) {
 
                 <div className="mt-6">
                   <DimensionConnectPractice
-                    dimensions={INSTRUCTION_DIMENSIONS.map((d) => ({
+                    dimensions={dimensions.map((d) => ({
                       key: d.key,
                       title: d.title,
                     }))}

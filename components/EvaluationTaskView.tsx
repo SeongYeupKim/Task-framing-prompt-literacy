@@ -180,7 +180,7 @@ export function EvaluationTaskView({
         </div>
       )}
 
-      {/* Full width: scenario + task requirements */}
+      {/* Full width: scenario + task constraints */}
       <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-orange-50/50 px-5 py-6 shadow-student sm:px-7">
         <p className="text-xs font-semibold uppercase tracking-wide text-amber-900/70">
           Scenario
@@ -192,7 +192,7 @@ export function EvaluationTaskView({
           ))}
         </div>
         <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-student-muted">
-          Task requirements (the explanation should satisfy all of these)
+          Task constraints (the explanation should satisfy all of these)
         </h3>
         <ul className="mt-3 space-y-3 text-student-ink">
           {taskConditions.map((c) => (

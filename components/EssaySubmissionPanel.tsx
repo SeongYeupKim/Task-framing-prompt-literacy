@@ -75,10 +75,9 @@ export function EssaySubmissionPanel({
             </span>{" "}
             and address the{" "}
             <span className="font-bold underline decoration-teal-600 decoration-2 underline-offset-2">
-              task requirements
+              task constraints
             </span>{" "}
-            listed in the scenario and requirements section above (evidence,
-            brain-and-learning links, examples, audience, and organization).
+            listed in the scenario section above.
           </p>
           <p className="text-student-muted">
             When you submit, your{" "}
