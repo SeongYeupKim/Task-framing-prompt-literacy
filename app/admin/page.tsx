@@ -13,10 +13,12 @@ export default function AdminDashboardPage() {
   const [secret, setSecret] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [data, setData] = useState<AdminExportPayload | null>(null);
 
   const runExport = useCallback(async () => {
     setError(null);
+    setErrorDetail(null);
     setData(null);
     setLoading(true);
     try {
@@ -25,9 +27,20 @@ export default function AdminDashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ secret: secret.trim() }),
       });
-      const json = (await res.json()) as AdminExportPayload & { error?: string };
+      const json = (await res.json()) as AdminExportPayload & {
+        error?: string;
+        hint?: string;
+        vercelEnv?: string | null;
+      };
       if (!res.ok) {
         setError(json.error || `Request failed (${res.status})`);
+        const parts = [
+          json.hint,
+          json.vercelEnv != null
+            ? `Vercel deployment environment: ${json.vercelEnv}`
+            : null,
+        ].filter(Boolean);
+        setErrorDetail(parts.length ? parts.join("\n\n") : null);
         return;
       }
       if (typeof json.participantCount !== "number" || !Array.isArray(json.participants)) {
@@ -83,9 +96,14 @@ export default function AdminDashboardPage() {
             {loading ? "Fetching…" : "Load export from database"}
           </button>
           {error && (
-            <p className="mt-4 text-sm font-medium text-red-600" role="alert">
-              {error}
-            </p>
+            <div className="mt-4 space-y-2" role="alert">
+              <p className="text-sm font-medium text-red-600">{error}</p>
+              {errorDetail && (
+                <p className="whitespace-pre-wrap text-xs leading-relaxed text-red-800/90">
+                  {errorDetail}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
