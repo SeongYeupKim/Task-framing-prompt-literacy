@@ -41,7 +41,8 @@ Password-protected dashboard to download all `users` documents, including full *
 **Vercel / server env (never commit):**
 
 - **`ADMIN_EXPORT_SECRET`** — long random string; enter it as the password on `/admin`.
-- **`FIREBASE_SERVICE_ACCOUNT_JSON`** — full JSON of a [Firebase service account](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) private key (single line in Vercel). The account must be able to read Firestore (default “Firebase Admin SDK” service account works).
+- **`FIREBASE_SERVICE_ACCOUNT_JSON`** — full JSON of a [Firebase service account](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) private key as **one line** (e.g. `jq -c . key.json`).  
+  **Or** set three variables instead (easier in Vercel): **`FIREBASE_ADMIN_PROJECT_ID`**, **`FIREBASE_ADMIN_CLIENT_EMAIL`**, **`FIREBASE_ADMIN_PRIVATE_KEY`** (paste the PEM with `\n` where line breaks were). The default Admin SDK service account can read Firestore.
 
 Exports: **JSON** (complete nested data), **CSV** (one row per participant; nested fields as JSON strings), **.txt** (human-readable chat logs per UID).
 

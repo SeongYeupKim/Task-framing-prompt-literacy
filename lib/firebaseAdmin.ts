@@ -1,17 +1,11 @@
 import * as admin from "firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
-import { getFirebaseServiceAccountJson } from "@/lib/serverEnv";
+import { resolveFirebaseServiceAccount } from "@/lib/serverEnv";
 
 let app: admin.app.App | undefined;
 
 function getServiceAccount(): admin.ServiceAccount {
-  const raw = getFirebaseServiceAccountJson();
-  if (!raw) {
-    throw new Error(
-      "FIREBASE_SERVICE_ACCOUNT_JSON is not set. Add the service account JSON in Vercel (or .env.local for local testing).",
-    );
-  }
-  return JSON.parse(raw) as admin.ServiceAccount;
+  return resolveFirebaseServiceAccount();
 }
 
 /** Server-only Firebase Admin app (Firestore). Lazy init so builds work without env. */
