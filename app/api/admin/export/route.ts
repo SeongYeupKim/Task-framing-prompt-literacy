@@ -19,15 +19,27 @@ function safeCompareSecret(a: string, b: string): boolean {
 }
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export const maxDuration = 120;
 
+/** Read at runtime; bracket access avoids build-time inlining as `undefined` when the var was added after an old build. */
+function getAdminExportSecret(): string {
+  const env = process.env;
+  const raw =
+    env["ADMIN_EXPORT_SECRET"] ??
+    env["ADIM_EXPORT_SECRET"];
+  return typeof raw === "string" ? raw.trim() : "";
+}
+
 export async function POST(req: Request) {
-  const expected = process.env.ADMIN_EXPORT_SECRET?.trim();
+  const expected = getAdminExportSecret();
   if (!expected) {
     return NextResponse.json(
       {
         error:
-          "Server is not configured for exports (missing ADMIN_EXPORT_SECRET).",
+          "Server is not configured for exports (missing admin export password env var).",
+        hint:
+          "In Vercel → Project → Settings → Environment Variables: add ADMIN_EXPORT_SECRET (exact name) for Production, save, then Redeploy. If you used a typo, ADIM_EXPORT_SECRET is also accepted.",
       },
       { status: 503 },
     );
