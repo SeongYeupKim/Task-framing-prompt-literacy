@@ -4,6 +4,7 @@ import {
   deepSerializeFirestore,
   getAdminFirestore,
 } from "@/lib/firebaseAdmin";
+import { getAdminExportSecret } from "@/lib/serverEnv";
 
 const COLLECTION = "users";
 
@@ -22,15 +23,6 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-/** Read at runtime; bracket access avoids build-time inlining as `undefined` when the var was added after an old build. */
-function getAdminExportSecret(): string {
-  const env = process.env;
-  const raw =
-    env["ADMIN_EXPORT_SECRET"] ??
-    env["ADIM_EXPORT_SECRET"];
-  return typeof raw === "string" ? raw.trim() : "";
-}
-
 export async function POST(req: Request) {
   const expected = getAdminExportSecret();
   if (!expected) {
@@ -39,7 +31,8 @@ export async function POST(req: Request) {
         error:
           "Server is not configured for exports (missing admin export password env var).",
         hint:
-          "In Vercel → Project → Settings → Environment Variables: add ADMIN_EXPORT_SECRET (exact name) for Production, save, then Redeploy. If you used a typo, ADIM_EXPORT_SECRET is also accepted.",
+          "Vercel → Settings → Environment Variables: name must be ADMIN_EXPORT_SECRET (or ADIM_EXPORT_SECRET), value non-empty, Production checked, then Redeploy. If it still fails, remove the variable and add it again so a new deployment picks it up.",
+        vercelEnv: process.env.VERCEL_ENV ?? null,
       },
       { status: 503 },
     );
