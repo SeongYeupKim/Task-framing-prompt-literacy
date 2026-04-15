@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "firebase": "^11.6.0",
-    "firebase-admin": "^13.8.0",
     "next": "14.2.18",
     "openai": "^4.73.0",
     "react": "^18.3.1",

@@ -36,21 +36,17 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 ## Researcher export (`/admin`)
 
-Password-protected dashboard to download all `users` documents, including full **`genaiMessages`** (every user turn and assistant reply with `createdAt`).
+Researchers sign in with the same **Firebase Email/Password** flow as participants (**`@psu.edu`**). The browser reads all documents in **`users`** using the client SDK—**no** Firebase Admin or service-account variables on Vercel.
 
-**Vercel / server env (never commit):**
+**Firestore:** publish **`firestore.rules`** from this repo. Rules let each user read/write their own doc and let **any signed-in user** read every **`users`** document (so `/admin` can export). Keep the `/admin` URL off public pages if you do not want participants browsing each other’s data.
 
-- **`ADMIN_EXPORT_SECRET`** — long random string; enter it as the password on `/admin`.
-- **`FIREBASE_SERVICE_ACCOUNT_JSON`** — full JSON of a [Firebase service account](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk) private key as **one line** (e.g. `jq -c . key.json`).  
-  **Or** set three variables instead (easier in Vercel): **`FIREBASE_ADMIN_PROJECT_ID`**, **`FIREBASE_ADMIN_CLIENT_EMAIL`**, **`FIREBASE_ADMIN_PRIVATE_KEY`** (paste the PEM with `\n` where line breaks were). The default Admin SDK service account can read Firestore.
-
-Exports: **JSON** (complete nested data), **CSV** (one row per participant; nested fields as JSON strings), **.txt** (human-readable chat logs per UID).
+Exports: **JSON** (complete nested data), **CSV** (one row per participant; nested fields as JSON strings), **.txt** (human-readable chat logs per UID), including full **`genaiMessages`**.
 
 ## Security
 
 - Never commit `.env.local` or API keys.  
 - OpenAI key server-side only (`/api/chat`).
-- Treat **`ADMIN_EXPORT_SECRET`** and the **service account JSON** like root access to participant data; rotate if exposed.
+- **`/admin` is not a secret gate:** anyone with a study account and the URL can export. Tighten rules (e.g. custom claims or an allow-list collection) if you need stricter access later.
 
 ## License
 

@@ -59,15 +59,12 @@ git push origin main
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | |
-| `ADMIN_EXPORT_SECRET` | Long random password for **`/admin`** exports (Production). |
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | **Option A:** One-line JSON of the Firebase **service account** key (`jq -c . your-key.json`). **Option B:** omit this and set the three vars below instead. |
-| `FIREBASE_ADMIN_PROJECT_ID` | From the same JSON: `project_id` |
-| `FIREBASE_ADMIN_CLIENT_EMAIL` | From the same JSON: `client_email` |
-| `FIREBASE_ADMIN_PRIVATE_KEY` | From the same JSON: `private_key` — in Vercel paste as one line; replace real newlines with `\n` (backslash + n). |
 
 **Save** → **Deployments** → **⋯** → **Redeploy**.
 
 Missing **`OPENAI_API_KEY`** on Vercel is the #1 reason chat works locally but not online.
+
+**`/admin` exports:** no extra Vercel variables. Researchers sign in with Firebase; publish **`firestore.rules`** from the repo (see **`README.md`**).
 
 ---
 

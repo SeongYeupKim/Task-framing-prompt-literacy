@@ -1,9 +1,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Research app: each authenticated user may only read/write their own document.
     match /users/{userId} {
+      // Each participant reads/writes only their own document.
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Any signed-in account may read any user doc (e.g. /admin export). Do not
+      // share /admin URL publicly; treat study accounts as trusted for this project.
+      allow read: if request.auth != null;
     }
   }
 }

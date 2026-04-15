@@ -132,6 +132,7 @@ To stop the server: in Terminal press **Ctrl + C**.
 | “Missing OPENAI_API_KEY” | `OPENAI_API_KEY=` line is filled and file is saved; restart `npm run dev`. |
 | Chat returns error | Check `OPENAI_MODEL` matches a model your key can use; check billing on OpenAI if needed. |
 | Permission denied in Firestore | Re-publish **`firestore.rules`** from this repo (Part A4). |
+| **`/admin`** permission denied | Re-publish **`firestore.rules`** from this repo (Part A4). You must be signed in. |
 | `npm` not found | Install [Node.js LTS](https://nodejs.org/) and open a new Terminal. |
 
 ---
