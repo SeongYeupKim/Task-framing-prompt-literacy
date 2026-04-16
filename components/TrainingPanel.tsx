@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   TRAINING_SECTIONS,
   instructionDimensionsForCondition,
@@ -8,6 +8,10 @@ import {
   type TextChunk,
 } from "@/lib/studyContent";
 import type { InstructionPracticeData, StudyCondition } from "@/types/study";
+import {
+  recordInstructionPart2Start,
+  recordTrainingModuleEntered,
+} from "@/lib/userStudy";
 import { DimensionConnectPractice } from "@/components/DimensionConnectPractice";
 
 function renderChunks(chunks: TextChunk[]) {
@@ -32,12 +36,17 @@ function ParagraphBlock({ p }: { p: string | TextChunk[] }) {
 
 type Props = {
   condition: StudyCondition;
+  studyUid: string;
   onComplete: (data: InstructionPracticeData) => Promise<void>;
 };
 
 const part2 = TRAINING_SECTIONS[1];
 
-export function TrainingPanel({ condition, onComplete }: Props) {
+export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
+  useEffect(() => {
+    void recordTrainingModuleEntered(studyUid);
+  }, [studyUid]);
+
   const [step, setStep] = useState<1 | 2>(1);
   const [selfExplanation, setSelfExplanation] = useState("");
   const [matching, setMatching] = useState<Record<string, string>>({});
@@ -147,6 +156,7 @@ export function TrainingPanel({ condition, onComplete }: Props) {
               type="button"
               disabled={!part1Complete}
               onClick={() => {
+                void recordInstructionPart2Start(studyUid);
                 setStep(2);
                 window.scrollTo(0, 0);
               }}

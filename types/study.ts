@@ -72,11 +72,19 @@ export interface UserStudyDoc {
   /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
   aiAcceptanceResponses?: number[];
   aiAcceptanceCompletedAt?: string;
+  /** First paint of the instruction module (Part 1); set when TrainingPanel mounts. */
+  trainingStartedAt?: string;
+  /** First time the participant opens Part 2 (matching practice). */
+  instructionStartedAt?: string;
   trainingCompletedAt?: string;
   instructionSelfExplanation?: string;
   instructionMatchingByDimension?: Record<string, string>;
   instructionMatchingExampleDisplayOrder?: string[];
   instructionCompletedAt?: string;
+  /** First entry into the GenAI + essay block (after final task intro). */
+  finalTaskStartedAt?: string;
+  /** First time the participant opens the essay editor (after chat phase). */
+  essayEditorOpenedAt?: string;
   eval1?: EvaluationTaskSubmission;
   eval2?: EvaluationTaskSubmission;
   genaiMessages?: ChatMessage[];

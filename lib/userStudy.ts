@@ -187,15 +187,60 @@ export async function saveAiAcceptance(uid: string, responses: number[]) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
   const snap = await getDoc(ref);
-  const raw = snap.data() as { condition?: string } | undefined;
+  const raw = snap.data() as UserStudyDoc | undefined;
   const cond = normalizeCondition(raw?.condition);
   const next = phaseAfterAiAcceptance(cond);
+  const now = new Date().toISOString();
   await updateDoc(ref, {
     aiAcceptanceResponses: responses,
-    aiAcceptanceCompletedAt: new Date().toISOString(),
+    aiAcceptanceCompletedAt: now,
     phase: next,
-    updatedAt: new Date().toISOString(),
+    updatedAt: now,
   });
+}
+
+/** TrainingPanel mounted (Part 1 visible); idempotent. */
+export async function recordTrainingModuleEntered(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() as UserStudyDoc | undefined;
+  if (data?.trainingStartedAt) return;
+  const now = new Date().toISOString();
+  await updateDoc(ref, { trainingStartedAt: now, updatedAt: now });
+}
+
+/** First transition to instruction Part 2 (matching); idempotent. */
+export async function recordInstructionPart2Start(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() as UserStudyDoc | undefined;
+  if (data?.instructionStartedAt) return;
+  const now = new Date().toISOString();
+  await updateDoc(ref, { instructionStartedAt: now, updatedAt: now });
+}
+
+/** First entry into GenAI phase; idempotent. */
+export async function recordFinalTaskStarted(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() as UserStudyDoc | undefined;
+  if (data?.finalTaskStartedAt) return;
+  const now = new Date().toISOString();
+  await updateDoc(ref, { finalTaskStartedAt: now, updatedAt: now });
+}
+
+/** First transition to essay phase; idempotent. */
+export async function recordEssayEditorOpened(uid: string) {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() as UserStudyDoc | undefined;
+  if (data?.essayEditorOpenedAt) return;
+  const now = new Date().toISOString();
+  await updateDoc(ref, { essayEditorOpenedAt: now, updatedAt: now });
 }
 
 export async function saveInstructionCompletion(
@@ -298,6 +343,8 @@ export async function resetStudyFromBeginning(uid: string) {
     studyOverviewCompletedAt: deleteField(),
     aiAcceptanceResponses: deleteField(),
     aiAcceptanceCompletedAt: deleteField(),
+    trainingStartedAt: deleteField(),
+    instructionStartedAt: deleteField(),
     trainingCompletedAt: deleteField(),
     instructionSelfExplanation: deleteField(),
     instructionMatchingByDimension: deleteField(),
@@ -308,6 +355,8 @@ export async function resetStudyFromBeginning(uid: string) {
     genaiMessages: deleteField(),
     essayText: deleteField(),
     essaySubmittedAt: deleteField(),
+    finalTaskStartedAt: deleteField(),
+    essayEditorOpenedAt: deleteField(),
     demographics: deleteField(),
     demographicsSubmittedAt: deleteField(),
     studyRestartedAt: now,

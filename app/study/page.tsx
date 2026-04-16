@@ -22,6 +22,8 @@ import {
   saveInstructionCompletion,
   resetStudyFromBeginning,
   updateUserPhase,
+  recordFinalTaskStarted,
+  recordEssayEditorOpened,
 } from "@/lib/userStudy";
 import {
   clearStudySessionMarkers,
@@ -173,6 +175,7 @@ export default function StudyPage() {
 
   async function handleTaskIntroFinalContinue() {
     if (!uid) return;
+    await recordFinalTaskStarted(uid);
     await updateUserPhase(uid, "genai");
     setPhase("genai");
   }
@@ -196,6 +199,7 @@ export default function StudyPage() {
 
   async function handleContinueToEssay() {
     if (!uid) return;
+    await recordEssayEditorOpened(uid);
     await updateUserPhase(uid, "essay");
     setPhase("essay");
   }
@@ -305,6 +309,7 @@ export default function StudyPage() {
         {!showAiAcceptance && phase === "training" && (
           <TrainingPanel
             condition={condition}
+            studyUid={uid}
             onComplete={handleInstructionComplete}
           />
         )}

@@ -39,6 +39,15 @@ function str(v: unknown): string {
   }
 }
 
+/** Whole seconds between ISO timestamps; empty if missing or invalid. */
+function durationSecondsIso(isoStart: unknown, isoEnd: unknown): string {
+  if (typeof isoStart !== "string" || typeof isoEnd !== "string") return "";
+  const a = Date.parse(isoStart);
+  const b = Date.parse(isoEnd);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) return "";
+  return String(Math.round((b - a) / 1000));
+}
+
 function genaiUserAssistantLists(messages: unknown): {
   user: string[];
   assistant: string[];
@@ -170,8 +179,13 @@ export function studyWideExportStaticHeaders(): string[] {
     "studyOverviewCompletedAt",
     "aiAcceptanceCompletedAt",
     ...likert,
+    "trainingStartedAt",
     "trainingCompletedAt",
+    "instructionStartedAt",
     "instructionCompletedAt",
+    "training_total_seconds",
+    "instruction_part1_seconds",
+    "instruction_part2_seconds",
     "instruction_self_explanation",
     ...instrMatch,
     "instruction_matching_display_order_json",
@@ -182,6 +196,12 @@ export function studyWideExportStaticHeaders(): string[] {
     "eval1_rationale_studentB",
     "eval1_rationale_studentC",
     "eval1_submittedAt",
+    "finalTaskStartedAt",
+    "essayEditorOpenedAt",
+    "essaySubmittedAt",
+    "final_task_total_seconds",
+    "final_task_genai_seconds",
+    "final_task_essay_seconds",
     "essay_text",
   ];
 }
@@ -229,6 +249,31 @@ export function buildStudyWideExportCsv(
         ? ""
         : str(p.instructionMatchingExampleDisplayOrder);
 
+    const trainingTotalSec = durationSecondsIso(
+      p.trainingStartedAt,
+      p.trainingCompletedAt,
+    );
+    const instructionPart1Sec = durationSecondsIso(
+      p.trainingStartedAt,
+      p.instructionStartedAt,
+    );
+    const instructionPart2Sec = durationSecondsIso(
+      p.instructionStartedAt,
+      p.instructionCompletedAt,
+    );
+    const finalTaskTotalSec = durationSecondsIso(
+      p.finalTaskStartedAt,
+      p.essaySubmittedAt,
+    );
+    const finalTaskGenaiSec = durationSecondsIso(
+      p.finalTaskStartedAt,
+      p.essayEditorOpenedAt,
+    );
+    const finalTaskEssaySec = durationSecondsIso(
+      p.essayEditorOpenedAt,
+      p.essaySubmittedAt,
+    );
+
     const cells: string[] = [
       csvCell(str(p.email)),
       csvCell(cond),
@@ -241,14 +286,25 @@ export function buildStudyWideExportCsv(
       csvCell(str(p.studyOverviewCompletedAt)),
       csvCell(str(p.aiAcceptanceCompletedAt)),
       ...likertColumns(p).map(csvCell),
+      csvCell(str(p.trainingStartedAt)),
       csvCell(str(p.trainingCompletedAt)),
+      csvCell(str(p.instructionStartedAt)),
       csvCell(str(p.instructionCompletedAt)),
+      csvCell(trainingTotalSec),
+      csvCell(instructionPart1Sec),
+      csvCell(instructionPart2Sec),
       csvCell(str(p.instructionSelfExplanation)),
       ...INSTR_DIM_KEYS.map((k) => csvCell(instrMatchingDim(p, k))),
       csvCell(displayOrder),
       ...ev.ratings.map(csvCell),
       ...ev.rationales.map(csvCell),
       csvCell(ev.submittedAt),
+      csvCell(str(p.finalTaskStartedAt)),
+      csvCell(str(p.essayEditorOpenedAt)),
+      csvCell(str(p.essaySubmittedAt)),
+      csvCell(finalTaskTotalSec),
+      csvCell(finalTaskGenaiSec),
+      csvCell(finalTaskEssaySec),
       csvCell(str(p.essayText)),
     ];
 
