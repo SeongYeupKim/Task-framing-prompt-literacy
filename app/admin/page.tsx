@@ -50,7 +50,7 @@ function clearSession() {
 
 function formatClientExportError(err: unknown): string {
   if (err instanceof FirebaseError && err.code === "permission-denied") {
-    return "Permission denied. In Firebase → Firestore → Rules, publish firestore.rules from this repo.";
+    return "Permission denied. On /admin use “Copy rules from this app”, paste into Firebase → Firestore → Rules, Publish.";
   }
   if (err instanceof Error) return err.message;
   return "Export failed.";
@@ -59,6 +59,97 @@ function formatClientExportError(err: unknown): string {
 function isExportFirebaseUser(u: User | null): boolean {
   const e = u?.email?.trim().toLowerCase();
   return !!e && e === RESEARCH_EXPORT_FIREBASE_EMAIL;
+}
+
+function FirebaseExportSetupCard({
+  authUsersUrl,
+  rulesConsoleUrl,
+  githubRulesRaw,
+  onCopyRules,
+  rulesHint,
+}: {
+  authUsersUrl: string;
+  rulesConsoleUrl: string;
+  githubRulesRaw: string;
+  onCopyRules: () => void;
+  rulesHint: string | null;
+}) {
+  return (
+    <div className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/90 px-5 py-4 text-sm text-amber-950">
+      <p className="font-semibold">One-time: publish Firestore rules (~1 minute)</p>
+      <p className="mt-2 text-xs leading-relaxed text-amber-900/95">
+        <strong>“Repo”</strong> just means your study&apos;s code (e.g. on GitHub). You
+        don&apos;t have to open it — use <strong>Copy rules</strong> below. Rules are
+        the security text Firebase uses for your database; they live in the Firebase
+        website under <strong>Firestore → Rules</strong>, not under Authentication.
+      </p>
+      <ol className="mt-3 list-decimal space-y-3 pl-5 leading-relaxed">
+        <li>
+          You added{" "}
+          <code className="rounded bg-white/90 px-1">{RESEARCH_EXPORT_FIREBASE_EMAIL}</code>{" "}
+          under{" "}
+          <a
+            href={authUsersUrl}
+            className="font-medium underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Authentication → Users
+          </a>{" "}
+          (same password as this admin page).
+        </li>
+        <li>
+          Open{" "}
+          <a
+            href={rulesConsoleUrl}
+            className="font-medium underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Firestore Database → Rules
+          </a>{" "}
+          in the same Firebase project.
+        </li>
+        <li>
+          Click <strong>Copy rules from this app</strong>, then in Firebase select
+          everything in the rules box (⌘A / Ctrl+A), delete it, paste (⌘V / Ctrl+V), and
+          click <strong>Publish</strong>.
+        </li>
+      </ol>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <button
+          type="button"
+          onClick={onCopyRules}
+          className="rounded-xl bg-amber-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-900"
+        >
+          Copy rules from this app
+        </button>
+        <a
+          href={rulesConsoleUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-xl border border-amber-800 bg-white px-4 py-2.5 text-sm font-semibold text-amber-950 hover:bg-amber-100/80"
+        >
+          Open Firebase Rules editor
+        </a>
+        <a
+          href={githubRulesRaw}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center text-sm font-medium text-amber-900 underline"
+        >
+          Backup: view rules on GitHub
+        </a>
+      </div>
+      {rulesHint && (
+        <p className="mt-3 text-sm font-medium text-amber-900">{rulesHint}</p>
+      )}
+      <p className="mt-3 text-xs text-amber-900/90">
+        Optional: <strong>FIREBASE_SERVICE_ACCOUNT_JSON</strong> on Vercel skips browser
+        Firebase.
+      </p>
+    </div>
+  );
 }
 
 export default function AdminDashboardPage() {
@@ -83,6 +174,29 @@ export default function AdminDashboardPage() {
   const authUsersUrl = projectId
     ? `https://console.firebase.google.com/project/${projectId}/authentication/users`
     : "https://console.firebase.google.com";
+  const rulesConsoleUrl = projectId
+    ? `https://console.firebase.google.com/project/${projectId}/firestore/rules`
+    : "https://console.firebase.google.com";
+  const githubRulesRaw =
+    "https://raw.githubusercontent.com/SeongYeupKim/Task-framing-prompt-literacy/main/firestore.rules";
+
+  const [rulesHint, setRulesHint] = useState<string | null>(null);
+
+  const copyFirestoreRules = useCallback(async () => {
+    setRulesHint(null);
+    try {
+      const res = await fetch("/api/admin/firestore-rules");
+      if (!res.ok) throw new Error("bad");
+      const text = await res.text();
+      await navigator.clipboard.writeText(text);
+      setRulesHint(
+        "Copied. In Firebase: select all in the rules box, paste, then click Publish.",
+      );
+    } catch {
+      setRulesHint("Could not copy from this site — use “Backup: view rules on GitHub”, copy the whole file, then paste into Firebase.");
+    }
+    setTimeout(() => setRulesHint(null), 10000);
+  }, []);
 
   useEffect(() => {
     const s = readSession();
@@ -345,6 +459,14 @@ export default function AdminDashboardPage() {
               {busy ? "Checking…" : "Sign in"}
             </button>
           </form>
+          <FirebaseExportSetupCard
+            authUsersUrl={authUsersUrl}
+            rulesConsoleUrl={rulesConsoleUrl}
+            githubRulesRaw={githubRulesRaw}
+            onCopyRules={() => void copyFirestoreRules()}
+            rulesHint={rulesHint}
+          />
+
           <p className="mt-8 text-center text-sm text-student-muted">
             <Link href="/" className="font-medium text-teal-700 hover:underline">
               Back to study home
@@ -434,38 +556,13 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        <div className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/90 px-5 py-4 text-sm text-amber-950">
-          <p className="font-semibold">One-time Firebase setup (only if download stays stuck)</p>
-          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
-            <li>
-              Open{" "}
-              <a
-                href={authUsersUrl}
-                className="font-medium underline"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Authentication → Users
-              </a>
-              .
-            </li>
-            <li>
-              <strong>Add user</strong> → email{" "}
-              <code className="rounded bg-white/90 px-1">{RESEARCH_EXPORT_FIREBASE_EMAIL}</code>{" "}
-              → password = <strong>the same password</strong> you use on this page
-              (e.g. <code className="text-xs">mattandseong</code>).
-            </li>
-            <li>
-              <strong>Firestore → Rules</strong> → paste the full{" "}
-              <code className="text-xs">firestore.rules</code> file from this
-              project → <strong>Publish</strong>.
-            </li>
-          </ol>
-          <p className="mt-3 text-xs text-amber-900/90">
-            Optional: add <strong>FIREBASE_SERVICE_ACCOUNT_JSON</strong> on Vercel
-            to skip browser Firebase entirely.
-          </p>
-        </div>
+        <FirebaseExportSetupCard
+          authUsersUrl={authUsersUrl}
+          rulesConsoleUrl={rulesConsoleUrl}
+          githubRulesRaw={githubRulesRaw}
+          onCopyRules={() => void copyFirestoreRules()}
+          rulesHint={rulesHint}
+        />
 
         <p className="mt-12 text-center text-sm text-student-muted">
           <Link href="/" className="font-medium text-teal-700 hover:underline">
