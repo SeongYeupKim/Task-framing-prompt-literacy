@@ -10,15 +10,6 @@ import {
 import type { InstructionPracticeData, StudyCondition } from "@/types/study";
 import { DimensionConnectPractice } from "@/components/DimensionConnectPractice";
 
-function shuffle<T>(items: T[]): T[] {
-  const a = [...items];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function renderChunks(chunks: TextChunk[]) {
   return chunks.map((c, i) => {
     if (typeof c === "string") {
@@ -58,8 +49,6 @@ export function TrainingPanel({ condition, onComplete }: Props) {
     [condition],
   );
 
-  const shuffledExamples = useMemo(() => shuffle(INSTRUCTION_MATCHING_POOL), []);
-
   const part1Complete = selfExplanation.trim().length >= 40;
   const allMatched =
     dimensions.every((d) => matching[d.key]?.length > 0) &&
@@ -84,7 +73,7 @@ export function TrainingPanel({ condition, onComplete }: Props) {
       await onComplete({
         selfExplanation: selfExplanation.trim(),
         matchingByDimension: { ...matching },
-        matchingExampleDisplayOrder: shuffledExamples.map((e) => e.id),
+        matchingExampleDisplayOrder: INSTRUCTION_MATCHING_POOL.map((e) => e.id),
       });
     } catch {
       setError("Could not save. Try again.");
@@ -223,7 +212,7 @@ export function TrainingPanel({ condition, onComplete }: Props) {
                       key: d.key,
                       title: d.title,
                     }))}
-                    examples={shuffledExamples}
+                    examples={INSTRUCTION_MATCHING_POOL}
                     matching={matching}
                     setMatching={setMatching}
                   />
