@@ -35,6 +35,11 @@ function getServiceAccountFromEnv(): {
   return null;
 }
 
+/** True when service account env vars are present (server export can run). */
+export function isFirebaseAdminConfigured(): boolean {
+  return getServiceAccountFromEnv() !== null;
+}
+
 let app: App | null = null;
 
 export function getFirebaseAdminApp(): App {

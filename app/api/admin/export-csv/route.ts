@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { validateAdminCredentials } from "@/lib/adminDashboardAuth";
-import { adminFirestore } from "@/lib/firebaseAdmin";
+import {
+  adminFirestore,
+  isFirebaseAdminConfigured,
+} from "@/lib/firebaseAdmin";
 import { serializeAdminDoc } from "@/lib/firestoreSerializeAdmin";
 import { buildStudyWideExportCsv } from "@/lib/studyWideExportCsv";
 
@@ -19,6 +22,17 @@ export async function POST(req: Request) {
     )
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isFirebaseAdminConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Firebase Admin is not configured on this server. Use browser export on /admin (Firebase researcher sign-in), or add FIREBASE_SERVICE_ACCOUNT_JSON / FIREBASE_ADMIN_* env vars.",
+        code: "NO_ADMIN_SDK",
+      },
+      { status: 503 },
+    );
   }
 
   try {

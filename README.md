@@ -36,9 +36,11 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 ## Researcher export (`/admin`)
 
-**Username / password:** built-in defaults are **`admin`** / **`mattandseong`** if env vars are unset. Override with **`ADMIN_DASHBOARD_USERNAME`** and **`ADMIN_DASHBOARD_PASSWORD`** (or **`ADMIN_EXPORT_SECRET`** for the password only) in `.env.local` / Vercel. **Firebase Admin** credentials (**`FIREBASE_SERVICE_ACCOUNT_JSON`** or the three `FIREBASE_ADMIN_*` vars) let **`POST /api/admin/export-csv`** read every document in **`users`**.
+**Username / password:** built-in defaults are **`admin`** / **`mattandseong`** (override with **`ADMIN_DASHBOARD_*`** / **`ADMIN_EXPORT_SECRET`**).
 
-The download is a **single wide CSV**: columns follow the **full-intervention** arm (`instruction_eval`). Control and instruction-only rows leave unused fields **blank**. Column order is **student email → condition → study responses (including 20 AI-acceptance Likerts, instruction fields, eval1)** → **`essay_text`** → **`st_1`, `ai_1`, `st_2`, `ai_2`, …** (main-task GenAI turns) → **demographics**.
+**Two ways to export the same wide CSV:** (1) **Server** — set **`FIREBASE_SERVICE_ACCOUNT_JSON`** or **`FIREBASE_ADMIN_*`** on Vercel so **`/api/admin/export-csv`** can read all **`users`**. (2) **Browser** — after dashboard login, sign in with Firebase (**@psu.edu**); add **`researchers/{your Auth UID}`** and publish **`firestore.rules`** (researcher allow-list can read all **`users`**).
+
+Columns follow **`instruction_eval`**; other arms leave unused cells blank. Order: **email → condition → responses (Likerts, instruction, eval1) → essay → `st_1`/`ai_1`/… → demographics**.
 
 ## Security
 
