@@ -36,17 +36,15 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 ## Researcher export (`/admin`)
 
-Researchers sign in with the same **Firebase Email/Password** flow as participants (**`@psu.edu`**). The browser reads all documents in **`users`** using the client SDK—**no** Firebase Admin or service-account variables on Vercel.
+**Username / password** (set on the server as **`ADMIN_DASHBOARD_USERNAME`** and **`ADMIN_DASHBOARD_PASSWORD`** in `.env.local` / Vercel) open the dashboard. **Firebase Admin** credentials (**`FIREBASE_SERVICE_ACCOUNT_JSON`** or the three `FIREBASE_ADMIN_*` vars) let **`POST /api/admin/export-csv`** read every document in **`users`**.
 
-**Firestore:** publish **`firestore.rules`** from this repo. Rules let each user read/write their own doc and let **any signed-in user** read every **`users`** document (so `/admin` can export). Keep the `/admin` URL off public pages if you do not want participants browsing each other’s data.
-
-Exports: **JSON** (complete nested data), **CSV** (one row per participant; nested fields as JSON strings), **.txt** (human-readable chat logs per UID), including full **`genaiMessages`**.
+The download is a **single wide CSV**: columns follow the **full-intervention** arm (`instruction_eval`). Control and instruction-only rows leave unused fields **blank**. Column order is **student email → condition → study responses (including 20 AI-acceptance Likerts, instruction fields, eval1)** → **`essay_text`** → **`st_1`, `ai_1`, `st_2`, `ai_2`, …** (main-task GenAI turns) → **demographics**.
 
 ## Security
 
 - Never commit `.env.local` or API keys.  
 - OpenAI key server-side only (`/api/chat`).
-- **`/admin` is not a secret gate:** anyone with a study account and the URL can export. Tighten rules (e.g. custom claims or an allow-list collection) if you need stricter access later.
+- Treat **`ADMIN_DASHBOARD_*`** and the **service account** like full access to participant data; rotate if exposed. Do not rely on obscurity for `/admin`—use strong passwords and restrict who knows the URL.
 
 ## License
 

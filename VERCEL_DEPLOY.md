@@ -59,12 +59,18 @@ git push origin main
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | |
+| `ADMIN_DASHBOARD_USERNAME` | Login for **`/admin`** (e.g. `admin`). |
+| `ADMIN_DASHBOARD_PASSWORD` | Strong secret; same value you type on `/admin`. |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | **Option A:** One-line JSON of the Firebase service account (`jq -c . key.json`). **Option B:** omit and set the three vars below. |
+| `FIREBASE_ADMIN_PROJECT_ID` | From the same JSON: `project_id` |
+| `FIREBASE_ADMIN_CLIENT_EMAIL` | From the same JSON: `client_email` |
+| `FIREBASE_ADMIN_PRIVATE_KEY` | From the same JSON: `private_key` — paste as one line; use `\n` for newlines inside the string. |
 
 **Save** → **Deployments** → **⋯** → **Redeploy**.
 
 Missing **`OPENAI_API_KEY`** on Vercel is the #1 reason chat works locally but not online.
 
-**`/admin` exports:** no extra Vercel variables. Researchers sign in with Firebase; publish **`firestore.rules`** from the repo (see **`README.md`**).
+**`/admin` exports** use **`ADMIN_DASHBOARD_*`** plus **Firebase Admin** env vars so the API can read all **`users`** documents. Participant Firestore rules do not need to allow public read-all for exports.
 
 ---
 
