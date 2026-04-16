@@ -253,9 +253,10 @@ export default function AdminDashboardPage() {
           </summary>
           <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed">
             <li>
-              <strong>ADMIN_DASHBOARD_USERNAME</strong> and{" "}
-              <strong>ADMIN_DASHBOARD_PASSWORD</strong> must match what you use
-              here.
+              Login defaults: <strong>admin</strong> / <strong>mattandseong</strong>{" "}
+              unless you set <strong>ADMIN_DASHBOARD_USERNAME</strong>,{" "}
+              <strong>ADMIN_DASHBOARD_PASSWORD</strong>, or legacy{" "}
+              <strong>ADMIN_EXPORT_SECRET</strong> on the server.
             </li>
             <li>
               <strong>FIREBASE_SERVICE_ACCOUNT_JSON</strong> (one-line JSON) or{" "}

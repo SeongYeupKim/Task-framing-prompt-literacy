@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  adminAuthEnvConfigured,
-  validateAdminCredentials,
-} from "@/lib/adminDashboardAuth";
+import { validateAdminCredentials } from "@/lib/adminDashboardAuth";
 import { adminFirestore } from "@/lib/firebaseAdmin";
 import { serializeAdminDoc } from "@/lib/firestoreSerializeAdmin";
 import { buildStudyWideExportCsv } from "@/lib/studyWideExportCsv";
@@ -13,16 +10,6 @@ export async function POST(req: Request) {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  if (!adminAuthEnvConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Admin dashboard is not configured. Set ADMIN_DASHBOARD_USERNAME and ADMIN_DASHBOARD_PASSWORD.",
-      },
-      { status: 503 },
-    );
   }
 
   if (

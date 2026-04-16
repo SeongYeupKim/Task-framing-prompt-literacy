@@ -36,7 +36,7 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 ## Researcher export (`/admin`)
 
-**Username / password** (set on the server as **`ADMIN_DASHBOARD_USERNAME`** and **`ADMIN_DASHBOARD_PASSWORD`** in `.env.local` / Vercel) open the dashboard. **Firebase Admin** credentials (**`FIREBASE_SERVICE_ACCOUNT_JSON`** or the three `FIREBASE_ADMIN_*` vars) let **`POST /api/admin/export-csv`** read every document in **`users`**.
+**Username / password:** built-in defaults are **`admin`** / **`mattandseong`** if env vars are unset. Override with **`ADMIN_DASHBOARD_USERNAME`** and **`ADMIN_DASHBOARD_PASSWORD`** (or **`ADMIN_EXPORT_SECRET`** for the password only) in `.env.local` / Vercel. **Firebase Admin** credentials (**`FIREBASE_SERVICE_ACCOUNT_JSON`** or the three `FIREBASE_ADMIN_*` vars) let **`POST /api/admin/export-csv`** read every document in **`users`**.
 
 The download is a **single wide CSV**: columns follow the **full-intervention** arm (`instruction_eval`). Control and instruction-only rows leave unused fields **blank**. Column order is **student email → condition → study responses (including 20 AI-acceptance Likerts, instruction fields, eval1)** → **`essay_text`** → **`st_1`, `ai_1`, `st_2`, `ai_2`, …** (main-task GenAI turns) → **demographics**.
 

@@ -59,8 +59,9 @@ git push origin main
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | |
-| `ADMIN_DASHBOARD_USERNAME` | Login for **`/admin`** (e.g. `admin`). |
-| `ADMIN_DASHBOARD_PASSWORD` | Strong secret; same value you type on `/admin`. |
+| `ADMIN_DASHBOARD_USERNAME` | Optional. Overrides default **`admin`**. |
+| `ADMIN_DASHBOARD_PASSWORD` | Optional. Overrides default password; use a strong value in production. |
+| `ADMIN_EXPORT_SECRET` | Optional legacy alias: used as password if **`ADMIN_DASHBOARD_PASSWORD`** is empty. |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | **Option A:** One-line JSON of the Firebase service account (`jq -c . key.json`). **Option B:** omit and set the three vars below. |
 | `FIREBASE_ADMIN_PROJECT_ID` | From the same JSON: `project_id` |
 | `FIREBASE_ADMIN_CLIENT_EMAIL` | From the same JSON: `client_email` |

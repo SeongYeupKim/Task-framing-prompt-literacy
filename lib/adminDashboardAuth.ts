@@ -1,21 +1,28 @@
 /**
  * Server-only validation for /admin dashboard API routes.
- * Set ADMIN_DASHBOARD_USERNAME and ADMIN_DASHBOARD_PASSWORD in .env.local / Vercel.
+ *
+ * Defaults (when env vars are unset): username `admin`, password `mattandseong`.
+ * Override in production with ADMIN_DASHBOARD_USERNAME and ADMIN_DASHBOARD_PASSWORD.
+ * Legacy: ADMIN_EXPORT_SECRET is accepted as the password if ADMIN_DASHBOARD_PASSWORD is empty.
  */
+
+export function getExpectedAdminCredentials(): {
+  username: string;
+  password: string;
+} {
+  const username =
+    process.env.ADMIN_DASHBOARD_USERNAME?.trim() || "admin";
+  const password =
+    process.env.ADMIN_DASHBOARD_PASSWORD?.trim() ||
+    process.env.ADMIN_EXPORT_SECRET?.trim() ||
+    "mattandseong";
+  return { username, password };
+}
 
 export function validateAdminCredentials(
   username: string,
   password: string,
 ): boolean {
-  const u = process.env.ADMIN_DASHBOARD_USERNAME?.trim();
-  const p = process.env.ADMIN_DASHBOARD_PASSWORD?.trim();
-  if (!u || !p) return false;
-  return username === u && password === p;
-}
-
-export function adminAuthEnvConfigured(): boolean {
-  return !!(
-    process.env.ADMIN_DASHBOARD_USERNAME?.trim() &&
-    process.env.ADMIN_DASHBOARD_PASSWORD?.trim()
-  );
+  const expected = getExpectedAdminCredentials();
+  return username === expected.username && password === expected.password;
 }
