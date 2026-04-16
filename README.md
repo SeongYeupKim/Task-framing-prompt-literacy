@@ -38,7 +38,7 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 **Username / password:** built-in defaults are **`admin`** / **`mattandseong`** (override with **`ADMIN_DASHBOARD_*`** / **`ADMIN_EXPORT_SECRET`**).
 
-**Two ways to export the same wide CSV:** (1) **Server** — set **`FIREBASE_SERVICE_ACCOUNT_JSON`** or **`FIREBASE_ADMIN_*`** on Vercel so **`/api/admin/export-csv`** can read all **`users`**. (2) **Browser** — after dashboard login, sign in with Firebase (**@psu.edu**); add **`researchers/{your Auth UID}`** and publish **`firestore.rules`** (researcher allow-list can read all **`users`**).
+**Two ways to export the same wide CSV:** (1) **Server** — **`FIREBASE_SERVICE_ACCOUNT_JSON`** / **`FIREBASE_ADMIN_*`** on Vercel. (2) **Browser** — one dashboard login (**default `admin` / `mattandseong`**); the app signs into Firebase as **`admin@psu.edu`** (same password) unless you set **`ADMIN_EXPORT_FIREBASE_EMAIL`** or **`NEXT_PUBLIC_EXPORT_FIREBASE_EMAIL`**. Register that @psu.edu user, add **`researchers/{uid}`**, publish **`firestore.rules`**.
 
 Columns follow **`instruction_eval`**; other arms leave unused cells blank. Order: **email → condition → responses (Likerts, instruction, eval1) → essay → `st_1`/`ai_1`/… → demographics**.
 
