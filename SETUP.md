@@ -132,7 +132,7 @@ To stop the server: in Terminal press **Ctrl + C**.
 | “Missing OPENAI_API_KEY” | `OPENAI_API_KEY=` line is filled and file is saved; restart `npm run dev`. |
 | Chat returns error | Check `OPENAI_MODEL` matches a model your key can use; check billing on OpenAI if needed. |
 | Permission denied in Firestore | Re-publish **`firestore.rules`** from this repo (Part A4). |
-| **`/admin`** CSV error (Firebase) | Set Firebase Admin env vars in **`.env.local`** / Vercel (**`FIREBASE_SERVICE_ACCOUNT_JSON`** or the three **`FIREBASE_ADMIN_*`** vars). Login defaults to **admin** / **mattandseong** unless you override with **`ADMIN_DASHBOARD_*`**. |
+| **`/admin`** download fails | **Browser export:** Firebase → **Authentication** → add user **`admin@psu.edu`** with the **same password** as `/admin` (default **`mattandseong`**). **Firestore → Rules** → paste **`firestore.rules`** from the repo → **Publish**. **Or** set **`FIREBASE_SERVICE_ACCOUNT_JSON`** on Vercel for server-only export. |
 | `npm` not found | Install [Node.js LTS](https://nodejs.org/) and open a new Terminal. |
 
 ---

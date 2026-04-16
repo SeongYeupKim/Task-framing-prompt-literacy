@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { FirebaseError } from "firebase/app";
 import {
@@ -9,13 +9,13 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { downloadBlob } from "@/lib/adminExportFormat";
 import { buildStudyWideExportCsv } from "@/lib/studyWideExportCsv";
 import { getClientAuth, getClientDb } from "@/lib/firebase";
 import { formatAuthError } from "@/lib/firebaseErrors";
+import { RESEARCH_EXPORT_FIREBASE_EMAIL } from "@/lib/researchExportEmail";
 import { serializeFirestoreValue } from "@/lib/firestoreSerializeClient";
-import { isPennStateEmail } from "@/lib/psuEmail";
 
 const SESSION_KEY = "taskFramingAdminSession";
 
@@ -50,27 +50,15 @@ function clearSession() {
 
 function formatClientExportError(err: unknown): string {
   if (err instanceof FirebaseError && err.code === "permission-denied") {
-    return "Firestore permission denied. Publish firestore.rules and add researchers/{your UID}.";
+    return "Permission denied. In Firebase → Firestore → Rules, publish firestore.rules from this repo.";
   }
   if (err instanceof Error) return err.message;
   return "Export failed.";
 }
 
-async function resolveFirebaseExportEmail(
-  adminUser: string,
-  adminPass: string,
-): Promise<string | null> {
-  const pub = process.env.NEXT_PUBLIC_EXPORT_FIREBASE_EMAIL?.trim();
-  if (pub && isPennStateEmail(pub)) return pub.toLowerCase();
-  const res = await fetch("/api/admin/firebase-bridge", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username: adminUser, password: adminPass }),
-  });
-  if (!res.ok) return null;
-  const data = (await res.json()) as { firebaseEmail?: string };
-  const e = data.firebaseEmail?.trim();
-  return e && isPennStateEmail(e) ? e : null;
+function isExportFirebaseUser(u: User | null): boolean {
+  const e = u?.email?.trim().toLowerCase();
+  return !!e && e === RESEARCH_EXPORT_FIREBASE_EMAIL;
 }
 
 export default function AdminDashboardPage() {
@@ -85,18 +73,15 @@ export default function AdminDashboardPage() {
     boolean | null
   >(null);
 
-  const [fbEmail, setFbEmail] = useState("");
-  const [fbPassword, setFbPassword] = useState("");
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [fbReady, setFbReady] = useState(false);
-  const [researcherOk, setResearcherOk] = useState<boolean | null>(null);
   const [fbError, setFbError] = useState<string | null>(null);
-  const [manualFirebase, setManualFirebase] = useState(false);
   const [firebaseConnecting, setFirebaseConnecting] = useState(false);
+  const triedExportSignIn = useRef(false);
 
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim() ?? "";
-  const consoleUrl = projectId
-    ? `https://console.firebase.google.com/project/${projectId}/firestore`
+  const authUsersUrl = projectId
+    ? `https://console.firebase.google.com/project/${projectId}/authentication/users`
     : "https://console.firebase.google.com";
 
   useEffect(() => {
@@ -139,56 +124,30 @@ export default function AdminDashboardPage() {
     };
   }, [authed]);
 
-  useEffect(() => {
-    if (!firebaseUser) {
-      setResearcherOk(null);
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      try {
-        const ref = doc(getClientDb(), "researchers", firebaseUser.uid);
-        const snap = await getDoc(ref);
-        if (!cancelled) setResearcherOk(snap.exists());
-      } catch {
-        if (!cancelled) setResearcherOk(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [firebaseUser]);
-
-  /** After admin login: auto Firebase sign-in with same password (Nudge-style one gate). */
+  /** Same password as dashboard → Firebase export account (Nudge-style one form). */
   useEffect(() => {
     if (!authed || !fbReady) return;
     if (serverExportEnabled !== false) return;
-    if (manualFirebase) return;
-    if (firebaseUser) return;
+    if (firebaseUser && isExportFirebaseUser(firebaseUser)) return;
+    if (triedExportSignIn.current) return;
 
     const s = readSession();
     if (!s?.password) return;
 
+    triedExportSignIn.current = true;
     let cancelled = false;
     setFirebaseConnecting(true);
     setFbError(null);
     void (async () => {
       try {
-        const email = await resolveFirebaseExportEmail(s.username, s.password);
-        if (cancelled) return;
-        if (!email) {
-          setManualFirebase(true);
-          return;
-        }
         await signInWithEmailAndPassword(
           getClientAuth(),
-          email,
+          RESEARCH_EXPORT_FIREBASE_EMAIL,
           s.password,
         );
       } catch (e) {
         if (!cancelled) {
           setFbError(formatAuthError(e));
-          setManualFirebase(true);
         }
       } finally {
         if (!cancelled) setFirebaseConnecting(false);
@@ -198,19 +157,12 @@ export default function AdminDashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [
-    authed,
-    serverExportEnabled,
-    fbReady,
-    firebaseUser,
-    manualFirebase,
-  ]);
+  }, [authed, serverExportEnabled, fbReady, firebaseUser]);
 
   const handleLogin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setError(null);
-      setManualFirebase(false);
       setFbError(null);
       setBusy(true);
       try {
@@ -228,6 +180,7 @@ export default function AdminDashboardPage() {
           return;
         }
         writeSession({ username, password });
+        triedExportSignIn.current = false;
         setAuthed(true);
       } catch {
         setError("Network error. Try again.");
@@ -240,6 +193,7 @@ export default function AdminDashboardPage() {
 
   const handleLogout = useCallback(() => {
     clearSession();
+    triedExportSignIn.current = false;
     void signOut(getClientAuth());
     setAuthed(false);
     setPassword("");
@@ -247,7 +201,6 @@ export default function AdminDashboardPage() {
     setServerExportEnabled(null);
     setError(null);
     setFbError(null);
-    setManualFirebase(false);
     setFirebaseConnecting(false);
   }, []);
 
@@ -287,9 +240,7 @@ export default function AdminDashboardPage() {
       a.download = name;
       a.click();
       URL.revokeObjectURL(url);
-      setExportHint(
-        "Download started. Wide CSV: all arms share columns; unused fields are blank.",
-      );
+      setExportHint("Download started.");
     } catch {
       setError("Could not download export.");
     } finally {
@@ -298,7 +249,7 @@ export default function AdminDashboardPage() {
   }, [username, password]);
 
   const runClientExport = useCallback(async () => {
-    if (!firebaseUser || !researcherOk) return;
+    if (!isExportFirebaseUser(firebaseUser)) return;
     setFbError(null);
     setExportHint(null);
     setBusy(true);
@@ -315,59 +266,25 @@ export default function AdminDashboardPage() {
         csv,
         "text/csv;charset=utf-8",
       );
-      setExportHint("Download complete (same CSV as server export).");
+      setExportHint("Download complete.");
     } catch (err) {
       setFbError(formatClientExportError(err));
     } finally {
       setBusy(false);
     }
-  }, [firebaseUser, researcherOk]);
+  }, [firebaseUser]);
 
   const handleDownloadCsv = useCallback(async () => {
     if (serverExportEnabled === true) {
       await runServerExport();
       return;
     }
-    if (firebaseUser && researcherOk) {
+    if (isExportFirebaseUser(firebaseUser)) {
       await runClientExport();
       return;
     }
-    setError(
-      "Cannot download yet: wait for Firebase, or fix researchers/{uid} in Console.",
-    );
-  }, [
-    serverExportEnabled,
-    firebaseUser,
-    researcherOk,
-    runServerExport,
-    runClientExport,
-  ]);
-
-  const handleFirebaseSignIn = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setFbError(null);
-      if (!isPennStateEmail(fbEmail)) {
-        setFbError("Use your @psu.edu account.");
-        return;
-      }
-      setBusy(true);
-      try {
-        await signInWithEmailAndPassword(
-          getClientAuth(),
-          fbEmail,
-          fbPassword,
-        );
-        setFbPassword("");
-        setManualFirebase(false);
-      } catch (err) {
-        setFbError(formatAuthError(err));
-      } finally {
-        setBusy(false);
-      }
-    },
-    [fbEmail, fbPassword],
-  );
+    setError("Cannot download yet — wait for Firebase sign-in or fix the setup note below.");
+  }, [serverExportEnabled, firebaseUser, runServerExport, runClientExport]);
 
   if (!hydrated) {
     return (
@@ -385,7 +302,7 @@ export default function AdminDashboardPage() {
             Researcher export
           </h1>
           <p className="mt-2 text-center text-sm text-student-muted">
-            Sign in to download participant data (wide CSV).
+            Sign in, then download the CSV (same flow as a simple admin panel).
           </p>
           <form onSubmit={(e) => void handleLogin(e)} className="mt-8 space-y-4">
             <div>
@@ -398,12 +315,6 @@ export default function AdminDashboardPage() {
                 className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                 required
               />
-              <p className="mt-1 text-xs text-student-muted">
-                Default <code className="text-xs">admin</code> uses Firebase{" "}
-                <code className="text-xs">admin@psu.edu</code> with the same password
-                (register that account and add{" "}
-                <code className="text-xs">researchers/{"{uid}"}</code>).
-              </p>
             </div>
             <div>
               <label className="block text-sm font-semibold">Password</label>
@@ -416,6 +327,11 @@ export default function AdminDashboardPage() {
                 required
               />
             </div>
+            <p className="text-xs leading-relaxed text-student-muted">
+              Use the same password for Firebase user{" "}
+              <strong>{RESEARCH_EXPORT_FIREBASE_EMAIL}</strong> (see one-time setup
+              after login).
+            </p>
             {error && (
               <p className="text-sm font-medium text-red-600" role="alert">
                 {error}
@@ -441,9 +357,7 @@ export default function AdminDashboardPage() {
 
   const serverReady = serverExportEnabled === true;
   const browserReady =
-    serverExportEnabled === false &&
-    !!firebaseUser &&
-    researcherOk === true;
+    serverExportEnabled === false && isExportFirebaseUser(firebaseUser);
   const downloadDisabled =
     busy ||
     serverExportEnabled === null ||
@@ -452,9 +366,10 @@ export default function AdminDashboardPage() {
   let downloadLabel = "Download all participants (CSV)";
   if (busy) downloadLabel = "Preparing…";
   else if (serverExportEnabled === null) downloadLabel = "Checking…";
-  else if (serverReady) downloadLabel = "Download all participants (CSV)";
-  else if (firebaseConnecting) downloadLabel = "Connecting to Firebase…";
-  else if (!firebaseUser) downloadLabel = "Waiting for Firebase…";
+  else if (firebaseConnecting) downloadLabel = "Connecting…";
+  else if (serverExportEnabled === false && !browserReady) {
+    downloadLabel = "Waiting for Firebase…";
+  }
 
   return (
     <div className="min-h-screen bg-student-canvas px-4 py-8 pb-16 text-student-ink sm:px-6">
@@ -468,10 +383,9 @@ export default function AdminDashboardPage() {
               Data export
             </h1>
             <p className="mt-2 text-sm text-student-muted">
-              One login, then download. Server export runs if configured; otherwise
-              we sign you into Firebase automatically using the same password (e.g.{" "}
-              <code className="text-xs">admin</code> →{" "}
-              <code className="text-xs">admin@psu.edu</code>).
+              One login here, then download. No second form — we sign into Firebase
+              as <strong>{RESEARCH_EXPORT_FIREBASE_EMAIL}</strong> using the same
+              password you just entered.
             </p>
           </div>
           <button
@@ -489,18 +403,6 @@ export default function AdminDashboardPage() {
             <span className="font-medium">{username}</span>
           </p>
 
-          {serverExportEnabled === false && firebaseUser && (
-            <p className="mt-2 text-xs text-student-muted">
-              Firebase: {firebaseUser.email ?? firebaseUser.uid}
-              {researcherOk === false && (
-                <span className="ml-2 font-medium text-amber-700">
-                  — add{" "}
-                  <code className="text-xs">researchers/{firebaseUser.uid}</code>
-                </span>
-              )}
-            </p>
-          )}
-
           <button
             type="button"
             disabled={downloadDisabled}
@@ -512,72 +414,14 @@ export default function AdminDashboardPage() {
 
           {serverExportEnabled === true && (
             <p className="mt-3 text-xs text-student-muted">
-              Using Firebase Admin on the server.
+              Server export (Firebase Admin on Vercel).
             </p>
           )}
 
-          {serverExportEnabled === false && !manualFirebase && fbError && (
-            <p className="mt-3 text-sm font-medium text-red-600">{fbError}</p>
-          )}
-
-          {manualFirebase && serverExportEnabled === false && (
-            <div className="mt-6 rounded-xl border border-teal-200 bg-teal-50/60 p-4 sm:p-5">
-              <p className="text-sm font-semibold text-teal-950">
-                Sign in to Firebase manually
-              </p>
-              <p className="mt-2 text-sm text-teal-900/90">
-                Allow-listed{" "}
-                <code className="rounded bg-white/80 px-1 text-xs">researchers</code>{" "}
-                UID required.{" "}
-                <a
-                  className="font-medium underline"
-                  href={consoleUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Console
-                </a>
-              </p>
-              <form
-                onSubmit={(e) => void handleFirebaseSignIn(e)}
-                className="mt-4 space-y-3"
-              >
-                <input
-                  type="email"
-                  autoComplete="email"
-                  value={fbEmail}
-                  onChange={(e) => setFbEmail(e.target.value)}
-                  className="w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm"
-                  placeholder="you@psu.edu"
-                  required
-                />
-                <input
-                  type="password"
-                  autoComplete="current-password"
-                  value={fbPassword}
-                  onChange={(e) => setFbPassword(e.target.value)}
-                  className="w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm"
-                  required
-                />
-                {fbError && (
-                  <p className="text-sm font-medium text-red-600">{fbError}</p>
-                )}
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="w-full rounded-xl bg-teal-700 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-                >
-                  Sign in to Firebase
-                </button>
-              </form>
-              <button
-                type="button"
-                onClick={() => void signOut(getClientAuth())}
-                className="mt-3 text-sm font-medium text-teal-800 underline"
-              >
-                Firebase sign out
-              </button>
-            </div>
+          {fbError && (
+            <p className="mt-4 text-sm font-medium text-red-600" role="alert">
+              {fbError}
+            </p>
           )}
 
           {error && (
@@ -590,28 +434,38 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        <details className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-5 py-4 text-sm text-amber-950">
-          <summary className="cursor-pointer font-semibold">
-            Setup notes
-          </summary>
-          <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed">
+        <div className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/90 px-5 py-4 text-sm text-amber-950">
+          <p className="font-semibold">One-time Firebase setup (only if download stays stuck)</p>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
             <li>
-              Dashboard defaults: <strong>admin</strong> /{" "}
-              <strong>mattandseong</strong>. Register{" "}
-              <strong>admin@psu.edu</strong> in Firebase with that password and
-              add <code className="rounded bg-white/80 px-1">researchers/{"{uid}"}</code>.
+              Open{" "}
+              <a
+                href={authUsersUrl}
+                className="font-medium underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Authentication → Users
+              </a>
+              .
             </li>
             <li>
-              Or set <strong>ADMIN_EXPORT_FIREBASE_EMAIL</strong> /{" "}
-              <strong>NEXT_PUBLIC_EXPORT_FIREBASE_EMAIL</strong> for a different
-              export account (same password as dashboard).
+              <strong>Add user</strong> → email{" "}
+              <code className="rounded bg-white/90 px-1">{RESEARCH_EXPORT_FIREBASE_EMAIL}</code>{" "}
+              → password = <strong>the same password</strong> you use on this page
+              (e.g. <code className="text-xs">mattandseong</code>).
             </li>
             <li>
-              Optional: <strong>FIREBASE_SERVICE_ACCOUNT_JSON</strong> skips
-              browser Firebase and downloads from the server.
+              <strong>Firestore → Rules</strong> → paste the full{" "}
+              <code className="text-xs">firestore.rules</code> file from this
+              project → <strong>Publish</strong>.
             </li>
-          </ul>
-        </details>
+          </ol>
+          <p className="mt-3 text-xs text-amber-900/90">
+            Optional: add <strong>FIREBASE_SERVICE_ACCOUNT_JSON</strong> on Vercel
+            to skip browser Firebase entirely.
+          </p>
+        </div>
 
         <p className="mt-12 text-center text-sm text-student-muted">
           <Link href="/" className="font-medium text-teal-700 hover:underline">

@@ -1,16 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Researcher allow-list: doc id = Firebase Auth UID. Create in Console only.
-    match /researchers/{researcherId} {
-      allow read: if request.auth != null && request.auth.uid == researcherId;
-      allow write: if false;
+    function isResearchExportAccount() {
+      return request.auth != null &&
+        request.auth.token.email != null &&
+        request.auth.token.email.lower() == 'admin@psu.edu';
     }
 
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null &&
-        exists(/databases/$(database)/documents/researchers/$(request.auth.uid));
+      // Same account as /admin browser export (admin@psu.edu). Change both here and
+      // RESEARCH_EXPORT_FIREBASE_EMAIL / NEXT_PUBLIC_RESEARCH_EXPORT_EMAIL if needed.
+      allow read: if isResearchExportAccount();
     }
   }
 }
