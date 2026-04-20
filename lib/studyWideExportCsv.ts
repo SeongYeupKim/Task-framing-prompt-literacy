@@ -120,6 +120,13 @@ function instrMatchingDim(
   return v == null ? "" : String(v);
 }
 
+function courseInstructorLabel(raw: unknown): string {
+  if (raw === "cristin_hall") return "Dr. Cristin Hall";
+  if (raw === "rayne_sperling") return "Dr. Rayne Sperling";
+  if (raw === "other") return "Other";
+  return raw == null || raw === "" ? "" : String(raw);
+}
+
 function demographicsFlat(p: WideExportParticipant): {
   psuEmail: string;
   ageYears: string;
@@ -127,6 +134,8 @@ function demographicsFlat(p: WideExportParticipant): {
   raceEthnicity: string;
   nameForCredit: string;
   followUpInterview: string;
+  courseInstructor: string;
+  courseInstructorOther: string;
   submittedAt: string;
 } {
   const d = p.demographics;
@@ -138,6 +147,8 @@ function demographicsFlat(p: WideExportParticipant): {
       raceEthnicity: "",
       nameForCredit: "",
       followUpInterview: "",
+      courseInstructor: "",
+      courseInstructorOther: "",
       submittedAt: "",
     };
   }
@@ -148,6 +159,7 @@ function demographicsFlat(p: WideExportParticipant): {
     ? re.map((x) => String(x)).join("|")
     : str(re);
   const fu = (d as { followUpInterview?: unknown }).followUpInterview;
+  const ci = (d as { courseInstructor?: unknown }).courseInstructor;
   return {
     psuEmail: str((d as { psuEmail?: unknown }).psuEmail),
     ageYears: str((d as { ageYears?: unknown }).ageYears),
@@ -156,6 +168,10 @@ function demographicsFlat(p: WideExportParticipant): {
     nameForCredit: str((d as { nameForCredit?: unknown }).nameForCredit),
     followUpInterview:
       fu === true ? "true" : fu === false ? "false" : "",
+    courseInstructor: courseInstructorLabel(ci),
+    courseInstructorOther: str(
+      (d as { courseInstructorOther?: unknown }).courseInstructorOther,
+    ),
     submittedAt: str((d as { submittedAt?: unknown }).submittedAt),
   };
 }
@@ -222,6 +238,8 @@ export function studyWideExportDemographicsHeaders(): string[] {
     "demographics_raceEthnicity",
     "demographics_nameForCredit",
     "demographics_followUpInterview",
+    "demographics_courseInstructor",
+    "demographics_courseInstructor_other",
     "demographics_submittedAt",
   ];
 }
@@ -320,6 +338,8 @@ export function buildStudyWideExportCsv(
       csvCell(demo.raceEthnicity),
       csvCell(demo.nameForCredit),
       csvCell(demo.followUpInterview),
+      csvCell(demo.courseInstructor),
+      csvCell(demo.courseInstructorOther),
       csvCell(demo.submittedAt),
     );
 

@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { DemographicsSubmission } from "@/types/study";
+import type {
+  CourseInstructorChoice,
+  DemographicsSubmission,
+} from "@/types/study";
 import {
   DEMOGRAPHICS_GENDER_OPTIONS,
   DEMOGRAPHICS_RACE_OPTIONS,
@@ -24,6 +27,9 @@ export function DemographicsSurvey({ onSubmit }: Props) {
   const [raceEthnicity, setRaceEthnicity] = useState<string[]>([]);
   const [nameForCredit, setNameForCredit] = useState("");
   const [followUp, setFollowUp] = useState<"yes" | "no" | null>(null);
+  const [courseInstructor, setCourseInstructor] =
+    useState<CourseInstructorChoice | null>(null);
+  const [courseInstructorOther, setCourseInstructorOther] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,6 +72,17 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       setError("Please answer whether you are interested in a follow-up interview.");
       return;
     }
+    if (courseInstructor === null) {
+      setError("Please identify your course instructor (question 7).");
+      return;
+    }
+    if (
+      courseInstructor === "other" &&
+      !courseInstructorOther.trim()
+    ) {
+      setError('Please type your instructor’s name under “Others”.');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -76,6 +93,9 @@ export function DemographicsSurvey({ onSubmit }: Props) {
         raceEthnicity: [...raceEthnicity],
         nameForCredit: nameForCredit.trim(),
         followUpInterview: followUp === "yes",
+        courseInstructor,
+        courseInstructorOther:
+          courseInstructor === "other" ? courseInstructorOther.trim() : "",
         submittedAt: new Date().toISOString(),
       });
     } catch {
@@ -225,6 +245,57 @@ export function DemographicsSurvey({ onSubmit }: Props) {
             />
             No
           </label>
+        </div>
+      </section>
+
+      {/* 7 */}
+      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+        <h3 className="text-sm font-semibold text-student-ink">
+          7. Identify the course instructor.
+        </h3>
+        <div className="mt-4 space-y-3">
+          <label className="flex cursor-pointer items-start gap-3 text-sm text-student-ink">
+            <input
+              type="radio"
+              name="courseInstructor"
+              checked={courseInstructor === "cristin_hall"}
+              onChange={() => setCourseInstructor("cristin_hall")}
+              className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+            />
+            <span>Dr. Cristin Hall</span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 text-sm text-student-ink">
+            <input
+              type="radio"
+              name="courseInstructor"
+              checked={courseInstructor === "rayne_sperling"}
+              onChange={() => setCourseInstructor("rayne_sperling")}
+              className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+            />
+            <span>Dr. Rayne Sperling</span>
+          </label>
+          <div className="space-y-2">
+            <label className="flex cursor-pointer items-start gap-3 text-sm text-student-ink">
+              <input
+                type="radio"
+                name="courseInstructor"
+                checked={courseInstructor === "other"}
+                onChange={() => setCourseInstructor("other")}
+                className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+              />
+              <span className="font-medium">Others</span>
+            </label>
+            {courseInstructor === "other" && (
+              <input
+                type="text"
+                value={courseInstructorOther}
+                onChange={(e) => setCourseInstructorOther(e.target.value)}
+                placeholder="Type instructor name"
+                aria-label="Other instructor name"
+                className="ml-7 w-full max-w-md rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              />
+            )}
+          </div>
         </div>
       </section>
 

@@ -42,6 +42,11 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+export type CourseInstructorChoice =
+  | "cristin_hall"
+  | "rayne_sperling"
+  | "other";
+
 export interface DemographicsSubmission {
   psuEmail: string;
   ageYears: string;
@@ -49,6 +54,10 @@ export interface DemographicsSubmission {
   raceEthnicity: string[];
   nameForCredit: string;
   followUpInterview: boolean;
+  /** Item 7: course instructor (preset or other with specify). */
+  courseInstructor: CourseInstructorChoice;
+  /** Free text when `courseInstructor === "other"`; otherwise empty. */
+  courseInstructorOther: string;
   submittedAt: string;
 }
 
