@@ -39,7 +39,7 @@ export function StudyRestartGate({
 
   if (step === "choose") {
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+      <div className="mx-auto max-w-lg rounded-md border border-student-border bg-student-card px-8 py-10 shadow-student">
         <h1 className="text-xl font-semibold text-student-ink">
           Your study session is already on file
         </h1>
@@ -58,7 +58,7 @@ export function StudyRestartGate({
           <button
             type="button"
             onClick={onKeepSubmission}
-            className="rounded-2xl border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink transition hover:bg-student-canvas sm:order-2"
+            className="rounded-md border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink transition hover:bg-student-canvas sm:order-2"
           >
             No — keep my submitted responses
           </button>
@@ -68,7 +68,7 @@ export function StudyRestartGate({
               setError(null);
               setStep("password");
             }}
-            className="rounded-2xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 sm:order-1"
+            className="rounded-md bg-navy-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-navy-900 sm:order-1"
           >
             Yes — restart from the beginning
           </button>
@@ -78,7 +78,7 @@ export function StudyRestartGate({
   }
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+    <div className="mx-auto max-w-lg rounded-md border border-student-border bg-student-card px-8 py-10 shadow-student">
       <h1 className="text-xl font-semibold text-student-ink">
         Confirm your password to restart
       </h1>
@@ -98,7 +98,7 @@ export function StudyRestartGate({
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="mt-1.5 w-full rounded-md border border-student-border px-3 py-2.5 text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
           />
         </div>
         {error && (
@@ -115,14 +115,14 @@ export function StudyRestartGate({
               setPassword("");
               setError(null);
             }}
-            className="rounded-2xl border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink hover:bg-student-canvas disabled:opacity-50"
+            className="rounded-md border border-student-border bg-white px-6 py-3 text-sm font-semibold text-student-ink hover:bg-student-canvas disabled:opacity-50"
           >
             Back
           </button>
           <button
             type="submit"
             disabled={busy}
-            className="rounded-2xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-50"
+            className="rounded-md bg-navy-800 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50"
           >
             {busy ? "Verifying…" : "Restart study"}
           </button>

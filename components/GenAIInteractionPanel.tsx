@@ -105,24 +105,22 @@ export function GenAIInteractionPanel({
 
   return (
     <div
-      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-student-border bg-student-card shadow-student ${className}`}
+      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-student-border bg-student-card shadow-student ${className}`}
     >
-      <div className="shrink-0 border-b border-student-border bg-teal-50/50 px-4 py-3.5 sm:px-5">
-        <h2 className="text-base font-semibold text-student-ink">
+      <div className="shrink-0 border-b border-student-border bg-navy-50 px-4 py-3.5 sm:px-5">
+        <h2 className="text-lg font-semibold text-student-ink">
           Chat with the AI
         </h2>
-        <p className="mt-1 text-xs leading-snug text-student-muted">
-          Send as many messages as you need. The assignment and task constraints
-          are in the section above—scroll inside this column to read older messages.
+        <p className="mt-2 text-base leading-7 text-student-ink">
+          Send as many messages as you need. The scenario and the task stay
+          above this chat.
         </p>
       </div>
       <div className="flex min-h-0 flex-1 flex-col bg-student-canvas/40">
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
           {messages.length === 0 && (
-            <p className="rounded-xl bg-white/90 px-3 py-2.5 text-[0.9375rem] leading-relaxed text-student-muted">
-              Type a message below to start—for example, “Help me outline my
-              explanation” or “How might exercise connect to studying and school
-              performance?”
+            <p className="rounded-md bg-white px-4 py-3 text-base leading-7 text-student-muted">
+              Type a message below to start.
             </p>
           )}
           {messages.map((m, i) => (
@@ -131,9 +129,9 @@ export function GenAIInteractionPanel({
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-[0.9375rem] leading-relaxed ${
+                className={`max-w-[92%] rounded-md px-4 py-3 text-base leading-7 ${
                   m.role === "user"
-                    ? "rounded-br-md border border-teal-700 bg-white text-neutral-900 shadow-sm"
+                    ? "rounded-br-md border border-navy-800 bg-white text-neutral-900 shadow-sm"
                     : "border border-stone-200 bg-white text-neutral-900 shadow-sm"
                 }`}
               >
@@ -181,7 +179,7 @@ export function GenAIInteractionPanel({
                 if (editing) markInputStarted();
               }}
               rows={3}
-              className="min-h-[4.5rem] flex-1 resize-y rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="min-h-[4.5rem] flex-1 resize-y rounded-md border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
               placeholder="Type your message… (Enter to send, Shift+Enter for new line)"
               disabled={loading}
             />
@@ -189,7 +187,7 @@ export function GenAIInteractionPanel({
               type="button"
               onClick={() => void send()}
               disabled={loading || !input.trim()}
-              className="self-end rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
+              className="self-end rounded-md bg-navy-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-navy-900 disabled:opacity-50"
             >
               Send
             </button>

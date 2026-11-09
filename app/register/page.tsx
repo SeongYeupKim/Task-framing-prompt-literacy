@@ -57,7 +57,7 @@ export default function RegisterPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-student-canvas px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+      <div className="w-full max-w-md rounded-md border border-student-border bg-student-card px-8 py-10 shadow-student">
         <h1 className="text-2xl font-semibold text-student-ink">
           Create an account
         </h1>
@@ -65,9 +65,9 @@ export default function RegisterPage() {
           You’ll get a study path at random. Your responses are used only for
           this research.
         </p>
-        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
-          <p className="font-semibold text-teal-900">University email</p>
-          <p className="mt-1 text-teal-900/90">
+        <div className="mt-4 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
+          <p className="font-semibold text-navy-900">University email</p>
+          <p className="mt-1 text-navy-900/90">
             Register and sign in with your <strong>Penn State email</strong>{" "}
             (must end in <code className="rounded bg-white/80 px-1 py-0.5 text-xs">@psu.edu</code>
             ).
@@ -83,7 +83,7 @@ export default function RegisterPage() {
               placeholder="you123@psu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-md border border-student-border px-3 py-2.5 text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
             />
           </div>
           <div>
@@ -97,7 +97,7 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-md border border-student-border px-3 py-2.5 text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
             />
             <p className="mt-1 text-xs text-student-muted">At least 8 characters.</p>
           </div>
@@ -109,14 +109,14 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
+            className="w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white hover:bg-navy-900 disabled:opacity-50"
           >
             {loading ? "Creating account…" : "Continue"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-student-muted">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-teal-700 hover:underline">
+          <Link href="/login" className="font-medium text-navy-800 hover:underline">
             Sign in
           </Link>
         </p>

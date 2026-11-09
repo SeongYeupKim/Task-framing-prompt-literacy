@@ -110,7 +110,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       onSubmit={(e) => void handleSubmit(e)}
       className="mx-auto max-w-2xl space-y-10 pb-12"
     >
-      <div className="rounded-2xl border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8">
+      <div className="rounded-md border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8">
         <h2 className="text-xl font-semibold text-student-ink">
           A few final questions
         </h2>
@@ -121,7 +121,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       </div>
 
       {/* 1 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           1. Please enter your PSU email address (e.g., abc123@psu.edu).
         </h3>
@@ -131,7 +131,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
           value={psuEmail}
           onChange={(e) => setPsuEmail(e.target.value)}
           placeholder="abc123@psu.edu"
-          className="mt-3 w-full rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          className="mt-3 w-full rounded-md border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
         />
         <p className="mt-2 text-xs leading-relaxed text-student-muted">
           <strong className="text-student-ink">Note:</strong> Your PSU email
@@ -141,7 +141,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       </section>
 
       {/* 2 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           2. Please enter your age in years below.
         </h3>
@@ -151,12 +151,12 @@ export function DemographicsSurvey({ onSubmit }: Props) {
           value={ageYears}
           onChange={(e) => setAgeYears(e.target.value.replace(/\D/g, ""))}
           placeholder="e.g., 20"
-          className="mt-3 w-full max-w-[12rem] rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          className="mt-3 w-full max-w-[12rem] rounded-md border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
         />
       </section>
 
       {/* 3 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           3. Which of the following best describes your gender? Select all that
           apply.
@@ -169,7 +169,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
                   type="checkbox"
                   checked={gender.includes(opt)}
                   onChange={() => setGender((g) => toggleInList(g, opt))}
-                  className="mt-1 h-4 w-4 shrink-0 rounded border-student-border text-teal-600 focus:ring-teal-500"
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-student-border text-navy-800 focus:ring-navy-700"
                 />
                 <span>{opt}</span>
               </label>
@@ -179,7 +179,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       </section>
 
       {/* 4 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           4. Which of the following best describes your race/ethnicity? Select
           all that apply.
@@ -194,7 +194,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
                   onChange={() =>
                     setRaceEthnicity((r) => toggleInList(r, opt))
                   }
-                  className="mt-1 h-4 w-4 shrink-0 rounded border-student-border text-teal-600 focus:ring-teal-500"
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-student-border text-navy-800 focus:ring-navy-700"
                 />
                 <span>{opt}</span>
               </label>
@@ -204,7 +204,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       </section>
 
       {/* 5 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           5. Please identify your name to get an extra course credit.
         </h3>
@@ -214,12 +214,12 @@ export function DemographicsSurvey({ onSubmit }: Props) {
           value={nameForCredit}
           onChange={(e) => setNameForCredit(e.target.value)}
           placeholder="Your name as it appears on the course roster"
-          className="mt-3 w-full rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          className="mt-3 w-full rounded-md border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
         />
       </section>
 
       {/* 6 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           6. Do you have any intention for the follow-up interview with respect
           to your task? Additional compensation will be provided.
@@ -231,7 +231,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
               name="followup"
               checked={followUp === "yes"}
               onChange={() => setFollowUp("yes")}
-              className="h-4 w-4 border-student-border text-teal-600 focus:ring-teal-500"
+              className="h-4 w-4 border-student-border text-navy-800 focus:ring-navy-700"
             />
             Yes
           </label>
@@ -241,7 +241,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
               name="followup"
               checked={followUp === "no"}
               onChange={() => setFollowUp("no")}
-              className="h-4 w-4 border-student-border text-teal-600 focus:ring-teal-500"
+              className="h-4 w-4 border-student-border text-navy-800 focus:ring-navy-700"
             />
             No
           </label>
@@ -249,7 +249,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
       </section>
 
       {/* 7 */}
-      <section className="rounded-2xl border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
+      <section className="rounded-md border border-student-border bg-white px-5 py-6 shadow-sm sm:px-7">
         <h3 className="text-sm font-semibold text-student-ink">
           7. Identify the course instructor.
         </h3>
@@ -260,7 +260,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
               name="courseInstructor"
               checked={courseInstructor === "cristin_hall"}
               onChange={() => setCourseInstructor("cristin_hall")}
-              className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+              className="mt-1 h-4 w-4 shrink-0 border-student-border text-navy-800 focus:ring-navy-700"
             />
             <span>Dr. Cristin Hall</span>
           </label>
@@ -270,7 +270,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
               name="courseInstructor"
               checked={courseInstructor === "rayne_sperling"}
               onChange={() => setCourseInstructor("rayne_sperling")}
-              className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+              className="mt-1 h-4 w-4 shrink-0 border-student-border text-navy-800 focus:ring-navy-700"
             />
             <span>Dr. Rayne Sperling</span>
           </label>
@@ -281,7 +281,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
                 name="courseInstructor"
                 checked={courseInstructor === "other"}
                 onChange={() => setCourseInstructor("other")}
-                className="mt-1 h-4 w-4 shrink-0 border-student-border text-teal-600 focus:ring-teal-500"
+                className="mt-1 h-4 w-4 shrink-0 border-student-border text-navy-800 focus:ring-navy-700"
               />
               <span className="font-medium">Others</span>
             </label>
@@ -292,7 +292,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
                 onChange={(e) => setCourseInstructorOther(e.target.value)}
                 placeholder="Type instructor name"
                 aria-label="Other instructor name"
-                className="ml-7 w-full max-w-md rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="ml-7 w-full max-w-md rounded-md border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
               />
             )}
           </div>
@@ -309,7 +309,7 @@ export function DemographicsSurvey({ onSubmit }: Props) {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
+          className="rounded-md bg-navy-800 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-navy-900 disabled:opacity-50"
         >
           {saving ? "Saving…" : "Submit and finish"}
         </button>

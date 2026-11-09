@@ -28,7 +28,7 @@ The two instruction arms read the same CARE text (contextualization, articulatio
 ## Data stored (`users/{uid}`)
 
 - `condition`, `phase`, timestamps  
-- `aiAcceptanceResponses` (20× Likert 1–5), `aiAcceptanceCompletedAt`  
+- `aiAcceptanceResponses` (14× Likert 1–5), `aiAcceptanceCompletedAt`. Pilot rows that still hold the retired 20-item scale stay length 20.  
 - **Instruction:** `instructionCompletedAt`, `trainingCompletedAt`. **`instruction_se` also stores** `careSeDefinition`, `careSeDistinction`, `careSeJudgment`, `careSeAdvice`, `careSeDistinctionOrder` (`extend_first` or `repair_first`).
 - Pilot fields (`instructionSelfExplanation`, matching, `eval1`) remain on older documents.  
 - `genaiMessages`, `essayText`, `essaySubmittedAt`. A follow-up prompt also stores `secAfterAiToInput` (AI reply shown → first keystroke) and `secAfterAiToSend` (AI reply shown → send). Wide CSV columns are `st_i_sec_to_input` and `st_i_sec_to_send`.
@@ -41,7 +41,7 @@ The two instruction arms read the same CARE text (contextualization, articulatio
 
 **Two ways to export the same wide CSV:** (1) **Server** — **`FIREBASE_SERVICE_ACCOUNT_JSON`** / **`FIREBASE_ADMIN_*`** on Vercel. (2) **Browser** — one dashboard login (**default `admin` / `mattandseong`**); the app signs into Firebase as **`admin@psu.edu`** with that same password. **One-time:** add that user under **Authentication → Users** in Firebase and **publish `firestore.rules`** (export account is named in the rules). Optional: **`NEXT_PUBLIC_RESEARCH_EXPORT_EMAIL`** if you use another address (edit rules to match).
 
-Wide CSV includes the CARE answers (`care_se_*`) and, for older rows, the pilot matching and eval1 columns. Order: **email → condition → responses → essay → `st_1`/`ai_1`/… → demographics**.
+Wide CSV includes the CARE answers (`care_se_*`) and, for older rows, the pilot matching and eval1 columns. Current acceptance answers are `ai_accept2_01`–`ai_accept2_14`. Retired 20-item answers stay in `ai_accept_01`–`ai_accept_20`. Order: **email → condition → responses → essay → `st_1`/`ai_1`/… → demographics**.
 
 ## Security
 

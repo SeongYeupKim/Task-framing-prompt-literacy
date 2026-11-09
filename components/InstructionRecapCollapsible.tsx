@@ -5,20 +5,20 @@ import { INSTRUCTION_RECAP_BULLETS } from "@/lib/studyContent";
 /** Brief reminder of CARE (collapsed by default). */
 export function InstructionRecapCollapsible() {
   return (
-    <details className="group rounded-xl border border-teal-200 bg-teal-50/60 shadow-sm">
-      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-teal-900">
+    <details className="group rounded-md border border-navy-200 bg-navy-50 shadow-sm">
+      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-navy-900">
         <span className="inline-flex items-center gap-2">
-          <span className="text-teal-600 group-open:rotate-90 transition-transform">▸</span>
+          <span className="text-navy-800 group-open:rotate-90 transition-transform">▸</span>
           Brief instruction reminder (CARE)
         </span>
       </summary>
-      <div className="border-t border-teal-100 px-4 pb-4 pt-2 text-sm leading-relaxed text-student-ink">
-        <p className="text-student-muted">
+      <div className="border-t border-navy-100 px-5 pb-5 pt-4 text-base leading-7 text-student-ink">
+        <p>
           Four moves for prompting and for what you do after the AI answers:
         </p>
-        <ul className="mt-3 list-none space-y-2">
+        <ul className="mt-4 list-none space-y-4">
           {INSTRUCTION_RECAP_BULLETS.map((line) => (
-            <li key={line} className="border-l-2 border-teal-400 pl-3">
+            <li key={line} className="border-l-2 border-navy-700 pl-4">
               {line}
             </li>
           ))}

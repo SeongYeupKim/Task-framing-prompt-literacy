@@ -10,17 +10,17 @@ type Props = {
 export function TaskIntroPanel({ variant, onContinue }: Props) {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-16">
-      <div className="rounded-2xl border border-student-border bg-student-card px-6 py-8 shadow-student sm:px-10">
-        <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+      <div className="rounded-md border border-student-border bg-student-card px-6 py-8 shadow-student sm:px-10">
+        <p className="text-xs font-semibold uppercase tracking-widest text-navy-800">
           What you’ll do next
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-student-ink">
+        <h2 className="mt-3 text-2xl font-semibold leading-snug text-student-ink">
           {variant === "final_control" && "Main task: chat, then write"}
           {variant === "final_instruction" && "Main task: chat, then write"}
         </h2>
 
         {variant === "final_control" && (
-          <div className="mt-5 space-y-4 text-base leading-relaxed text-student-ink">
+          <div className="mt-6 space-y-5 text-base leading-7 text-student-ink">
             <p>
               You are a <strong className="font-semibold">student</strong>{" "}
               working on a science assignment. Next, you’ll use an AI chat to
@@ -42,7 +42,7 @@ export function TaskIntroPanel({ variant, onContinue }: Props) {
         )}
 
         {variant === "final_instruction" && (
-          <div className="mt-5 space-y-4 text-base leading-relaxed text-student-ink">
+          <div className="mt-6 space-y-5 text-base leading-7 text-student-ink">
             <p>
               You are a <strong className="font-semibold">student</strong>{" "}
               working on a science assignment. Next, you’ll use an AI chat to
@@ -67,7 +67,7 @@ export function TaskIntroPanel({ variant, onContinue }: Props) {
         <button
           type="button"
           onClick={() => void onContinue()}
-          className="mt-8 w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 sm:w-auto sm:px-10"
+          className="mt-8 w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-navy-900 sm:w-auto sm:px-10"
         >
           Continue
         </button>

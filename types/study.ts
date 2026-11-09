@@ -96,7 +96,7 @@ export interface UserStudyDoc {
   studyConsentCompletedAt?: string;
   /** Participation guidance page completed; next is AI acceptance. */
   studyOverviewCompletedAt?: string;
-  /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
+  /** Pre-study Likert (1–5). Current scale is 14 items; pilot rows may still hold 20. */
   aiAcceptanceResponses?: number[];
   aiAcceptanceCompletedAt?: string;
   /** First paint of the CARE reading; set when TrainingPanel mounts. */

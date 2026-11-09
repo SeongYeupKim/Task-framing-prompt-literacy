@@ -53,14 +53,14 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-student-canvas px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+      <div className="w-full max-w-md rounded-md border border-student-border bg-student-card px-8 py-10 shadow-student">
         <h1 className="text-2xl font-semibold text-student-ink">Sign in</h1>
         <p className="mt-2 text-sm text-student-muted">
           Use the email and password you registered with.
         </p>
-        <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
-          <p className="font-semibold text-teal-900">University email</p>
-          <p className="mt-1 text-teal-900/90">
+        <div className="mt-4 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm leading-relaxed text-student-ink shadow-sm">
+          <p className="font-semibold text-navy-900">University email</p>
+          <p className="mt-1 text-navy-900/90">
             Sign in with your <strong>Penn State email</strong> (
             <code className="rounded bg-white/80 px-1 py-0.5 text-xs">@psu.edu</code>
             ).
@@ -76,7 +76,7 @@ export default function LoginPage() {
               placeholder="you123@psu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-md border border-student-border px-3 py-2.5 text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
             />
           </div>
           <div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-student-border px-3 py-2.5 text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-md border border-student-border px-3 py-2.5 text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
             />
           </div>
           {error && (
@@ -100,14 +100,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
+            className="w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white hover:bg-navy-900 disabled:opacity-50"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-student-muted">
           Need an account?{" "}
-          <Link href="/register" className="font-medium text-teal-700 hover:underline">
+          <Link href="/register" className="font-medium text-navy-800 hover:underline">
             Create one
           </Link>
         </p>

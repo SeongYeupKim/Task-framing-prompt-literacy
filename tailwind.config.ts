@@ -17,11 +17,19 @@ const config: Config = {
           900: "#1e3a5f",
         },
         student: {
-          canvas: "#eef2f6",
+          canvas: "#f3f4f6",
           card: "#ffffff",
-          ink: "#1a2e3d",
-          muted: "#5a6d7d",
-          border: "#dfe6ee",
+          ink: "#1a1a1a",
+          muted: "#3e4c59",
+          border: "#c9d1d9",
+        },
+        navy: {
+          50: "#e8eef6",
+          100: "#d4e0f0",
+          200: "#a9c0de",
+          700: "#1e407c",
+          800: "#001e44",
+          900: "#001433",
         },
       },
       boxShadow: {

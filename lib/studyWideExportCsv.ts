@@ -5,7 +5,10 @@
  * Column order: email, condition, responses…, essay, st_1/ai_1/…, demographics.
  */
 
-import { AI_ACCEPTANCE_ITEMS } from "@/lib/aiAcceptanceSurvey";
+import {
+  AI_ACCEPTANCE_ITEMS,
+  LEGACY_AI_ACCEPTANCE_COUNT,
+} from "@/lib/aiAcceptanceSurvey";
 import { normalizeCondition } from "@/lib/studyConditions";
 
 export type WideExportParticipant = Record<string, unknown> & { uid: string };
@@ -20,6 +23,7 @@ const INSTR_DIM_KEYS = [
 ] as const;
 
 const AI_ACCEPT_N = AI_ACCEPTANCE_ITEMS.length;
+const AI_ACCEPT_LEGACY_N = LEGACY_AI_ACCEPTANCE_COUNT;
 
 function csvCell(value: string): string {
   if (value === "") return "";
@@ -96,17 +100,27 @@ function maxChatDepth(participants: WideExportParticipant[]): number {
   return max;
 }
 
+function likertCell(raw: unknown, index: number): string {
+  if (!Array.isArray(raw) || raw[index] === undefined || raw[index] === null) {
+    return "";
+  }
+  return str(raw[index]);
+}
+
+/**
+ * Pilot rows (length 20) stay in ai_accept_01–20.
+ * The current 14-item scale is exported as ai_accept2_01–14.
+ */
 function likertColumns(p: WideExportParticipant): string[] {
   const raw = p.aiAcceptanceResponses;
-  const out: string[] = [];
-  for (let i = 0; i < AI_ACCEPT_N; i++) {
-    if (!Array.isArray(raw) || raw[i] === undefined || raw[i] === null) {
-      out.push("");
-    } else {
-      out.push(str(raw[i]));
-    }
-  }
-  return out;
+  const isCurrent = Array.isArray(raw) && raw.length === AI_ACCEPT_N;
+  const legacy = Array.from({ length: AI_ACCEPT_LEGACY_N }, (_, i) =>
+    isCurrent ? "" : likertCell(raw, i),
+  );
+  const current = Array.from({ length: AI_ACCEPT_N }, (_, i) =>
+    isCurrent ? likertCell(raw, i) : "",
+  );
+  return [...legacy, ...current];
 }
 
 function eval1Flat(p: WideExportParticipant): {
@@ -199,9 +213,13 @@ function demographicsFlat(p: WideExportParticipant): {
 
 /** Fixed header list (excluding dynamic st_i / ai_i). */
 export function studyWideExportStaticHeaders(): string[] {
+  const likertLegacy = Array.from(
+    { length: AI_ACCEPT_LEGACY_N },
+    (_, i) => `ai_accept_${String(i + 1).padStart(2, "0")}`,
+  );
   const likert = Array.from(
     { length: AI_ACCEPT_N },
-    (_, i) => `ai_accept_${String(i + 1).padStart(2, "0")}`,
+    (_, i) => `ai_accept2_${String(i + 1).padStart(2, "0")}`,
   );
   const instrMatch = INSTR_DIM_KEYS.map((k) => `instr_match_${k}`);
   return [
@@ -215,6 +233,7 @@ export function studyWideExportStaticHeaders(): string[] {
     "studyConsentCompletedAt",
     "studyOverviewCompletedAt",
     "aiAcceptanceCompletedAt",
+    ...likertLegacy,
     ...likert,
     "trainingStartedAt",
     "trainingCompletedAt",

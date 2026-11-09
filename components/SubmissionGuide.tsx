@@ -52,7 +52,7 @@ export function SubmissionGuide({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-12">
-      <div className="rounded-2xl border border-student-border bg-student-card px-6 py-7 shadow-student">
+      <div className="rounded-md border border-student-border bg-student-card px-6 py-7 shadow-student">
         <h2 className="text-xl font-semibold text-student-ink">
           Download your assignment record
         </h2>
@@ -73,7 +73,7 @@ export function SubmissionGuide({
         type="button"
         onClick={() => void handleDownload()}
         disabled={busy !== null}
-        className="w-full rounded-2xl bg-teal-600 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-50"
+        className="w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50"
       >
         {busy === "pdf"
           ? "Preparing PDF…"
@@ -92,7 +92,7 @@ export function SubmissionGuide({
         type="button"
         onClick={() => void handleFinish()}
         disabled={!downloaded || busy !== null}
-        className="w-full rounded-2xl border border-student-border bg-white py-3.5 text-base font-semibold text-student-ink hover:bg-student-canvas disabled:opacity-50"
+        className="w-full rounded-md border border-student-border bg-white py-3.5 text-base font-semibold text-student-ink hover:bg-student-canvas disabled:opacity-50"
       >
         {busy === "finish" ? "Saving…" : "I uploaded it to Canvas — finish"}
       </button>

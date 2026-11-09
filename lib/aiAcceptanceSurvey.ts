@@ -1,26 +1,26 @@
-/** Pre-study AI acceptance (Likert 1–5). Order is fixed for analysis. */
+/**
+ * Pre-study GenAI acceptance (Likert 1–5). Item order is fixed for analysis.
+ * Pilot sessions used a different 20-item list; those arrays stay length 20.
+ */
 export const AI_ACCEPTANCE_ITEMS: readonly string[] = [
-  "I plan to integrate AI into my academic work regularly.",
-  "I feel comfortable engaging in dialogue with the AI during learning.",
-  "If I have the opportunity, I intend to choose learning environments that use AI.",
-  "I would encourage others to use AI tools for academic purposes.",
-  "I am likely to use AI tools for both individual and collaborative learning.",
-  "Using AI makes my learning experience feel more engaging and dynamic.",
-  "I enjoy using AI for learning activities.",
-  "I feel positive about using AI when it is part of my learning experience.",
-  "I intend to use AI for learning in the future.",
-  "I can critically interact with AI tools without needing extensive training.",
-  "I can effectively use AI for learning without assistance from others.",
-  "AI tools require little effort to integrate into my learning process.",
-  "I can easily guide or redirect the AI when needed.",
-  "I can recognize how the AI arrives at its suggestions or explanations.",
-  "AI assists me in understanding difficult concepts more easily.",
-  "AI enhances my ability to organize and synthesize information from different sources.",
-  "Using AI tools in my learning helps me complete tasks more efficiently.",
-  "AI improves the quality of my learning outcomes.",
-  "AI provides useful feedback that supports my academic progress.",
-  "AI helps me generate ideas and structure my writing more effectively.",
+  "GenAI enhances my ability to organize and synthesize information from different sources.",
+  "GenAI assists me in understanding difficult concepts more easily.",
+  "GenAI is useful for checking my understanding of course materials.",
+  "GenAI improves the quality of my learning outcomes.",
+  "GenAI provides useful feedback that supports my academic progress.",
+  "GenAI helps me summarize ideas and structure course concepts more effectively.",
+  "GenAI is useful for brainstorming and developing new ideas.",
+  "GenAI is useful for generating or refining my academic work (e.g., essays).",
+  "Using GenAI tools in my learning helps me complete tasks more efficiently.",
+  "I can critically interact with GenAI tools considering they can generate misinformation.",
+  "I can effectively use GenAI for learning without assistance from others.",
+  "I can recognize how the GenAI arrives at its suggestions or explanations.",
+  "I know how to re-question and re-ask GenAI if their responses do not align with my purpose.",
+  "I feel confident using GenAI to support my studies.",
 ] as const;
+
+/** Length of the retired pilot acceptance scale. */
+export const LEGACY_AI_ACCEPTANCE_COUNT = 20;
 
 /** 5-point scale labels (1 = lowest agreement with statement as written, adjust wording per convention) */
 export const LIKERT_SCALE = [

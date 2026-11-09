@@ -36,11 +36,11 @@ export function StudyParticipationOverview({
   }
 
   return (
-    <div className="mx-auto max-w-3xl rounded-2xl border border-student-border bg-student-card px-6 py-8 shadow-student sm:px-10 sm:py-10">
+    <div className="mx-auto max-w-3xl rounded-md border border-student-border bg-student-card px-6 py-8 shadow-student sm:px-10 sm:py-10">
       <h1 className="text-2xl font-semibold tracking-tight text-student-ink">
         {PARTICIPATION_OVERVIEW_SHARED.headline}
       </h1>
-      <div className="mt-5 space-y-4 text-base font-medium leading-relaxed text-student-ink">
+      <div className="mt-6 space-y-5 text-base leading-7 text-student-ink">
         {PARTICIPATION_OVERVIEW_SHARED.purpose.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
@@ -50,17 +50,17 @@ export function StudyParticipationOverview({
       <h2 className="mt-8 text-lg font-semibold text-student-ink">
         What you&apos;ll do in this session
       </h2>
-      <p className="mt-2 text-sm font-medium text-student-muted">
+      <p className="mt-3 text-base leading-7 text-student-muted">
         After informed consent, your steps proceed on separate screens, in this
         order:
       </p>
-      <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm font-medium leading-relaxed text-student-ink sm:text-base">
+      <ol className="mt-5 list-decimal space-y-4 pl-5 text-base leading-7 text-student-ink">
         {steps.map((step, i) => (
           <li key={i}>{step}</li>
         ))}
       </ol>
 
-      <p className="mt-6 rounded-xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm font-medium leading-relaxed text-teal-950">
+      <p className="mt-8 rounded-md border border-navy-100 bg-navy-50 px-5 py-4 text-base leading-7 text-navy-900">
         {PARTICIPATION_OVERVIEW_SHARED.time}
       </p>
 
@@ -75,7 +75,7 @@ export function StudyParticipationOverview({
           type="button"
           disabled={busy}
           onClick={() => void handleClick()}
-          className="rounded-2xl bg-teal-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
+          className="rounded-md bg-navy-800 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-navy-900 disabled:opacity-50"
         >
           {busy ? "Continuing…" : "Continue"}
         </button>

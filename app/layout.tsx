@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.className} min-h-screen bg-student-canvas text-student-ink antialiased`}
+        className={`${inter.className} min-h-screen bg-student-canvas text-student-ink antialiased`}
       >
         {children}
       </body>

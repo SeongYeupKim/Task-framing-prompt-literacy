@@ -1,5 +1,6 @@
 import { deleteField, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import type { User } from "firebase/auth";
+import { AI_ACCEPTANCE_ITEMS } from "@/lib/aiAcceptanceSurvey";
 import { getClientDb } from "@/lib/firebase";
 import {
   isLegacyEvalCondition,
@@ -195,6 +196,12 @@ export async function completeStudyOverview(uid: string) {
 }
 
 export async function saveAiAcceptance(uid: string, responses: number[]) {
+  const valid =
+    responses.length === AI_ACCEPTANCE_ITEMS.length &&
+    responses.every((n) => Number.isInteger(n) && n >= 1 && n <= 5);
+  if (!valid) {
+    throw new Error("Invalid AI acceptance responses");
+  }
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
   const snap = await getDoc(ref);

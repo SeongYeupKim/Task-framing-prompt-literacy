@@ -3,7 +3,7 @@ import Link from "next/link";
 export function HomeLanding() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-student-canvas px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-student-border bg-student-card px-8 py-10 shadow-student">
+      <div className="w-full max-w-md rounded-md border border-student-border bg-student-card px-8 py-10 shadow-student">
         <h1 className="text-center text-2xl font-semibold tracking-tight text-student-ink">
           Learning session
         </h1>
@@ -14,13 +14,13 @@ export function HomeLanding() {
         <div className="mt-8 flex flex-col gap-3">
           <Link
             href="/login"
-            className="rounded-2xl bg-teal-600 py-3.5 text-center text-base font-semibold text-white shadow-sm transition hover:bg-teal-700"
+            className="rounded-md bg-navy-800 py-3.5 text-center text-base font-semibold text-white shadow-sm transition hover:bg-navy-900"
           >
             Sign in
           </Link>
           <Link
             href="/register"
-            className="rounded-2xl border-2 border-teal-200 bg-teal-50 py-3.5 text-center text-base font-semibold text-teal-900 transition hover:bg-teal-100"
+            className="rounded-md border-2 border-navy-200 bg-navy-50 py-3.5 text-center text-base font-semibold text-navy-900 transition hover:bg-navy-100"
           >
             Create an account
           </Link>
