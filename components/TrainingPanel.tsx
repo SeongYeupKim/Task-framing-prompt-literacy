@@ -6,6 +6,7 @@ import {
   CARE_INSTRUCTION,
   CARE_MIN_CHARS,
   CARE_QUESTIONS,
+  type CareLetter,
 } from "@/lib/studyContent";
 import { needsSelfExplanation } from "@/lib/studyConditions";
 import type { CareSelfExplanationAnswers, StudyCondition } from "@/types/study";
@@ -20,52 +21,99 @@ type Props = {
   onComplete: (answers: CareSelfExplanationAnswers | null) => Promise<void>;
 };
 
-function CareReading() {
+function CareReading({
+  onOpened,
+}: {
+  onOpened?: (letter: CareLetter) => void;
+}) {
+  const [open, setOpen] = useState<CareLetter | null>(null);
+
+  function toggle(letter: CareLetter) {
+    setOpen((current) => (current === letter ? null : letter));
+    onOpened?.(letter);
+  }
+
   return (
-    <>
+    <div className="mx-auto max-w-3xl">
       <h2 className="text-xl font-semibold leading-snug text-student-ink">
         {CARE_INSTRUCTION.title}
       </h2>
-      <p className="mt-2 text-base leading-6 text-student-ink">
+      <p className="mt-3 text-base leading-6 text-student-ink">
         <span className="font-semibold">Definition of prompting literacy: </span>
         {CARE_INSTRUCTION.definition}
       </p>
       <p className="mt-2 text-base leading-6 text-student-ink">
-        {CARE_INSTRUCTION.intro}
+        <span className="font-semibold">Why it matters: </span>
+        {CARE_INSTRUCTION.why}
       </p>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {CARE_INSTRUCTION.dimensions.map((dim) => (
-          <article
-            key={dim.letter}
-            className="border border-student-border bg-white px-4 py-3"
-          >
-            <h3 className="text-base font-semibold leading-snug text-student-ink">
-              <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-navy-800 text-xs font-semibold text-white">
-                {dim.letter}
-              </span>
-              {dim.title}
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-student-ink">
-              {dim.definition}
-            </p>
-            <p className="mt-2 text-sm leading-5 text-student-ink">
-              <span className="font-semibold">A weak move: </span>
-              {dim.weak}
-            </p>
-            <p className="mt-1 text-sm leading-5 text-student-ink">
-              <span className="font-semibold">A stronger move: </span>
-              {dim.stronger}
-            </p>
-          </article>
-        ))}
+      <p className="mt-2 text-base leading-6 text-student-ink">
+        {CARE_INSTRUCTION.guide}
+      </p>
+      <div className="mt-4 space-y-2">
+        {CARE_INSTRUCTION.dimensions.map((dim) => {
+          const isOpen = open === dim.letter;
+          return (
+            <article
+              key={dim.letter}
+              className="relative overflow-hidden rounded-md border border-student-border bg-white shadow-sm"
+            >
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-0 top-0 border-b-[18px] border-l-[18px] border-b-navy-100 border-l-transparent"
+              />
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => toggle(dim.letter)}
+                className="flex w-full items-center gap-3 px-4 py-3 pr-8 text-left"
+              >
+                <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy-800 text-sm font-semibold text-white">
+                  {dim.letter}
+                </span>
+                <span className="text-base font-semibold text-student-ink">
+                  {dim.title}
+                </span>
+                <span className="ml-auto text-sm font-medium text-navy-800">
+                  {isOpen ? "Fold" : "Unfold"}
+                </span>
+              </button>
+              {isOpen && (
+                <div className="space-y-3 border-t border-student-border px-4 py-3 text-sm leading-6 text-student-ink">
+                  <p>{dim.definition}</p>
+                  {dim.priorAi && (
+                    <div className="rounded-md border border-student-border bg-student-canvas px-3 py-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
+                        The AI has already replied
+                      </p>
+                      <p className="mt-1">{dim.priorAi}</p>
+                    </div>
+                  )}
+                  <p>
+                    <span className="font-semibold">
+                      {dim.priorAi ? "A weak next message: " : "A weak move: "}
+                    </span>
+                    {dim.weak}
+                  </p>
+                  <p>
+                    <span className="font-semibold">
+                      {dim.priorAi
+                        ? "A stronger next message: "
+                        : "A stronger move: "}
+                    </span>
+                    {dim.stronger}
+                  </p>
+                  {dim.note && (
+                    <p className="text-xs leading-5 text-student-muted">
+                      {dim.note}
+                    </p>
+                  )}
+                </div>
+              )}
+            </article>
+          );
+        })}
       </div>
-      <p className="mt-3 text-sm leading-5 text-student-muted">
-        <span className="font-semibold text-student-ink">
-          {CARE_INSTRUCTION.contrastTitle}:{" "}
-        </span>
-        {CARE_INSTRUCTION.contrast}
-      </p>
-    </>
+    </div>
   );
 }
 
@@ -86,6 +134,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   }, [studyUid]);
 
   const [step, setStep] = useState<1 | 2>(1);
+  const [opened, setOpened] = useState<CareLetter[]>([]);
   const [readConfirmed, setReadConfirmed] = useState(false);
   const [definition, setDefinition] = useState("");
   const [distinction, setDistinction] = useState("");
@@ -93,6 +142,10 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   const [advice, setAdvice] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const allOpened = CARE_INSTRUCTION.dimensions.every((dim) =>
+    opened.includes(dim.letter),
+  );
 
   const questionsComplete =
     definition.trim().length >= CARE_MIN_CHARS.definition &&
@@ -120,14 +173,20 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
         </p>
         <p className="mt-2 text-base leading-7 text-student-ink">
           {step === 1
-            ? "Read the explanation. Both parts of prompting are covered: how you build a request, and what you do after the AI answers."
-            : "Answer in your own words. Open “Reread the instruction” if you want the text again."}
+            ? "Start with the definition. Then unfold one dimension at a time."
+            : "Answer in your own words. Open “Reread the instruction” if you want a dimension again."}
         </p>
       </div>
 
       {step === 1 && (
         <section className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student sm:px-5">
-          <CareReading />
+          <CareReading
+            onOpened={(letter) =>
+              setOpened((prev) =>
+                prev.includes(letter) ? prev : [...prev, letter],
+              )
+            }
+          />
         </section>
       )}
 
@@ -148,10 +207,18 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <input
               type="checkbox"
               checked={readConfirmed}
+              disabled={!allOpened}
               onChange={(e) => setReadConfirmed(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-student-border text-navy-800 focus:ring-navy-700"
+              className="mt-1 h-4 w-4 rounded border-student-border text-navy-800 focus:ring-navy-700 disabled:cursor-not-allowed"
             />
-            <span>I have read this instruction.</span>
+            <span>
+              I have read this instruction.
+              {!allOpened && (
+                <span className="mt-1 block text-sm leading-5 text-student-muted">
+                  Unfold each of the four dimensions first.
+                </span>
+              )}
+            </span>
           </label>
           {error && (
             <p className="mt-4 text-sm font-medium text-red-600" role="alert">

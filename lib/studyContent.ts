@@ -12,20 +12,25 @@ export type CareDimension = {
   definition: string;
   weak: string;
   stronger: string;
+  /** AI reply the student has already seen. Set for R and E. */
+  priorAi?: string;
+  note?: string;
 };
 
 export const CARE_INSTRUCTION = {
   title: "How to prompt and interact with AI",
   definition:
-    "Prompting literacy is how a student formulates a request, directs what the AI should do with it, and adapts the next message after the AI answers.",
-  intro:
-    "The four moves below are called CARE. The first two build the request. The last two manage the conversation after the AI answers.",
+    "Prompting literacy is how you formulate a request, direct what the AI should do with it, and adapt your next message after the AI answers.",
+  why:
+    "It matters because a high-quality answer depends on both parts. If the AI does not know your purpose, or a later message does not respond to what it just said, the answer stays generic and hard to use.",
+  guide:
+    "Four dimensions support high-quality prompting. Unfold one at a time. Contextualization and articulation shape the request you send. Responsive interaction and evaluative refinement are what you do after you see the AI’s response.",
   dimensions: [
     {
       letter: "C",
       title: "Contextualization",
       definition:
-        "Give the AI the situation that should shape the answer: the task you are doing, the goal of that task, the relevant background, and the context that matters (who it is for, or the setting).",
+        "The extent to which you provide task-relevant contextual information that enables GenAI to understand the purpose, background, and circumstances of your request.",
       weak: "Tell me about feedback.",
       stronger:
         "I’m writing a short explanation for first-year students. The goal is to show how feedback helps learning, especially what a student does on the next draft.",
@@ -34,41 +39,44 @@ export const CARE_INSTRUCTION = {
       letter: "A",
       title: "Articulation",
       definition:
-        "State the request itself. Name what you want produced, the instructions the AI should follow, and the expectations for the answer — length, form, and what it must include. Being specific is part of articulation.",
+        "The extent to which you formulate a clear, specific, and actionable request that communicates what you expect GenAI to do or produce.",
       weak: "Write something good.",
       stronger:
         "Explain how feedback changes what a student does on the next draft. Use plain language, about 200 words, one paragraph, and one classroom example.",
     },
     {
       letter: "R",
-      title: "Responsive elaboration",
+      title: "Responsive interaction",
       definition:
-        "When an answer already meets the request, send a follow-up that develops that answer on purpose: a missing part, a further step, or an example you can use. A follow-up that only says to continue does not do this.",
+        "The extent to which you purposefully develop and sustain the interaction through follow-up prompts that build on the preceding exchange to extend, clarify, or explore task-relevant information.",
+      priorAi:
+        "Feedback tells you what you did well and what to change. It can point out a mistake, suggest a next step, or show an example of a stronger answer.",
       weak: "Say more.",
       stronger:
-        "After a clear explanation of feedback: “How does feedback change what a student does on the next draft?”",
+        "That explains what feedback is. Build on it: how does that information change what a student actually does when they revise a draft?",
     },
     {
       letter: "E",
-      title: "Evaluation-driven refinement",
+      title: "Evaluative refinement",
       definition:
-        "Compare the answer with what you asked. If the request was not met, name what was off and send a revised prompt. This judges the request, not whether every fact is true.",
+        "The extent to which you recognize and explicitly address limitations or mismatches in a previous AI response, or in your own prompt, by modifying the next instruction so it better achieves your goal.",
+      priorAi:
+        "Feedback is specific, timely, and focused on the task rather than the person. Researchers distinguish feedback about the task, the process, and self-regulation.",
       weak: "Make it better.",
       stronger:
-        "After an explanation that never mentions drafts: “I asked how feedback changes the next draft. Address that, in plain language, with one classroom example.”",
+        "I asked how feedback changes the next draft, for first-year students, in one short paragraph with one classroom example. Your reply never mentions a draft. Redo it that way.",
+      note:
+        "Responsive interaction builds on an answer you can already use. Evaluative refinement changes the next instruction because the answer missed the request. Checking whether a fact is true is not part of this lesson.",
     },
   ] satisfies CareDimension[],
-  contrastTitle: "A side note",
-  contrast:
-    "Elaboration and refinement are different. Elaboration develops an answer you can already use. Refinement changes the request because the answer missed what you asked. Checking whether a fact is true is a different job, and it is not part of this lesson.",
 } as const;
 
 /** Collapsible reminder during the main chat and essay. Same ideas as the reading. */
 export const INSTRUCTION_RECAP_BULLETS: string[] = [
-  "C — Contextualization: state the task, goal, background, and context.",
-  "A — Articulation: make the request, instructions, and expectations specific.",
-  "R — Responsive elaboration: use a later turn to build on an answer you can use.",
-  "E — Evaluation-driven refinement: if the answer missed what you asked, say what was off and change the prompt.",
+  "C — Contextualization: give the purpose, background, and circumstances of the request.",
+  "A — Articulation: make the request clear, specific, and actionable.",
+  "R — Responsive interaction: after an answer, follow up to extend, clarify, or explore it.",
+  "E — Evaluative refinement: if an answer misses the request, change the next instruction.",
 ];
 
 export const CARE_MIN_CHARS = {
