@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   CARE_CASE,
-  CARE_DISTINCTION,
   CARE_INSTRUCTION,
   CARE_MIN_CHARS,
   CARE_QUESTIONS,
-  type CareDistinctionOrder,
 } from "@/lib/studyContent";
 import { needsSelfExplanation } from "@/lib/studyConditions";
 import type { CareSelfExplanationAnswers, StudyCondition } from "@/types/study";
@@ -25,48 +23,48 @@ type Props = {
 function CareReading() {
   return (
     <>
-      <h2 className="text-2xl font-semibold leading-snug text-student-ink">
+      <h2 className="text-xl font-semibold leading-snug text-student-ink">
         {CARE_INSTRUCTION.title}
       </h2>
-      <div className="mt-5 space-y-5 text-base leading-7 text-student-ink">
-        {CARE_INSTRUCTION.intro.map((p) => (
-          <p key={p}>{p}</p>
-        ))}
-      </div>
-      <div className="mt-10 space-y-8">
+      <p className="mt-2 text-base leading-6 text-student-ink">
+        <span className="font-semibold">Definition of prompting literacy: </span>
+        {CARE_INSTRUCTION.definition}
+      </p>
+      <p className="mt-2 text-base leading-6 text-student-ink">
+        {CARE_INSTRUCTION.intro}
+      </p>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
         {CARE_INSTRUCTION.dimensions.map((dim) => (
           <article
             key={dim.letter}
-            className="border border-student-border bg-white px-6 py-6 sm:px-7 sm:py-7"
+            className="border border-student-border bg-white px-4 py-3"
           >
-            <h3 className="text-lg font-semibold leading-snug text-student-ink">
-              <span className="mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-800 text-sm font-semibold text-white">
+            <h3 className="text-base font-semibold leading-snug text-student-ink">
+              <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-navy-800 text-xs font-semibold text-white">
                 {dim.letter}
               </span>
               {dim.title}
             </h3>
-            <p className="mt-4 text-base leading-7 text-student-ink">
+            <p className="mt-2 text-sm leading-6 text-student-ink">
               {dim.definition}
             </p>
-            <p className="mt-4 text-base leading-7 text-student-ink">
+            <p className="mt-2 text-sm leading-5 text-student-ink">
               <span className="font-semibold">A weak move: </span>
               {dim.weak}
             </p>
-            <p className="mt-4 text-base leading-7 text-student-ink">
+            <p className="mt-1 text-sm leading-5 text-student-ink">
               <span className="font-semibold">A stronger move: </span>
               {dim.stronger}
             </p>
           </article>
         ))}
       </div>
-      <h3 className="mt-10 text-xl font-semibold leading-snug text-student-ink">
-        {CARE_INSTRUCTION.contrastTitle}
-      </h3>
-      <div className="mt-4 space-y-5 text-base leading-7 text-student-ink">
-        {CARE_INSTRUCTION.contrast.map((p) => (
-          <p key={p}>{p}</p>
-        ))}
-      </div>
+      <p className="mt-3 text-sm leading-5 text-student-muted">
+        <span className="font-semibold text-student-ink">
+          {CARE_INSTRUCTION.contrastTitle}:{" "}
+        </span>
+        {CARE_INSTRUCTION.contrast}
+      </p>
     </>
   );
 }
@@ -89,24 +87,12 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
 
   const [step, setStep] = useState<1 | 2>(1);
   const [readConfirmed, setReadConfirmed] = useState(false);
-  const [distinctionOrder] = useState<CareDistinctionOrder>(() =>
-    Math.random() < 0.5 ? "extend_first" : "repair_first"
-  );
   const [definition, setDefinition] = useState("");
   const [distinction, setDistinction] = useState("");
   const [judgment, setJudgment] = useState("");
   const [advice, setAdvice] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const message1 =
-    distinctionOrder === "extend_first"
-      ? CARE_DISTINCTION.extend
-      : CARE_DISTINCTION.repair;
-  const message2 =
-    distinctionOrder === "extend_first"
-      ? CARE_DISTINCTION.repair
-      : CARE_DISTINCTION.extend;
 
   const questionsComplete =
     definition.trim().length >= CARE_MIN_CHARS.definition &&
@@ -127,7 +113,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8 pb-16">
+    <div className="w-full space-y-3 pb-6">
       <div className="rounded-md border border-navy-200 bg-navy-50 px-5 py-4 shadow-sm sm:px-7">
         <p className="text-base font-semibold text-navy-900">
           {withQuestions ? `Instruction — Part ${step} of 2` : "Instruction"}
@@ -140,7 +126,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
       </div>
 
       {step === 1 && (
-        <section className="rounded-md border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-7">
+        <section className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student sm:px-5">
           <CareReading />
         </section>
       )}
@@ -201,8 +187,9 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
       )}
 
       {step === 2 && withQuestions && (
-        <section className="space-y-8">
-          <article className="rounded-md border border-student-border bg-student-card px-6 py-7 shadow-student sm:px-8">
+        <>
+        <section className="grid gap-3 xl:grid-cols-2">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
             <h3 className="text-lg font-semibold text-student-ink">
               1. Your definition
             </h3>
@@ -218,46 +205,23 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <CharCount value={definition} min={CARE_MIN_CHARS.definition} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-6 py-7 shadow-student sm:px-8">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
             <h3 className="text-lg font-semibold text-student-ink">
-              2. Two ways to continue
+              2. Articulation
             </h3>
-            <p className="mt-2 text-base leading-7 text-student-ink">
-              {CARE_DISTINCTION.prompt}
+            <p className="mt-2 text-base leading-6 text-student-ink">
+              {CARE_QUESTIONS.articulation}
             </p>
-            <div className="mt-4 rounded-md border border-student-border bg-student-canvas px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
-                AI answer
-              </p>
-              <p className="mt-2 text-base leading-7 text-student-ink">
-                {CARE_DISTINCTION.aiAnswer}
-              </p>
-            </div>
-            <div className="mt-3 space-y-3">
-              {[message1, message2].map((text, i) => (
-                <div
-                  key={i}
-                  className="rounded-md border border-navy-100 bg-navy-50 px-4 py-3"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-navy-800">
-                    Message {i + 1}
-                  </p>
-                  <p className="mt-1 text-base leading-7 text-student-ink">
-                    {text}
-                  </p>
-                </div>
-              ))}
-            </div>
             <textarea
               value={distinction}
               onChange={(e) => setDistinction(e.target.value)}
               rows={5}
-              className="mt-4 w-full rounded-md border border-student-border px-3 py-3 text-base leading-7 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
+              className="mt-3 w-full rounded-md border border-student-border px-3 py-3 text-base leading-6 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
             />
             <CharCount value={distinction} min={CARE_MIN_CHARS.distinction} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-6 py-7 shadow-student sm:px-8">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
             <h3 className="text-lg font-semibold text-student-ink">
               3. Judge this chat
             </h3>
@@ -297,7 +261,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <CharCount value={judgment} min={CARE_MIN_CHARS.judgment} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-6 py-7 shadow-student sm:px-8">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
             <h3 className="text-lg font-semibold text-student-ink">
               4. Advise this student
             </h3>
@@ -312,6 +276,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             />
             <CharCount value={advice} min={CARE_MIN_CHARS.advice} />
           </article>
+        </section>
 
           {error && (
             <p className="text-sm font-medium text-red-600" role="alert">
@@ -339,7 +304,6 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
                   distinction: distinction.trim(),
                   judgment: judgment.trim(),
                   advice: advice.trim(),
-                  distinctionOrder,
                 })
               }
               className="rounded-md bg-navy-800 px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50"
@@ -347,7 +311,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
               {saving ? "Saving…" : "Finish and continue"}
             </button>
           </div>
-        </section>
+        </>
       )}
     </div>
   );

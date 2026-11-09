@@ -107,13 +107,13 @@ export function GenAIInteractionPanel({
     <div
       className={`flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-student-border bg-student-card shadow-student ${className}`}
     >
-      <div className="shrink-0 border-b border-student-border bg-navy-50 px-4 py-3.5 sm:px-5">
-        <h2 className="text-lg font-semibold text-student-ink">
+      <div className="shrink-0 border-b border-student-border bg-navy-50 px-3 py-2">
+        <h2 className="text-sm font-semibold text-student-ink">
           Chat with the AI
         </h2>
-        <p className="mt-2 text-base leading-7 text-student-ink">
+        <p className="text-sm leading-5 text-student-ink">
           Send as many messages as you need. The scenario and the task stay
-          above this chat.
+          on this screen.
         </p>
       </div>
       <div className="flex min-h-0 flex-1 flex-col bg-student-canvas/40">

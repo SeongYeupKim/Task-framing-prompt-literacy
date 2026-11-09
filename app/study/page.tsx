@@ -236,14 +236,32 @@ export default function StudyPage() {
 
   const recapFinal = showInstructionRecap(condition, phase);
 
-  const wideMain =
-    phase === "training" || phase === "genai" || phase === "essay";
+  const wideMain = phase === "training";
+  const workspace = phase === "genai" || phase === "essay";
 
   return (
-    <div className="min-h-screen bg-student-canvas pb-16">
-      <header className="sticky top-0 z-10 border-b border-student-border bg-white">
-        <div className="mx-auto max-w-[1400px] px-4 py-4">
-          <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-student-border">
+    <div
+      className={
+        workspace
+          ? "flex h-dvh flex-col overflow-hidden bg-student-canvas"
+          : "min-h-screen bg-student-canvas pb-8"
+      }
+    >
+      <header
+        className={`z-10 border-b border-student-border bg-white ${
+          workspace ? "shrink-0" : "sticky top-0"
+        }`}
+      >
+        <div
+          className={`mx-auto max-w-[1600px] ${
+            workspace ? "px-3 py-2" : "px-4 py-3"
+          }`}
+        >
+          <div
+            className={`w-full overflow-hidden rounded-full bg-student-border ${
+              workspace ? "mb-1.5 h-1" : "mb-2 h-1.5"
+            }`}
+          >
             <div
               className="h-full rounded-full bg-navy-800 transition-all duration-500"
               style={{ width: `${(step / total) * 100}%` }}
@@ -270,9 +288,13 @@ export default function StudyPage() {
       </header>
 
       <main
-        className={`mx-auto px-3 pt-8 sm:px-4 ${
-          wideMain ? "max-w-[1920px]" : "max-w-4xl"
-        }`}
+        className={
+          workspace
+            ? "mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col overflow-hidden px-3 py-2"
+            : `mx-auto px-3 pt-3 sm:px-4 ${
+                wideMain ? "max-w-[1600px]" : "max-w-5xl"
+              }`
+        }
       >
         {phase === "study_consent" && (
           <InformedConsentScreen
@@ -312,36 +334,29 @@ export default function StudyPage() {
         )}
 
         {(phase === "genai" || phase === "essay") && (
-          <div className="mx-auto w-full max-w-[1400px] space-y-5">
-            {recapFinal && (
-              <div className="max-w-3xl">
-                <InstructionRecapCollapsible />
-              </div>
-            )}
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
+            {recapFinal && <InstructionRecapCollapsible />}
 
-            <div className="grid items-start gap-5 lg:grid-cols-2">
-              <article className="border border-student-border bg-white px-6 py-6 sm:px-7 sm:py-7">
-                <p className="text-xs font-semibold uppercase tracking-widest text-navy-800">
+            <div className="grid max-h-[38%] shrink-0 gap-2 overflow-hidden lg:grid-cols-2">
+              <article className="overflow-y-auto border border-student-border bg-white px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-navy-800">
                   Scenario
                 </p>
-                <h2 className="mt-3 text-xl font-semibold leading-snug text-student-ink">
+                <h2 className="mt-0.5 text-sm font-semibold leading-snug text-student-ink">
                   {GENAI_TASK.title}
                 </h2>
-                <div className="mt-5">
+                <div className="mt-1">
                   <GenaiTaskScenario />
                 </div>
               </article>
-              <section className="border border-student-border bg-white px-6 py-6 sm:px-7 sm:py-7">
-                <p className="text-xs font-semibold uppercase tracking-widest text-navy-800">
+              <section className="overflow-y-auto border border-student-border bg-white px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-navy-800">
                   Task
                 </p>
-                <h2 className="mt-3 text-xl font-semibold leading-snug text-student-ink">
+                <h2 className="mt-0.5 text-sm font-semibold leading-snug text-student-ink">
                   What the explanation should do
                 </h2>
-                <p className="mt-4 text-base leading-7 text-student-ink">
-                  The explanation should satisfy all of these:
-                </p>
-                <ol className="mt-5 space-y-4 text-base leading-7 text-student-ink">
+                <ol className="mt-1 space-y-1 text-sm leading-5 text-student-ink">
                   {GENAI_TASK.taskConditions.map((c, i) => (
                     <li key={c}>
                       <span className="font-semibold">{i + 1}. </span>
@@ -352,9 +367,8 @@ export default function StudyPage() {
               </section>
             </div>
 
-            {/* Two equal columns: fixed height so the page doesn’t grow with chat; scroll inside each panel. */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-6 xl:gap-8">
-              <div className="min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))]">
+            <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-2 gap-2 overflow-hidden lg:grid-cols-2 lg:grid-rows-1">
+              <div className="min-h-0 min-w-0">
                 <GenAIInteractionPanel
                   messages={genaiMessages}
                   onMessagesChange={persistMessages}
@@ -363,36 +377,23 @@ export default function StudyPage() {
               </div>
 
               {phase === "genai" && (
-                <div className="flex min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))] flex-col overflow-hidden rounded-md border-2 border-dashed border-navy-200 bg-navy-50 shadow-student">
-                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                    <div className="flex min-h-full flex-col justify-center p-6 text-center">
-                      <p className="text-base leading-7 text-student-ink">
-                        When you’re ready to write, open the essay editor. Your chat
-                        stays on the left.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => void handleContinueToEssay()}
-                        className="mt-5 w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-navy-900"
-                      >
-                        Open essay editor
-                      </button>
-                      <div className="mt-8 rounded-md border border-student-border bg-white/80 p-5 text-center shadow-sm">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
-                          Essay
-                        </p>
-                        <p className="mt-3 text-base leading-7 text-student-muted">
-                          After you open the editor, your draft appears in this
-                          column on the right so you can work beside the chat.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex min-h-0 min-w-0 flex-col justify-center overflow-hidden rounded-md border-2 border-dashed border-navy-200 bg-navy-50 px-5 py-4 text-center shadow-student">
+                  <p className="text-sm leading-6 text-student-ink">
+                    When you’re ready to write, open the essay editor. The chat
+                    stays on the left.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void handleContinueToEssay()}
+                    className="mx-auto mt-3 rounded-md bg-navy-800 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-navy-900"
+                  >
+                    Open essay editor
+                  </button>
                 </div>
               )}
 
               {phase === "essay" && (
-                <div className="min-h-0 min-w-0 h-[min(68vh,520px)] sm:h-[min(70vh,580px)] lg:h-[min(72vh,calc(100vh-16rem))]">
+                <div className="min-h-0 min-w-0">
                   <EssaySubmissionPanel
                     embedded
                     initialText={essayDraft}

@@ -33,13 +33,13 @@ export function AiAcceptanceSurvey({ onSubmit }: Props) {
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="mx-auto max-w-5xl space-y-6 pb-12"
+      className="mx-auto w-full max-w-[1400px] space-y-3 pb-6"
     >
-      <div className="rounded-md border border-student-border bg-student-card px-5 py-6 shadow-student sm:px-8 sm:py-8">
+      <div className="rounded-md border border-student-border bg-student-card px-4 py-3 shadow-student sm:px-5">
         <h2 className="text-xl font-semibold text-student-ink">
           AI in learning — your views
         </h2>
-        <p className="mt-4 text-base leading-7 text-student-ink">
+        <p className="mt-1 text-base leading-6 text-student-ink">
           Rate each statement using the matrix below:{" "}
           <strong className="font-semibold">1</strong> = strongly disagree
           through <strong className="font-semibold">5</strong> = strongly
@@ -50,25 +50,32 @@ export function AiAcceptanceSurvey({ onSubmit }: Props) {
       <div className="overflow-x-auto rounded-md border border-student-border bg-white shadow-sm">
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-student-border bg-student-canvas/80">
+            <tr className="bg-student-canvas/80">
               <th
                 scope="col"
-                className="sticky left-0 z-10 min-w-[280px] max-w-[min(58vw,520px)] bg-student-canvas/95 px-4 py-3 text-xs font-semibold uppercase tracking-widest text-student-muted backdrop-blur-sm"
+                rowSpan={2}
+                className="sticky left-0 z-10 min-w-[280px] max-w-[min(58vw,520px)] border-b border-student-border bg-student-canvas/95 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-student-muted backdrop-blur-sm"
               >
                 Statement
               </th>
+              {LIKERT_SCALE.map(({ value }) => (
+                <th
+                  key={value}
+                  scope="col"
+                  className="h-8 w-16 min-w-[3.25rem] px-1 text-center align-middle text-base font-semibold tabular-nums leading-none text-navy-800"
+                >
+                  {value}
+                </th>
+              ))}
+            </tr>
+            <tr className="border-b border-student-border bg-student-canvas/80">
               {LIKERT_SCALE.map(({ value, label }) => (
                 <th
                   key={value}
                   scope="col"
-                  className="w-14 min-w-[3.25rem] px-1 py-2 text-center align-bottom text-xs font-semibold text-student-ink sm:w-16"
+                  className="w-16 min-w-[3.25rem] px-1 pb-2 text-center align-top text-[10px] font-normal leading-tight text-student-muted"
                 >
-                  <span className="block tabular-nums text-base text-navy-800">
-                    {value}
-                  </span>
-                  <span className="mt-1 hidden leading-tight text-[10px] font-normal text-student-muted sm:block">
-                    {label}
-                  </span>
+                  {label}
                 </th>
               ))}
             </tr>
@@ -81,7 +88,7 @@ export function AiAcceptanceSurvey({ onSubmit }: Props) {
               >
                 <th
                   scope="row"
-                  className="sticky left-0 z-[1] min-w-[280px] max-w-[min(58vw,520px)] bg-inherit px-4 py-4 pr-3 text-left align-top text-base font-normal leading-7 text-student-ink"
+                  className="sticky left-0 z-[1] min-w-[280px] max-w-[min(58vw,520px)] bg-inherit px-4 py-2.5 pr-3 text-left align-middle text-base font-normal leading-6 text-student-ink"
                 >
                   <span className="mr-1.5 font-semibold text-student-muted tabular-nums">
                     {index + 1}.

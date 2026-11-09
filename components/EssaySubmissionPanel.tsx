@@ -43,75 +43,64 @@ export function EssaySubmissionPanel({
       onSubmit={(e) => void handleSubmit(e)}
       className={`rounded-md border border-student-border bg-student-card shadow-student ${
         embedded
-          ? "flex h-full min-h-0 max-h-full flex-col overflow-hidden p-5"
+          ? "flex h-full min-h-0 max-h-full flex-col overflow-hidden p-3"
           : "mx-auto max-w-3xl p-6 sm:p-8"
       }`}
     >
-      <div
-        className={
-          embedded
-            ? "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5"
-            : ""
-        }
-      >
+      <div className={embedded ? "shrink-0" : ""}>
         <p className="text-xs font-semibold uppercase tracking-wide text-student-muted">
           Your essay
         </p>
-        <h2 className="mt-1 text-lg font-semibold text-student-ink">
-          {GENAI_TASK.title}
-        </h2>
-        <div className="mt-4 space-y-4 text-base leading-7 text-student-ink">
-          <p>
-            <span className="font-bold underline decoration-navy-800 decoration-2 underline-offset-2">
-              Write in your own words.
-            </span>{" "}
-            You may use ideas from the chat on the left—scroll inside that panel
-            anytime to reread the assistant’s replies.
+        {embedded ? (
+          <p className="mt-1 text-sm leading-5 text-student-ink">
+            <span className="font-semibold">Write in your own words.</span> Aim
+            for 250–300 words and meet the task requirements above. Your essay
+            and chat are saved together; you will download a PDF for Canvas.
           </p>
-          <p>
-            Aim for about{" "}
-            <span className="font-bold underline decoration-navy-800 decoration-2 underline-offset-2">
-              250–300 words
-            </span>{" "}
-            and address the{" "}
-            <span className="font-bold underline decoration-navy-800 decoration-2 underline-offset-2">
-              task constraints
-            </span>{" "}
-            listed in the scenario section above.
-          </p>
-          <p className="text-student-muted">
-            When you submit, your{" "}
-            <span className="font-bold text-student-ink underline decoration-navy-800 decoration-2 underline-offset-2">
-              essay and full chat log
-            </span>{" "}
-            are saved together for the study. At the end you will download a
-            PDF of both to upload to Canvas.
-          </p>
-        </div>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={embedded ? 10 : 18}
-          className={`mt-4 w-full rounded-md border border-student-border bg-white px-3 py-3 text-sm leading-relaxed text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20 ${
-            embedded ? "min-h-[12rem] resize-none" : ""
-          }`}
-          placeholder="Start typing your essay…"
-        />
-        <p className="mt-2 text-xs text-student-muted">
-          Approx. word count: <span className="font-medium">{words}</span>
-        </p>
-        {error && (
-          <p className="mt-2 text-sm text-red-600" role="alert">
-            {error}
-          </p>
+        ) : (
+          <>
+            <h2 className="mt-1 text-lg font-semibold text-student-ink">
+              {GENAI_TASK.title}
+            </h2>
+            <div className="mt-4 space-y-4 text-base leading-7 text-student-ink">
+              <p>
+                <span className="font-bold underline decoration-navy-800 decoration-2 underline-offset-2">
+                  Write in your own words.
+                </span>{" "}
+                You may use ideas from the chat on the left.
+              </p>
+              <p>
+                Aim for about{" "}
+                <span className="font-bold underline decoration-navy-800 decoration-2 underline-offset-2">
+                  250–300 words
+                </span>{" "}
+                and address the task requirements.
+              </p>
+            </div>
+          </>
         )}
       </div>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={embedded ? 8 : 18}
+        className={`mt-2 w-full rounded-md border border-student-border bg-white px-3 py-2 text-sm leading-relaxed text-student-ink focus:border-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-700/20 ${
+          embedded ? "min-h-0 flex-1 resize-none" : ""
+        }`}
+        placeholder="Start typing your essay…"
+      />
+      <p className="mt-1 shrink-0 text-xs text-student-muted">
+        Approx. word count: <span className="font-medium">{words}</span>
+      </p>
+      {error && (
+        <p className="mt-1 shrink-0 text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={saving}
-        className={`mt-4 w-full rounded-md bg-navy-800 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50 ${
-          embedded ? "shrink-0" : ""
-        }`}
+        className={`mt-2 w-full shrink-0 rounded-md bg-navy-800 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50`}
       >
         {saving ? "Submitting…" : "Submit and finish"}
       </button>

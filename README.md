@@ -21,7 +21,7 @@ New assignments are `control` | `instruction` | `instruction_se`. Older document
 |-----------|------|
 | **`control`** | AI acceptance → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
 | **`instruction`** | AI acceptance → **CARE reading** → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
-| **`instruction_se`** | AI acceptance → **same CARE reading** → **four written questions** (definition, elaboration vs. refinement, judge a short chat, advise that student) → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
+| **`instruction_se`** | AI acceptance → **same CARE reading** → **four written questions** (definition, articulation, judge a short chat, advise that student) → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
 
 The two instruction arms read the same CARE text (contextualization, articulation, responsive elaboration, evaluation-driven refinement). Practice materials use feedback, not the exercise essay. Those arms get a **collapsible CARE reminder** during the **final task**.
 

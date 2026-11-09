@@ -16,16 +16,16 @@ export type CareDimension = {
 
 export const CARE_INSTRUCTION = {
   title: "How to prompt and interact with AI",
-  intro: [
-    "Prompting well is more than the first message you send. It includes how you build that request, and how you manage the conversation after the AI answers.",
-    "This lesson uses four moves. Together they are called CARE.",
-  ],
+  definition:
+    "Prompting literacy is how a student formulates a request, directs what the AI should do with it, and adapts the next message after the AI answers.",
+  intro:
+    "The four moves below are called CARE. The first two build the request. The last two manage the conversation after the AI answers.",
   dimensions: [
     {
       letter: "C",
       title: "Contextualization",
       definition:
-        "Establish the task, the goal, the background, and the context the AI needs.",
+        "Give the AI the situation that should shape the answer: the task you are doing, the goal of that task, the relevant background, and the context that matters (who it is for, or the setting).",
       weak: "Tell me about feedback.",
       stronger:
         "I’m writing a short explanation for first-year students. The goal is to show how feedback helps learning, especially what a student does on the next draft.",
@@ -34,7 +34,7 @@ export const CARE_INSTRUCTION = {
       letter: "A",
       title: "Articulation",
       definition:
-        "Say exactly what you want: the request, the instructions, and the expectations.",
+        "State the request itself. Name what you want produced, the instructions the AI should follow, and the expectations for the answer — length, form, and what it must include. Being specific is part of articulation.",
       weak: "Write something good.",
       stronger:
         "Explain how feedback changes what a student does on the next draft. Use plain language, about 200 words, one paragraph, and one classroom example.",
@@ -43,7 +43,7 @@ export const CARE_INSTRUCTION = {
       letter: "R",
       title: "Responsive elaboration",
       definition:
-        "After an answer you can use, send a follow-up that develops that answer.",
+        "When an answer already meets the request, send a follow-up that develops that answer on purpose: a missing part, a further step, or an example you can use. A follow-up that only says to continue does not do this.",
       weak: "Say more.",
       stronger:
         "After a clear explanation of feedback: “How does feedback change what a student does on the next draft?”",
@@ -52,19 +52,15 @@ export const CARE_INSTRUCTION = {
       letter: "E",
       title: "Evaluation-driven refinement",
       definition:
-        "If the answer missed what you asked, say what was off and change the request.",
+        "Compare the answer with what you asked. If the request was not met, name what was off and send a revised prompt. This judges the request, not whether every fact is true.",
       weak: "Make it better.",
       stronger:
         "After an explanation that never mentions drafts: “I asked how feedback changes the next draft. Address that, in plain language, with one classroom example.”",
     },
   ] satisfies CareDimension[],
-  contrastTitle: "Elaboration and refinement are different",
-  contrast: [
-    "Elaboration extends an answer you can already use. You want more of the topic, or a part the answer has not covered yet.",
-    "Refinement changes the request because the answer missed what you asked. You name the mismatch, then ask again in a more specific way.",
-    "“Say more” does not say what to develop. “Make it better” does not say what missed.",
-    "A later message counts when it responds to this exchange. Deciding whether a fact is true is a different job, and it is not part of this lesson.",
-  ],
+  contrastTitle: "A side note",
+  contrast:
+    "Elaboration and refinement are different. Elaboration develops an answer you can already use. Refinement changes the request because the answer missed what you asked. Checking whether a fact is true is a different job, and it is not part of this lesson.",
 } as const;
 
 /** Collapsible reminder during the main chat and essay. Same ideas as the reading. */
@@ -79,7 +75,7 @@ export const CARE_MIN_CHARS = {
   definition: 80,
   distinction: 80,
   judgment: 80,
-  advice: 120,
+  advice: 50,
 } as const;
 
 /** Which follow-up is shown as Message 1. Stored with the answer. */
@@ -119,6 +115,8 @@ export const CARE_CASE = {
 export const CARE_QUESTIONS = {
   definition:
     "In your own words, what does a student have to do to prompt and interact well? Include both how the first request is built and what the student does after the AI answers.",
+  articulation:
+    "Articulation is one of the four moves. In your own words, what does articulation require in the request itself? Name what a student has to make specific.",
   judgment:
     "What does the opening leave out? What do the later messages fail to do?",
   advice:

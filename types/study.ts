@@ -84,8 +84,8 @@ export interface CareSelfExplanationAnswers {
   distinction: string;
   judgment: string;
   advice: string;
-  /** Which follow-up was shown as Message 1. */
-  distinctionOrder: "extend_first" | "repair_first";
+  /** Older item 2 randomized two follow-ups. Current item 2 does not. */
+  distinctionOrder?: "extend_first" | "repair_first";
 }
 
 export interface UserStudyDoc {

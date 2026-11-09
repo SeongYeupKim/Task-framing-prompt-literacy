@@ -276,7 +276,9 @@ export async function saveInstructionCompletion(
           careSeDistinction: answers.distinction,
           careSeJudgment: answers.judgment,
           careSeAdvice: answers.advice,
-          careSeDistinctionOrder: answers.distinctionOrder,
+          ...(answers.distinctionOrder
+            ? { careSeDistinctionOrder: answers.distinctionOrder }
+            : {}),
         }
       : {}),
     instructionCompletedAt: now,
