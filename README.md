@@ -2,7 +2,7 @@
 
 **Repository:** [github.com/SeongYeupKim/Task-framing-prompt-literacy](https://github.com/SeongYeupKim/Task-framing-prompt-literacy)
 
-Next.js app for a **three-arm** design: **control (pure)** vs **instruction only** vs **instruction + one evaluation practice**, then a common **GenAI chat → essay** task, **demographics**, **complete**. Firebase Auth + Firestore, OpenAI chat API (server-side). Participants use a Penn State **`@psu.edu`** email (enforced on auth forms).
+Next.js app for a **three-arm** design: **control** vs **CARE instruction only** vs **CARE instruction + four self-explanation questions**, then a common **GenAI chat → essay** task, **demographics**, a **Canvas PDF** of the essay and chat, and **complete**. Firebase Auth + Firestore, OpenAI chat API (server-side). Participants use a Penn State **`@psu.edu`** email (enforced on auth forms).
 
 **New to Firebase / `.env`?** **[SETUP.md](./SETUP.md)** · **Vercel:** **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)**
 
@@ -15,24 +15,25 @@ Next.js app for a **three-arm** design: **control (pure)** vs **instruction only
 
 ## Conditions (random at first `/study` load)
 
-Firestore stores `control` | `instruction` | `instruction_eval`. Legacy documents may still show `two_eval` / `four_eval`; they are **normalized in the app** to `instruction` / `instruction_eval`.
+New assignments are `control` | `instruction` | `instruction_se`. Older documents may still show `instruction_eval`, `two_eval`, or `four_eval`. `two_eval` is treated as `instruction`. `instruction_eval` / `four_eval` stay labeled as the retired pilot arm and are moved on to the main task if they are still on the old lesson or prompt-rating screens. A restart from that retired arm is assigned one of the three current conditions.
 
 | Condition | Flow |
 |-----------|------|
-| **`control`** | AI acceptance → **guide (main task)** → GenAI → Essay → Demographics → Complete |
-| **`instruction`** | AI acceptance → **Instruction (Part 1 self-explanation + Part 2 matching)** → **guide (main task)** → GenAI → Essay → Demographics → Complete |
-| **`instruction_eval`** | AI acceptance → **Instruction** → **guide (evaluation)** → **Eval 1 (sleep & learning topic)** → **guide (main task)** → **GenAI + essay (exercise topic)** → Demographics → Complete |
+| **`control`** | AI acceptance → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
+| **`instruction`** | AI acceptance → **CARE reading** → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
+| **`instruction_se`** | AI acceptance → **same CARE reading** → **four written questions** (definition, elaboration vs. refinement, judge a short chat, advise that student) → **guide (main task)** → GenAI → Essay → Demographics → **Canvas PDF** → Complete |
 
-Intervention arms get a **collapsible “brief instruction reminder”** during the **final task** (and, for `instruction_eval`, also during **Eval 1**).
+The two instruction arms read the same CARE text (contextualization, articulation, responsive elaboration, evaluation-driven refinement). Practice materials use feedback, not the exercise essay. Those arms get a **collapsible CARE reminder** during the **final task**.
 
 ## Data stored (`users/{uid}`)
 
 - `condition`, `phase`, timestamps  
 - `aiAcceptanceResponses` (20× Likert 1–5), `aiAcceptanceCompletedAt`  
-- **Instruction:** `instructionSelfExplanation`, `instructionMatchingByDimension`, `instructionCompletedAt`, `trainingCompletedAt`  
-- `eval1` (ratings 1–6 + rationales A/B/C); `eval2` deprecated  
-- `genaiMessages`, `essayText`, `essaySubmittedAt`  
+- **Instruction:** `instructionCompletedAt`, `trainingCompletedAt`. **`instruction_se` also stores** `careSeDefinition`, `careSeDistinction`, `careSeJudgment`, `careSeAdvice`, `careSeDistinctionOrder` (`extend_first` or `repair_first`).
+- Pilot fields (`instructionSelfExplanation`, matching, `eval1`) remain on older documents.  
+- `genaiMessages`, `essayText`, `essaySubmittedAt`. A follow-up prompt also stores `secAfterAiToInput` (AI reply shown → first keystroke) and `secAfterAiToSend` (AI reply shown → send). Wide CSV columns are `st_i_sec_to_input` and `st_i_sec_to_send`.
 - `demographics`, `demographicsSubmittedAt`
+- `recordPdfDownloadedAt` when the Canvas record is downloaded
 
 ## Researcher export (`/admin`)
 
@@ -40,7 +41,7 @@ Intervention arms get a **collapsible “brief instruction reminder”** during 
 
 **Two ways to export the same wide CSV:** (1) **Server** — **`FIREBASE_SERVICE_ACCOUNT_JSON`** / **`FIREBASE_ADMIN_*`** on Vercel. (2) **Browser** — one dashboard login (**default `admin` / `mattandseong`**); the app signs into Firebase as **`admin@psu.edu`** with that same password. **One-time:** add that user under **Authentication → Users** in Firebase and **publish `firestore.rules`** (export account is named in the rules). Optional: **`NEXT_PUBLIC_RESEARCH_EXPORT_EMAIL`** if you use another address (edit rules to match).
 
-Columns follow **`instruction_eval`**; other arms leave unused cells blank. Order: **email → condition → responses (Likerts, instruction, eval1) → essay → `st_1`/`ai_1`/… → demographics**.
+Wide CSV includes the CARE answers (`care_se_*`) and, for older rows, the pilot matching and eval1 columns. Order: **email → condition → responses → essay → `st_1`/`ai_1`/… → demographics**.
 
 ## Security
 

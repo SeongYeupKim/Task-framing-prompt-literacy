@@ -23,6 +23,7 @@ function stepsControl(): string[] {
     "An interactive session where you use an AI chat tool with a study scenario and task instructions.",
     "A short writing task that builds on that work.",
     "A final demographics questionnaire.",
+    "A PDF of your essay and chat history, which you download and upload to Canvas.",
   ];
 }
 
@@ -30,22 +31,23 @@ function stepsInstruction(): string[] {
   return [
     SESSION_CONSENT_DONE,
     "A short questionnaire on your acceptance of AI tools.",
-    "Instruction on task framing and features of effective AI prompts (reading material and a short practice activity).",
+    "A short reading on how to prompt and interact with AI.",
     "A brief orientation, then an interactive session where you use an AI chat tool with a study scenario.",
     "A short writing task.",
     "A final demographics questionnaire.",
+    "A PDF of your essay and chat history, which you download and upload to Canvas.",
   ];
 }
 
-function stepsInstructionEval(): string[] {
+function stepsInstructionSe(): string[] {
   return [
     SESSION_CONSENT_DONE,
     "A short questionnaire on your acceptance of AI tools.",
-    "Instruction on task framing and effective prompting (reading and a short matching practice).",
-    "A practice activity where you read a scenario and rate example prompts for how well they frame the task.",
+    "The same short reading, followed by four written questions. You will explain the ideas in your own words, judge a short example chat, and advise that student on how to improve the interaction.",
     "A brief orientation, then an interactive session where you use an AI chat tool with a study scenario.",
     "A short writing task.",
     "A final demographics questionnaire.",
+    "A PDF of your essay and chat history, which you download and upload to Canvas.",
   ];
 }
 
@@ -58,8 +60,10 @@ export function participationOverviewSteps(
       return stepsControl();
     case "instruction":
       return stepsInstruction();
+    case "instruction_se":
+      return stepsInstructionSe();
     case "instruction_eval":
-      return stepsInstructionEval();
+      return stepsControl();
     default:
       return stepsControl();
   }

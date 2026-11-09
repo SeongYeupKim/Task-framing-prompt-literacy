@@ -1,295 +1,129 @@
-import type { StudyCondition } from "@/types/study";
-
-/** Training text chunks: plain string, or { b: "bold" } */
-export type TextChunk = string | { b: string };
-
-export type TrainingSection = {
-  title: string;
-  /** Each item is a paragraph: plain string, or array of chunks for mixed bold */
-  paragraphs: (string | TextChunk[])[];
-  bullets?: string[];
-  /** One illustrative example per domain (goal, content, task conditions, etc.) */
-  numbered?: { title: string; detail: string; example: string }[];
-  note?: string;
-};
-
-export const TRAINING_SECTIONS: TrainingSection[] = [
-  {
-    title: "What is task framing?",
-    paragraphs: [
-      "When you use AI for school work, it’s easy to focus only on the exact words you type. But helpful AI use starts earlier: you need a clear picture of what the assignment is asking.",
-      ["We call that thinking ", { b: "task framing" }, "."],
-      "Task framing means being clear about a few things:",
-    ],
-    bullets: [
-      "What you want the AI to help you with",
-      "What kind of answer you’re aiming for",
-      "What would count as a good answer for your task",
-    ],
-    note: "If the task is fuzzy in your mind, the AI’s answer often feels vague or off-topic. If the task is clear, you usually get answers that are easier to use.",
-  },
-  {
-    title: "What goes into a clear task?",
-    paragraphs: [
-      "Strong prompts usually make these pieces easy to see. Below, each domain has a short question plus one concrete example. The examples are only illustrations—you would swap in your real assignment.",
-    ],
-    numbered: [
-      {
-        title: "Goal",
-        detail: "What are you trying to accomplish?",
-        example:
-          "e.g., Explain how exercise might affect focus or memory so a classmate can use the idea when studying for exams.",
-      },
-      {
-        title: "Content",
-        detail: "What topics or ideas must be included?",
-        example:
-          "e.g., Must connect something about the brain (e.g., consolidation) to something about school behavior (e.g., paying attention in class).",
-      },
-      {
-        title: "Task constraints",
-        detail:
-          "Length, level, format, or other limits—what has to be true about the answer?",
-        example:
-          "e.g., About 250–300 words; plain language for 9th graders; include two real-life examples.",
-      },
-      {
-        title: "Audience",
-        detail: "Who is the answer for?",
-        example:
-          "e.g., Other students who have mixed reading levels, not experts in neuroscience.",
-      },
-      {
-        title: "Format",
-        detail: "Paragraph, list, essay, etc.?",
-        example:
-          "e.g., One coherent paragraph, not a bullet list of disconnected facts.",
-      },
-      {
-        title: "Success",
-        detail: "How will you judge if the answer is good enough?",
-        example:
-          "e.g., It uses evidence, links brain ideas to school life, and meets length and example constraints.",
-      },
-    ],
-  },
-];
-
-/** Six dimensions: keys stable for Firestore. Part 2 examples differ by condition (classroom topic). */
-export type InstructionDimension = {
-  key: string;
-  title: string;
-  detail: string;
-  instructionBullets: string[];
-  example: string;
-};
-
-/** Condition 1 (`instruction`): Earth science / weather unit examples. */
-const INSTRUCTION_DIMENSIONS_CONDITION1: InstructionDimension[] = [
-  {
-    key: "goal",
-    title: "Goal",
-    detail: "What are you trying to accomplish?",
-    instructionBullets: [
-      "It names what you want the AI to help you produce, decide, or plan—not just fancy wording.",
-      "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
-    ],
-    example:
-      "e.g., Explain how pressure systems relate to local weather patterns so my lab partner can review before our class presentation.",
-  },
-  {
-    key: "content",
-    title: "Content",
-    detail: "What topics or ideas must be included?",
-    instructionBullets: [
-      "Content is what must show up in the answer: topics, ideas, evidence, or angles that belong in the response.",
-      'It answers “what has to be in there?”—the substance, not the layout.',
-    ],
-    example:
-      "e.g., Must include both a warm-front and a cold-front example—not only fair-weather or “sunny day” descriptions.",
-  },
-  {
-    key: "task_conditions",
-    title: "Task constraints",
-    detail:
-      "Length, level, format, or other limits—what has to be true about the answer?",
-    instructionBullets: [
-      "These are the rules the answer must follow: length limits, level, citations, tone, language, or what to avoid.",
-      "They describe what the final product must satisfy, not only what it talks about.",
-    ],
-    example:
-      "e.g., Cap at 200 words, use SI units where we learned them, and mention our class handout once by name.",
-  },
-  {
-    key: "audience",
-    title: "Audience",
-    detail: "Who is the answer for?",
-    instructionBullets: [
-      "Audience is who will read or use the answer—classmates, instructors, novices, or specialists.",
-      "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
-    ],
-    example:
-      "e.g., Classmates who missed the weather-map lab—use everyday terms before any technical vocabulary.",
-  },
-  {
-    key: "format",
-    title: "Format",
-    detail: "Paragraph, list, essay, etc.?",
-    instructionBullets: [
-      "Format is how the answer is organized: one paragraph vs. sections, bullets vs. prose, outline vs. essay.",
-      "It should match how you will paste or present the text (slides, paper, study notes).",
-    ],
-    example:
-      "e.g., One continuous short essay with no subheadings—my teacher asked for flowing prose only.",
-  },
-  {
-    key: "success",
-    title: "Success",
-    detail: "How will you judge if the answer is good enough?",
-    instructionBullets: [
-      "Success criteria are the checks you will use: e.g., two examples, both sides named, matches a rubric.",
-      "They turn “good enough” into something you can actually verify.",
-    ],
-    example:
-      "e.g., I’ll use it only if it ties at least one pattern to a forecast we could check on a real weather report.",
-  },
-];
-
-/** Condition 2 (`instruction_eval`): creative writing / literature workshop examples. */
-const INSTRUCTION_DIMENSIONS_CONDITION2: InstructionDimension[] = [
-  {
-    key: "goal",
-    title: "Goal",
-    detail: "What are you trying to accomplish?",
-    instructionBullets: [
-      "It names what you want the AI to help you produce, decide, or plan—not just fancy wording.",
-      "A clear goal often names the outcome (e.g., outline, comparison) and what “done” should look like.",
-    ],
-    example:
-      "e.g., Help me state a theme for my short-story draft that I can defend in workshop tomorrow.",
-  },
-  {
-    key: "content",
-    title: "Content",
-    detail: "What topics or ideas must be included?",
-    instructionBullets: [
-      "Content is what must show up in the answer: topics, ideas, evidence, or angles that belong in the response.",
-      'It answers “what has to be in there?”—the substance, not the layout.',
-    ],
-    example:
-      "e.g., Connect imagery from my opening scene to the ending—don’t summarize the whole plot beat by beat.",
-  },
-  {
-    key: "task_conditions",
-    title: "Task constraints",
-    detail:
-      "Length, level, format, or other limits—what has to be true about the answer?",
-    instructionBullets: [
-      "These are the rules the answer must follow: length limits, level, citations, tone, language, or what to avoid.",
-      "They describe what the final product must satisfy, not only what it talks about.",
-    ],
-    example:
-      "e.g., No more than three paragraphs, present tense for literary analysis, and no quotes longer than one line.",
-  },
-  {
-    key: "audience",
-    title: "Audience",
-    detail: "Who is the answer for?",
-    instructionBullets: [
-      "Audience is who will read or use the answer—classmates, instructors, novices, or specialists.",
-      "It shapes how much jargon you use, how concrete examples need to be, and how ideas get explained.",
-    ],
-    example:
-      "e.g., Peers who haven’t read my draft—introduce characters by role (e.g., narrator, sibling), not only by name.",
-  },
-  {
-    key: "format",
-    title: "Format",
-    detail: "Paragraph, list, essay, etc.?",
-    instructionBullets: [
-      "Format is how the answer is organized: one paragraph vs. sections, bullets vs. prose, outline vs. essay.",
-      "It should match how you will paste or present the text (slides, paper, study notes).",
-    ],
-    example:
-      "e.g., Prose paragraphs only—if the answer comes back as a bullet list, I can’t paste it into my workshop submission.",
-  },
-  {
-    key: "success",
-    title: "Success",
-    detail: "How will you judge if the answer is good enough?",
-    instructionBullets: [
-      "Success criteria are the checks you will use: e.g., two examples, both sides named, matches a rubric.",
-      "They turn “good enough” into something you can actually verify.",
-    ],
-    example:
-      "e.g., I’ll keep it only if it names one risk of interpreting the theme too literally.",
-  },
-];
-
-/** Part 2 dimension cards + examples: `instruction` vs `instruction_eval` use different classroom topics. */
-export function instructionDimensionsForCondition(
-  c: StudyCondition,
-): InstructionDimension[] {
-  if (c === "instruction_eval") return INSTRUCTION_DIMENSIONS_CONDITION2;
-  return INSTRUCTION_DIMENSIONS_CONDITION1;
-}
-
 /**
- * Example prompts for the matching task only (not the same wording as Part 2 examples).
- * Each maps to exactly one dimension key for answer key.
+ * CARE instruction (identical for `instruction` and `instruction_se`)
+ * and the four self-explanation prompts (`instruction_se` only).
+ * Practice materials use feedback, so they do not overlap the exercise essay.
  */
-export const INSTRUCTION_MATCHING_POOL: {
-  id: string;
-  dimensionKey: string;
-  prompt: string;
-}[] = [
-  {
-    id: "mx1",
-    dimensionKey: "goal",
-    prompt:
-      "I need a short explanation my teammates can use during lab—tell the model the outcome should help us prep our poster, not write the poster for us.",
-  },
-  {
-    id: "mx2",
-    dimensionKey: "content",
-    prompt:
-      "Be sure to tie executive function to both working memory and inhibition when you answer—don’t focus on only one of those.",
-  },
-  {
-    id: "mx3",
-    dimensionKey: "task_conditions",
-    prompt:
-      "Keep it under 200 words, cite one source in MLA, and don’t use bullet points.",
-  },
-  {
-    id: "mx4",
-    dimensionKey: "audience",
-    prompt:
-      "Assume the reader is a first-year college athlete who hasn’t taken cognitive psychology—skip abbreviations like PFC.",
-  },
-  {
-    id: "mx5",
-    dimensionKey: "format",
-    prompt:
-      "Structure the reply as: (1) definition, (2) why it matters for studying, (3) one limitation—use those exact headings.",
-  },
-  {
-    id: "mx6",
-    dimensionKey: "success",
-    prompt:
-      "I’ll only use the answer if it compares two study strategies and names one trade-off for each.",
-  },
+
+export type CareLetter = "C" | "A" | "R" | "E";
+
+export type CareDimension = {
+  letter: CareLetter;
+  title: string;
+  definition: string;
+  weak: string;
+  stronger: string;
+};
+
+export const CARE_INSTRUCTION = {
+  title: "How to prompt and interact with AI",
+  intro: [
+    "Prompting well is more than the first message you send. It includes how you build that request, and how you manage the conversation after the AI answers.",
+    "This lesson uses four moves. Together they are called CARE.",
+  ],
+  dimensions: [
+    {
+      letter: "C",
+      title: "Contextualization",
+      definition:
+        "Establish the task, the goal, the background, and the context the AI needs.",
+      weak: "Tell me about feedback.",
+      stronger:
+        "I’m writing a short explanation for first-year students. The goal is to show how feedback helps learning, especially what a student does on the next draft.",
+    },
+    {
+      letter: "A",
+      title: "Articulation",
+      definition:
+        "Say exactly what you want: the request, the instructions, and the expectations.",
+      weak: "Write something good.",
+      stronger:
+        "Explain how feedback changes what a student does on the next draft. Use plain language, about 200 words, one paragraph, and one classroom example.",
+    },
+    {
+      letter: "R",
+      title: "Responsive elaboration",
+      definition:
+        "After an answer you can use, send a follow-up that develops that answer.",
+      weak: "Say more.",
+      stronger:
+        "After a clear explanation of feedback: “How does feedback change what a student does on the next draft?”",
+    },
+    {
+      letter: "E",
+      title: "Evaluation-driven refinement",
+      definition:
+        "If the answer missed what you asked, say what was off and change the request.",
+      weak: "Make it better.",
+      stronger:
+        "After an explanation that never mentions drafts: “I asked how feedback changes the next draft. Address that, in plain language, with one classroom example.”",
+    },
+  ] satisfies CareDimension[],
+  contrastTitle: "Elaboration and refinement are different",
+  contrast: [
+    "Elaboration extends an answer you can already use. You want more of the topic, or a part the answer has not covered yet.",
+    "Refinement changes the request because the answer missed what you asked. You name the mismatch, then ask again in a more specific way.",
+    "“Say more” does not say what to develop. “Make it better” does not say what missed.",
+    "A later message counts when it responds to this exchange. Deciding whether a fact is true is a different job, and it is not part of this lesson.",
+  ],
+} as const;
+
+/** Collapsible reminder during the main chat and essay. Same ideas as the reading. */
+export const INSTRUCTION_RECAP_BULLETS: string[] = [
+  "C — Contextualization: state the task, goal, background, and context.",
+  "A — Articulation: make the request, instructions, and expectations specific.",
+  "R — Responsive elaboration: use a later turn to build on an answer you can use.",
+  "E — Evaluation-driven refinement: if the answer missed what you asked, say what was off and change the prompt.",
 ];
 
-/** Short bullets for the collapsible recap (intervention conditions only). */
-export const INSTRUCTION_RECAP_BULLETS: string[] = [
-  "Goal — what you want the AI to help you accomplish.",
-  "Content — topics and ideas that must appear in the answer.",
-  "Task constraints — length, level, format, and other limits.",
-  "Audience — who will read or use the answer.",
-  "Format — paragraph, list, essay, etc.",
-  "Success — how you’ll tell if the answer is good enough.",
-];
+export const CARE_MIN_CHARS = {
+  definition: 80,
+  distinction: 80,
+  judgment: 80,
+  advice: 120,
+} as const;
+
+/** Which follow-up is shown as Message 1. Stored with the answer. */
+export type CareDistinctionOrder = "extend_first" | "repair_first";
+
+export const CARE_DISTINCTION = {
+  prompt:
+    "Read this AI answer and the two messages a student might send next. In your own words, what is each message doing? Why does one develop the exchange while the other changes the request?",
+  aiAnswer:
+    "Feedback is information about your work. Teachers, classmates, or a computer can tell you what you did well and what to change. Feedback can point out a mistake, suggest a next step, or show an example of a stronger answer.",
+  extend:
+    "How does that information change what a student actually does when they revise?",
+  repair:
+    "I needed this for first-year students, in one short paragraph, with one classroom example of revising a draft. Please redo it that way.",
+} as const;
+
+export const CARE_CASE = {
+  assignment:
+    "Write a short explanation for first-year students about how feedback helps learning. About 200 words, one paragraph, include one concrete classroom example, and connect the example to why feedback changes what a student does next.",
+  turns: [
+    { role: "student" as const, content: "Tell me about feedback." },
+    {
+      role: "ai" as const,
+      content:
+        "Feedback is information about performance. It can come from teachers, peers, or automated systems. Effective feedback is specific, timely, and focused on the task rather than the person. Researchers often distinguish feedback about the task, the process, and self-regulation.",
+    },
+    { role: "student" as const, content: "Can you say more?" },
+    {
+      role: "ai" as const,
+      content:
+        "Feedback supports learning when it helps students see a gap between their current work and a goal. Types include corrective feedback, suggestive feedback, and evaluative feedback. The timing of feedback and who gives it both matter.",
+    },
+    { role: "student" as const, content: "Make it better." },
+  ],
+};
+
+export const CARE_QUESTIONS = {
+  definition:
+    "In your own words, what does a student have to do to prompt and interact well? Include both how the first request is built and what the student does after the AI answers.",
+  judgment:
+    "What does the opening leave out? What do the later messages fail to do?",
+  advice:
+    "Tell this student how to improve the interaction. Rewrite the opening so the task, goal, and background are there and the request is specific. Then write the single next message they should send now, and say what that message is trying to change.",
+} as const;
 
 /**
  * Exercise / learning scenario and task constraints — main GenAI + essay task (all conditions).
@@ -308,117 +142,7 @@ export const EXERCISE_LEARNING_TASK_REQUIREMENTS: string[] = [
   "Present the explanation as a clear, well-organized essay (not a list of points).",
 ];
 
-/**
- * Sleep / learning — evaluation practice (Eval 1) for `instruction_eval` only.
- * The main chat + essay task uses the exercise topic above.
- */
-export const SLEEP_LEARNING_SCENARIO_PARAGRAPHS: string[] = [
-  "Three students are working as student assistants to help their school develop content for an online learning support website. The school is creating a section called “Study Smart: Understanding How Learning Works,” which aims to help students improve their academic performance by understanding how their bodies and minds influence learning.",
-  "As part of this project, the students have been asked to develop a short explanation titled: “How Sleep Affects Learning.” This explanation will be published on the school website and will be read by 9th-grade students with mixed reading abilities. Some students are strong readers, while others may struggle with complex or technical explanations.",
-  "Therefore, the explanation must be accessible and easy to understand, while still being accurate, meaningful, and informative. To complete this task, the students are provided with ChatGPT.",
-];
-
-export const SLEEP_LEARNING_TASK_REQUIREMENTS: string[] = [
-  "Make sure the explanation is based on the evidence.",
-  "Help students understand why sleep matters for their own learning, not just present factual information.",
-  "Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
-  "Include at least two concrete examples that illustrate how sleep affects learning in a real-life situation.",
-  "Approximately 250–300 words.",
-  "Present the explanation as a clear, coherent paragraph rather than a list of disconnected points.",
-];
-
-export const EVAL1_SCENARIO = {
-  title: "How Sleep Affects Learning",
-  scenario: SLEEP_LEARNING_SCENARIO_PARAGRAPHS,
-  taskConditions: SLEEP_LEARNING_TASK_REQUIREMENTS,
-  cases: {
-    studentA: {
-      label: "Student A",
-      prompts: [
-        "Explain how sleep affects learning, including brain processes like memory and attention and how it impacts school performance.",
-        "Write it for students so it's clear and not too technical.",
-        "Include two examples from school situations.",
-        "Keep it around 250–300 words in one paragraph.",
-        "Can you make the connection between sleep and performance a bit clearer?",
-      ],
-    },
-    studentB: {
-      label: "Student B",
-      prompts: [
-        "Explain how sleep affects learning for students with different reading levels.",
-        "Focus on how sleep supports brain processes like memory and attention and how those lead to outcomes like focus and grades.",
-        "Make sure the explanation shows how these ideas are connected, not just listed.",
-        "Write it as a clear paragraph (about 250–300 words) using language that is easy to understand but still accurate.",
-        "Include two examples from school situations that help explain why sleep matters for students' learning.",
-      ],
-    },
-    studentC: {
-      label: "Student C",
-      prompts: [
-        "Explain how sleep affects learning outcomes for students.",
-        "Can you include something about how the brain works during sleep?",
-        "Also add how it affects school performance like grades and focus.",
-        "Your explanation is too hard. Make it easier to understand.",
-        "Can you give two examples for this?",
-      ],
-    },
-  },
-};
-
-export const EVAL2_SCENARIO = {
-  title: "Should You Use Smartphones While Studying?",
-  scenario: [
-    "Three students are working as youth advisors for a local community center that runs after-school study programs. The center is preparing a short guide for students called “Smart Study Habits,” which will be shared during orientation sessions to help students improve how they study.",
-    "As part of this guide, the students have been asked to develop a short explanation titled: “Should You Use Smartphones While Studying?” This explanation will be presented to 9th-grade students with mixed reading abilities during an orientation session. Some students are confident readers, while others may find complex or abstract explanations difficult to follow.",
-    "Therefore, the explanation needs to be clear, engaging, and easy to understand, while still being accurate and thoughtful. To complete this task, the students are provided with ChatGPT.",
-  ],
-  taskConditions: [
-    "Avoid misinformation: Ensure the explanation is based on evidence.",
-    "Conceptual balance: Present both the benefits and drawbacks of smartphone use for studying.",
-    "Conditional reasoning: Clearly explain under what conditions smartphones help or harm learning, rather than presenting a one-sided claim.",
-    "Purpose alignment: Help students make better decisions about their own study habits.",
-    "Audience awareness: Write for 9th-grade students with mixed reading levels — avoid overly technical language; do not oversimplify important ideas.",
-    "Use of example: Include at least two concrete examples showing how smartphone use can help or interfere with studying in real situations.",
-    "Length constraint: Approximately 250–300 words.",
-    "Organization: Present the explanation as a clear, coherent paragraph.",
-  ],
-  cases: {
-    studentA: {
-      label: "Student A",
-      prompts: [
-        "Explain the effectiveness of smartphones in studying.",
-        "Can you explain both negative effects (e.g., distraction, reduced attention) and positive uses (e.g., learning tools, organization)?",
-        "Focus on explaining under what conditions smartphones help or harm learning, rather than simply saying they are good or bad.",
-        "Write the explanation to help students make better decisions about their own study habits.",
-        "Present it as one clear paragraph (about 250–300 words) using accessible language without oversimplifying key ideas.",
-        "Include two concrete examples that show how smartphone use can both support and interfere with studying.",
-      ],
-    },
-    studentB: {
-      label: "Student B",
-      prompts: [
-        "Explain whether smartphones are positive or negative for studying.",
-        "Can you include something about distractions and multitasking?",
-        "Also add how smartphones can help with studying.",
-        "Make it easier for students to understand.",
-        "Include two examples.",
-        "Keep it about 250–300 words.",
-      ],
-    },
-    studentC: {
-      label: "Student C",
-      prompts: [
-        "Explain how smartphones affect studying, including both negative effects like distraction and positive uses like helping with learning tools.",
-        "Write it clearly for students and avoid difficult terms.",
-        "Include two examples of how smartphones can help or hurt studying.",
-        "Keep it in one paragraph with about 250–300 words.",
-        "Can you explain more clearly when smartphones are helpful or harmful?",
-      ],
-    },
-  },
-};
-
-/** Main chat + essay task (exercise). Eval 1 uses sleep — see `EVAL1_SCENARIO`. */
+/** Main chat + essay task (exercise). CARE practice uses feedback, not this topic. */
 export const GENAI_TASK = {
   title: "How Does Physical Exercise Influence Learning and Academic Performance?",
   scenarioParagraphs: EXERCISE_LEARNING_SCENARIO_PARAGRAPHS,

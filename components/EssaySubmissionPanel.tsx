@@ -84,7 +84,8 @@ export function EssaySubmissionPanel({
             <span className="font-bold text-student-ink underline decoration-teal-600 decoration-2 underline-offset-2">
               essay and full chat log
             </span>{" "}
-            are saved together for the study.
+            are saved together for the study. At the end you will download a
+            PDF of both to upload to Canvas.
           </p>
         </div>
         <textarea

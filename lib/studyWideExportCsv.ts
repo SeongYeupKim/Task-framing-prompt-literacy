@@ -1,6 +1,7 @@
 /**
- * One wide CSV row per participant: superset schema (instruction_eval / condition2),
- * blank cells where control / instruction arms did not have that field.
+ * One wide CSV row per participant.
+ * CARE self-explanation columns are filled for `instruction_se`.
+ * Matching and eval1 columns remain for the retired pilot arm.
  * Column order: email, condition, responses…, essay, st_1/ai_1/…, demographics.
  */
 
@@ -48,22 +49,42 @@ function durationSecondsIso(isoStart: unknown, isoEnd: unknown): string {
   return String(Math.round((b - a) / 1000));
 }
 
+function secCell(value: unknown): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "";
+  return value.toFixed(1);
+}
+
 function genaiUserAssistantLists(messages: unknown): {
   user: string[];
   assistant: string[];
+  secToInput: string[];
+  secToSend: string[];
 } {
   const user: string[] = [];
   const assistant: string[] = [];
-  if (!Array.isArray(messages)) return { user, assistant };
+  const secToInput: string[] = [];
+  const secToSend: string[] = [];
+  if (!Array.isArray(messages)) {
+    return { user, assistant, secToInput, secToSend };
+  }
   for (const m of messages) {
     if (!m || typeof m !== "object") continue;
-    const role = (m as { role?: string }).role;
-    const content = (m as { content?: unknown }).content;
-    const text = content == null ? "" : String(content);
-    if (role === "user") user.push(text);
-    else if (role === "assistant") assistant.push(text);
+    const row = m as {
+      role?: string;
+      content?: unknown;
+      secAfterAiToInput?: unknown;
+      secAfterAiToSend?: unknown;
+    };
+    const text = row.content == null ? "" : String(row.content);
+    if (row.role === "user") {
+      user.push(text);
+      secToInput.push(secCell(row.secAfterAiToInput));
+      secToSend.push(secCell(row.secAfterAiToSend));
+    } else if (row.role === "assistant") {
+      assistant.push(text);
+    }
   }
-  return { user, assistant };
+  return { user, assistant, secToInput, secToSend };
 }
 
 function maxChatDepth(participants: WideExportParticipant[]): number {
@@ -203,6 +224,11 @@ export function studyWideExportStaticHeaders(): string[] {
     "instruction_part1_seconds",
     "instruction_part2_seconds",
     "instruction_self_explanation",
+    "care_se_definition",
+    "care_se_distinction",
+    "care_se_distinction_order",
+    "care_se_judgment",
+    "care_se_advice",
     ...instrMatch,
     "instruction_matching_display_order_json",
     "eval1_rating_studentA",
@@ -219,13 +245,19 @@ export function studyWideExportStaticHeaders(): string[] {
     "final_task_genai_seconds",
     "final_task_essay_seconds",
     "essay_text",
+    "recordPdfDownloadedAt",
   ];
 }
 
 export function studyWideExportChatHeaders(depth: number): string[] {
   const h: string[] = [];
   for (let i = 1; i <= depth; i++) {
-    h.push(`st_${i}`, `ai_${i}`);
+    h.push(
+      `st_${i}`,
+      `st_${i}_sec_to_input`,
+      `st_${i}_sec_to_send`,
+      `ai_${i}`,
+    );
   }
   return h;
 }
@@ -259,7 +291,9 @@ export function buildStudyWideExportCsv(
     const cond = normalizeCondition(str(p.condition));
     const ev = eval1Flat(p);
     const demo = demographicsFlat(p);
-    const { user, assistant } = genaiUserAssistantLists(p.genaiMessages);
+    const { user, assistant, secToInput, secToSend } = genaiUserAssistantLists(
+      p.genaiMessages,
+    );
 
     const displayOrder =
       p.instructionMatchingExampleDisplayOrder === undefined ||
@@ -312,6 +346,11 @@ export function buildStudyWideExportCsv(
       csvCell(instructionPart1Sec),
       csvCell(instructionPart2Sec),
       csvCell(str(p.instructionSelfExplanation)),
+      csvCell(str(p.careSeDefinition)),
+      csvCell(str(p.careSeDistinction)),
+      csvCell(str(p.careSeDistinctionOrder)),
+      csvCell(str(p.careSeJudgment)),
+      csvCell(str(p.careSeAdvice)),
       ...INSTR_DIM_KEYS.map((k) => csvCell(instrMatchingDim(p, k))),
       csvCell(displayOrder),
       ...ev.ratings.map(csvCell),
@@ -324,10 +363,13 @@ export function buildStudyWideExportCsv(
       csvCell(finalTaskGenaiSec),
       csvCell(finalTaskEssaySec),
       csvCell(str(p.essayText)),
+      csvCell(str(p.recordPdfDownloadedAt)),
     ];
 
     for (let i = 0; i < depth; i++) {
       cells.push(csvCell(user[i] ?? ""));
+      cells.push(csvCell(secToInput[i] ?? ""));
+      cells.push(csvCell(secToSend[i] ?? ""));
       cells.push(csvCell(assistant[i] ?? ""));
     }
 

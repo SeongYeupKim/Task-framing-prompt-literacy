@@ -1,8 +1,15 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/types/study";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
+
+/** Seconds from an AI response until a later timestamp, to 0.1s. */
+function elapsedSeconds(fromIso: string, toIso: string): number {
+  const ms = Date.parse(toIso) - Date.parse(fromIso);
+  if (!Number.isFinite(ms) || ms < 0) return 0;
+  return Math.round(ms / 100) / 10;
+}
 
 type Props = {
   messages: ChatMessage[];
@@ -19,6 +26,24 @@ export function GenAIInteractionPanel({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  /** createdAt of the AI response the student is currently reading. */
+  const awaitingSince = useRef<string | null>(null);
+  /** First keystroke or paste of the prompt that follows that response. */
+  const inputStartedAt = useRef<string | null>(null);
+
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (last?.role !== "assistant") return;
+    if (awaitingSince.current === last.createdAt) return;
+    awaitingSince.current = last.createdAt;
+    inputStartedAt.current = null;
+  }, [messages]);
+
+  function markInputStarted() {
+    if (awaitingSince.current && !inputStartedAt.current) {
+      inputStartedAt.current = new Date().toISOString();
+    }
+  }
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,11 +53,20 @@ export function GenAIInteractionPanel({
     const text = input.trim();
     if (!text || loading) return;
 
+    const sentAt = new Date().toISOString();
     const userMsg: ChatMessage = {
       role: "user",
       content: text,
-      createdAt: new Date().toISOString(),
+      createdAt: sentAt,
     };
+    if (awaitingSince.current) {
+      const started = inputStartedAt.current ?? sentAt;
+      userMsg.inputStartedAt = started;
+      userMsg.secAfterAiToInput = elapsedSeconds(awaitingSince.current, started);
+      userMsg.secAfterAiToSend = elapsedSeconds(awaitingSince.current, sentAt);
+    }
+    awaitingSince.current = null;
+    inputStartedAt.current = null;
     const next = [...messages, userMsg];
     onMessagesChange(next);
     setInput("");
@@ -128,12 +162,23 @@ export function GenAIInteractionPanel({
           <div className="flex gap-2">
             <textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onCompositionStart={markInputStarted}
+              onPaste={markInputStarted}
+              onChange={(e) => {
+                if (e.target.value.length > 0) markInputStarted();
+                setInput(e.target.value);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   void send();
+                  return;
                 }
+                const editing =
+                  e.key.length === 1 ||
+                  ((e.key === "Backspace" || e.key === "Delete") &&
+                    input.length > 0);
+                if (editing) markInputStarted();
               }}
               rows={3}
               className="min-h-[4.5rem] flex-1 resize-y rounded-xl border border-student-border px-3 py-2.5 text-sm text-student-ink focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"

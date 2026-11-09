@@ -14,12 +14,13 @@ import {
   completeStudyConsent,
   completeStudyOverview,
   getUserStudyDoc,
-  saveEvaluationSubmission,
   saveEssay,
   saveGenaiMessages,
   saveAiAcceptance,
   saveDemographics,
   saveInstructionCompletion,
+  recordRecordPdfDownloaded,
+  completeSubmissionGuide,
   resetStudyFromBeginning,
   updateUserPhase,
   recordFinalTaskStarted,
@@ -35,28 +36,28 @@ import { getPhaseProgress } from "@/lib/studyProgress";
 import {
   normalizeCondition,
   phaseAfterAiAcceptance,
+  seesCareInstruction,
   showInstructionRecap,
 } from "@/lib/studyConditions";
-import { EVAL1_SCENARIO, GENAI_TASK } from "@/lib/studyContent";
+import { GENAI_TASK } from "@/lib/studyContent";
 import { AiAcceptanceSurvey } from "@/components/AiAcceptanceSurvey";
 import { DemographicsSurvey } from "@/components/DemographicsSurvey";
 import { TrainingPanel } from "@/components/TrainingPanel";
-import { EvaluationTaskView } from "@/components/EvaluationTaskView";
 import { GenAIInteractionPanel } from "@/components/GenAIInteractionPanel";
 import { GenaiTaskScenario } from "@/components/GenaiTaskScenario";
 import { EssaySubmissionPanel } from "@/components/EssaySubmissionPanel";
 import { TaskConditionLine } from "@/components/TaskConditionLine";
 import { InstructionRecapCollapsible } from "@/components/InstructionRecapCollapsible";
 import { TaskIntroPanel } from "@/components/TaskIntroPanel";
+import { SubmissionGuide } from "@/components/SubmissionGuide";
 import { InformedConsentScreen } from "@/components/InformedConsentScreen";
 import { StudyParticipationOverview } from "@/components/StudyParticipationOverview";
 import { StudyRestartGate } from "@/components/StudyRestartGate";
 import { stripMarkdownForChat } from "@/lib/chatPlainText";
 import type {
+  CareSelfExplanationAnswers,
   ChatMessage,
   DemographicsSubmission,
-  EvaluationTaskSubmission,
-  InstructionPracticeData,
   StudyCondition,
   StudyPhase,
 } from "@/types/study";
@@ -69,6 +70,7 @@ export default function StudyPage() {
   const [phase, setPhase] = useState<StudyPhase | null>(null);
   const [genaiMessages, setGenaiMessages] = useState<ChatMessage[]>([]);
   const [essayDraft, setEssayDraft] = useState("");
+  const [pdfDownloaded, setPdfDownloaded] = useState(false);
   const [aiAcceptanceDone, setAiAcceptanceDone] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [postCompleteUI, setPostCompleteUI] = useState<
@@ -103,6 +105,7 @@ export default function StudyPage() {
       if (doc?.essayText) {
         setEssayDraft(doc.essayText);
       }
+      setPdfDownloaded(!!doc?.recordPdfDownloadedAt);
       setAiAcceptanceDone(!!doc?.aiAcceptanceCompletedAt);
       setReady(true);
     });
@@ -132,10 +135,12 @@ export default function StudyPage() {
     }
     const cred = EmailAuthProvider.credential(user.email, password);
     await reauthenticateWithCredential(user, cred);
-    await resetStudyFromBeginning(uid);
+    const nextCondition = await resetStudyFromBeginning(uid);
     clearStudySessionMarkers();
+    setCondition(nextCondition);
     setGenaiMessages([]);
     setEssayDraft("");
+    setPdfDownloaded(false);
     setAiAcceptanceDone(false);
     setPhase("study_consent");
   }
@@ -159,18 +164,14 @@ export default function StudyPage() {
     setPhase(phaseAfterAiAcceptance(condition));
   }
 
-  async function handleInstructionComplete(data: InstructionPracticeData) {
+  async function handleInstructionComplete(
+    answers: CareSelfExplanationAnswers | null
+  ) {
     if (!uid || !condition) return;
     const next = getNextPhaseAfter(condition, "training");
     if (!next) return;
-    await saveInstructionCompletion(uid, data, next);
+    await saveInstructionCompletion(uid, answers, next);
     setPhase(next);
-  }
-
-  async function handleTaskIntroEvalContinue() {
-    if (!uid) return;
-    await updateUserPhase(uid, "eval1");
-    setPhase("eval1");
   }
 
   async function handleTaskIntroFinalContinue() {
@@ -178,15 +179,6 @@ export default function StudyPage() {
     await recordFinalTaskStarted(uid);
     await updateUserPhase(uid, "genai");
     setPhase("genai");
-  }
-
-  async function handleEvalSubmit(sub: EvaluationTaskSubmission) {
-    if (!uid || !condition) return;
-    await saveEvaluationSubmission(uid, sub);
-    const next = getNextPhaseAfter(condition, "eval1");
-    if (!next) return;
-    await updateUserPhase(uid, next);
-    setPhase(next);
   }
 
   const persistMessages = useCallback(
@@ -207,14 +199,14 @@ export default function StudyPage() {
   async function handleEssaySubmit(text: string) {
     if (!uid) return;
     await saveEssay(uid, text, genaiMessages);
+    setEssayDraft(text);
     setPhase("demographics");
   }
 
   async function handleDemographicsSubmit(data: DemographicsSubmission) {
     if (!uid) return;
     await saveDemographics(uid, data);
-    markStudyCompletedInThisBrowserSession();
-    setPhase("complete");
+    setPhase("submission_guide");
   }
 
   useEffect(() => {
@@ -244,14 +236,9 @@ export default function StudyPage() {
   const { step, total } = getPhaseProgress(condition, effectivePhase);
 
   const recapFinal = showInstructionRecap(condition, phase);
-  const recapEval = showInstructionRecap(condition, "eval1");
 
   const wideMain =
-    phase === "training" ||
-    phase === "genai" ||
-    phase === "essay" ||
-    phase === "eval1" ||
-    phase === "task_intro_eval";
+    phase === "training" || phase === "genai" || phase === "essay";
 
   return (
     <div className="min-h-screen bg-student-canvas pb-16">
@@ -314,29 +301,12 @@ export default function StudyPage() {
           />
         )}
 
-        {phase === "task_intro_eval" && (
-          <TaskIntroPanel
-            variant="eval"
-            onContinue={handleTaskIntroEvalContinue}
-          />
-        )}
-
-        {phase === "eval1" && (
-          <EvaluationTaskView
-            taskKey="eval1"
-            title={EVAL1_SCENARIO.title}
-            scenario={[...EVAL1_SCENARIO.scenario]}
-            taskConditions={[...EVAL1_SCENARIO.taskConditions]}
-            cases={EVAL1_SCENARIO.cases}
-            onSubmit={handleEvalSubmit}
-            showInstructionRecap={recapEval}
-          />
-        )}
-
         {phase === "task_intro_final" && (
           <TaskIntroPanel
             variant={
-              condition === "control" ? "final_control" : "final_instruction"
+              seesCareInstruction(condition)
+                ? "final_instruction"
+                : "final_control"
             }
             onContinue={handleTaskIntroFinalContinue}
           />
@@ -432,6 +402,24 @@ export default function StudyPage() {
           <DemographicsSurvey onSubmit={handleDemographicsSubmit} />
         )}
 
+        {phase === "submission_guide" && (
+          <SubmissionGuide
+            email={userEmail}
+            essay={essayDraft}
+            messages={genaiMessages}
+            alreadyDownloaded={pdfDownloaded}
+            onDownloaded={async () => {
+              await recordRecordPdfDownloaded(uid);
+              setPdfDownloaded(true);
+            }}
+            onFinish={async () => {
+              await completeSubmissionGuide(uid);
+              markStudyCompletedInThisBrowserSession();
+              setPhase("complete");
+            }}
+          />
+        )}
+
         {phase === "complete" && postCompleteUI === "pending" && (
           <p className="text-center text-sm font-medium text-student-muted">
             Loading…
@@ -447,7 +435,8 @@ export default function StudyPage() {
               Thank you
             </h1>
             <p className="mt-3 text-sm font-medium leading-relaxed text-student-muted">
-              Your responses are saved. You can close this tab or log out.
+              Your responses are saved. Keep the PDF you downloaded and upload
+              it to Canvas if you have not already.
             </p>
             <button
               type="button"

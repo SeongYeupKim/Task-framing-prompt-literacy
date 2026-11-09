@@ -2,14 +2,15 @@ import { deleteField, doc, getDoc, setDoc, updateDoc } from "firebase/firestore"
 import type { User } from "firebase/auth";
 import { getClientDb } from "@/lib/firebase";
 import {
+  isLegacyEvalCondition,
   normalizeCondition,
   phaseAfterAiAcceptance,
 } from "@/lib/studyConditions";
 import type {
+  CareSelfExplanationAnswers,
   ChatMessage,
   DemographicsSubmission,
   EvaluationTaskSubmission,
-  InstructionPracticeData,
   StudyCondition,
   StudyPhase,
   UserStudyDoc,
@@ -29,7 +30,7 @@ function randomCondition(): StudyCondition {
   const r = Math.floor(Math.random() * 3);
   if (r === 0) return "control";
   if (r === 1) return "instruction";
-  return "instruction_eval";
+  return "instruction_se";
 }
 
 export async function ensureUserStudyDoc(user: User): Promise<{
@@ -82,6 +83,7 @@ export async function ensureUserStudyDoc(user: User): Promise<{
       phase === "genai" ||
       phase === "essay" ||
       phase === "demographics" ||
+      phase === "submission_guide" ||
       phase === "complete";
     if (progressedPastConsent) {
       const ts = data.studyOverviewCompletedAt ?? data.createdAt ?? now;
@@ -138,8 +140,17 @@ export async function ensureUserStudyDoc(user: User): Promise<{
     });
   }
 
-  /** Drop removed second evaluation phase for redesign. */
-  if (String(phase) === "eval2") {
+  /**
+   * Retired prompt-rating screens, and in-progress pilot `instruction_eval`
+   * sessions still sitting on the old lesson. Send them to the main task
+   * without relabeling the condition.
+   */
+  const removedPhase =
+    phase === "task_intro_eval" ||
+    phase === "eval1" ||
+    String(phase) === "eval2" ||
+    (condition === "instruction_eval" && phase === "training");
+  if (removedPhase) {
     phase = "task_intro_final";
     await updateDoc(ref, {
       phase,
@@ -210,7 +221,7 @@ export async function recordTrainingModuleEntered(uid: string) {
   await updateDoc(ref, { trainingStartedAt: now, updatedAt: now });
 }
 
-/** First transition to instruction Part 2 (matching); idempotent. */
+/** First transition to the four self-explanation questions; idempotent. */
 export async function recordInstructionPart2Start(uid: string) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
@@ -245,19 +256,20 @@ export async function recordEssayEditorOpened(uid: string) {
 
 export async function saveInstructionCompletion(
   uid: string,
-  practice: InstructionPracticeData,
+  answers: CareSelfExplanationAnswers | null,
   nextPhase: StudyPhase
 ) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
   const now = new Date().toISOString();
   await updateDoc(ref, {
-    instructionSelfExplanation: practice.selfExplanation,
-    instructionMatchingByDimension: practice.matchingByDimension,
-    ...(practice.matchingExampleDisplayOrder !== undefined
+    ...(answers
       ? {
-          instructionMatchingExampleDisplayOrder:
-            practice.matchingExampleDisplayOrder,
+          careSeDefinition: answers.definition,
+          careSeDistinction: answers.distinction,
+          careSeJudgment: answers.judgment,
+          careSeAdvice: answers.advice,
+          careSeDistinctionOrder: answers.distinctionOrder,
         }
       : {}),
     instructionCompletedAt: now,
@@ -323,21 +335,53 @@ export async function saveDemographics(
   await updateDoc(ref, {
     demographics: data,
     demographicsSubmittedAt: data.submittedAt,
-    phase: "complete",
+    phase: "submission_guide",
     updatedAt: new Date().toISOString(),
   });
 }
 
-/**
- * Clears task responses and returns the participant to the start (overview).
- * Preserves `condition`, `email`, `createdAt`. Requires recent password
- * reauthentication on the client before calling.
- */
-export async function resetStudyFromBeginning(uid: string) {
+/** First download of the Canvas record PDF; idempotent. */
+export async function recordRecordPdfDownloaded(uid: string) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() as UserStudyDoc | undefined;
+  if (data?.recordPdfDownloadedAt) return;
+  const now = new Date().toISOString();
+  await updateDoc(ref, { recordPdfDownloadedAt: now, updatedAt: now });
+}
+
+export async function completeSubmissionGuide(uid: string) {
+  const db = getClientDb();
+  const now = new Date().toISOString();
+  await updateDoc(doc(db, COLLECTION, uid), {
+    phase: "complete" as StudyPhase,
+    studyCompletedAt: now,
+    updatedAt: now,
+  });
+}
+
+/**
+ * Clears task responses and returns the participant to informed consent.
+ * Keeps the current condition, except a retired `instruction_eval` assignment,
+ * which is replaced with a new random condition. Requires recent password
+ * reauthentication on the client before calling.
+ */
+export async function resetStudyFromBeginning(
+  uid: string
+): Promise<StudyCondition> {
+  const db = getClientDb();
+  const ref = doc(db, COLLECTION, uid);
+  const snap = await getDoc(ref);
+  const rawCondition = String(
+    (snap.data() as UserStudyDoc | undefined)?.condition ?? ""
+  );
+  const condition = isLegacyEvalCondition(rawCondition)
+    ? randomCondition()
+    : normalizeCondition(rawCondition);
   const now = new Date().toISOString();
   await updateDoc(ref, {
+    ...(isLegacyEvalCondition(rawCondition) ? { condition } : {}),
     phase: "study_consent" as StudyPhase,
     studyConsentCompletedAt: deleteField(),
     studyOverviewCompletedAt: deleteField(),
@@ -349,6 +393,11 @@ export async function resetStudyFromBeginning(uid: string) {
     instructionSelfExplanation: deleteField(),
     instructionMatchingByDimension: deleteField(),
     instructionMatchingExampleDisplayOrder: deleteField(),
+    careSeDefinition: deleteField(),
+    careSeDistinction: deleteField(),
+    careSeJudgment: deleteField(),
+    careSeAdvice: deleteField(),
+    careSeDistinctionOrder: deleteField(),
     instructionCompletedAt: deleteField(),
     eval1: deleteField(),
     eval2: deleteField(),
@@ -359,7 +408,10 @@ export async function resetStudyFromBeginning(uid: string) {
     essayEditorOpenedAt: deleteField(),
     demographics: deleteField(),
     demographicsSubmittedAt: deleteField(),
+    recordPdfDownloadedAt: deleteField(),
+    studyCompletedAt: deleteField(),
     studyRestartedAt: now,
     updatedAt: now,
   });
+  return condition;
 }

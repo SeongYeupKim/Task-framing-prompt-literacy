@@ -1,5 +1,12 @@
-/** Assigned at registration / first session (equal random). Legacy: two_eval, four_eval. */
-export type StudyCondition = "control" | "instruction" | "instruction_eval";
+/**
+ * Assigned at registration (equal random): control, instruction, instruction_se.
+ * `instruction_eval` is the retired pilot arm (also stored as four_eval). two_eval maps to instruction.
+ */
+export type StudyCondition =
+  | "control"
+  | "instruction"
+  | "instruction_se"
+  | "instruction_eval";
 
 /** Linear progress through the study UI. */
 export type StudyPhase =
@@ -13,6 +20,7 @@ export type StudyPhase =
   | "genai"
   | "essay"
   | "demographics"
+  | "submission_guide"
   | "complete";
 
 export type EvalCaseId = "studentA" | "studentB" | "studentC";
@@ -40,6 +48,15 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   createdAt: string;
+  /**
+   * Follow-up prompts only. First moment the student typed or pasted the next
+   * prompt after the preceding AI response was shown.
+   */
+  inputStartedAt?: string;
+  /** Seconds from that AI response until `inputStartedAt`. */
+  secAfterAiToInput?: number;
+  /** Seconds from that AI response until this prompt was sent. */
+  secAfterAiToSend?: number;
 }
 
 export type CourseInstructorChoice =
@@ -61,13 +78,14 @@ export interface DemographicsSubmission {
   submittedAt: string;
 }
 
-/** Saved when participant finishes instruction (both practice parts). */
-export interface InstructionPracticeData {
-  selfExplanation: string;
-  /** Maps dimension key (e.g. goal) to chosen matching example id (e.g. mx3). */
-  matchingByDimension: Record<string, string>;
-  /** Example ids in display order (Example 1 = top …); for analysis / replication. */
-  matchingExampleDisplayOrder?: string[];
+/** Written answers for the instruction + self-explanation arm. */
+export interface CareSelfExplanationAnswers {
+  definition: string;
+  distinction: string;
+  judgment: string;
+  advice: string;
+  /** Which follow-up was shown as Message 1. */
+  distinctionOrder: "extend_first" | "repair_first";
 }
 
 export interface UserStudyDoc {
@@ -81,14 +99,21 @@ export interface UserStudyDoc {
   /** Pre-study Likert (1–5), one value per AI acceptance item in order. */
   aiAcceptanceResponses?: number[];
   aiAcceptanceCompletedAt?: string;
-  /** First paint of the instruction module (Part 1); set when TrainingPanel mounts. */
+  /** First paint of the CARE reading; set when TrainingPanel mounts. */
   trainingStartedAt?: string;
-  /** First time the participant opens Part 2 (matching practice). */
+  /** First time the self-explanation questions open (`instruction_se` only). */
   instructionStartedAt?: string;
   trainingCompletedAt?: string;
+  /** Pilot instruction arm: free response before the matching task. */
   instructionSelfExplanation?: string;
   instructionMatchingByDimension?: Record<string, string>;
   instructionMatchingExampleDisplayOrder?: string[];
+  /** CARE self-explanation arm. */
+  careSeDefinition?: string;
+  careSeDistinction?: string;
+  careSeJudgment?: string;
+  careSeAdvice?: string;
+  careSeDistinctionOrder?: "extend_first" | "repair_first";
   instructionCompletedAt?: string;
   /** First entry into the GenAI + essay block (after final task intro). */
   finalTaskStartedAt?: string;
@@ -101,6 +126,9 @@ export interface UserStudyDoc {
   essaySubmittedAt?: string;
   demographics?: DemographicsSubmission;
   demographicsSubmittedAt?: string;
+  /** First time the Canvas record PDF was downloaded. */
+  recordPdfDownloadedAt?: string;
+  studyCompletedAt?: string;
   /** Set when participant confirms password and restarts from study_consent. */
   studyRestartedAt?: string;
   updatedAt?: string;

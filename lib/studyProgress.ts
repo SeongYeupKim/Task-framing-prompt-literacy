@@ -10,6 +10,7 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "genai",
     "essay",
     "demographics",
+    "submission_guide",
     "complete",
   ],
   instruction: [
@@ -21,19 +22,31 @@ const FLOW: Record<StudyCondition, StudyPhase[]> = {
     "genai",
     "essay",
     "demographics",
+    "submission_guide",
     "complete",
   ],
-  instruction_eval: [
+  instruction_se: [
     "study_consent",
     "study_overview",
     "ai_acceptance",
     "training",
-    "task_intro_eval",
-    "eval1",
     "task_intro_final",
     "genai",
     "essay",
     "demographics",
+    "submission_guide",
+    "complete",
+  ],
+  /** Pilot arm. Removed screens are migrated forward before render. */
+  instruction_eval: [
+    "study_consent",
+    "study_overview",
+    "ai_acceptance",
+    "task_intro_final",
+    "genai",
+    "essay",
+    "demographics",
+    "submission_guide",
     "complete",
   ],
 };
