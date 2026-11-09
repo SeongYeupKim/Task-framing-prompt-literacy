@@ -180,13 +180,13 @@ function AnswerField({
   rows?: number;
 }) {
   return (
-    <div className="mt-4 border-t border-student-border pt-3">
-      <p className="text-base leading-6 text-student-ink">{prompt}</p>
+    <div className="flex h-full flex-col rounded-md border border-student-border bg-white px-3 py-3">
+      <p className="text-sm leading-5 text-student-ink">{prompt}</p>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        className="mt-2 w-full rounded-md border border-student-border px-3 py-3 text-base leading-6 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
+        className="mt-2 w-full flex-1 rounded-md border border-student-border px-3 py-2 text-base leading-6 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
       />
       <CharCount value={value} min={min} />
     </div>
@@ -328,7 +328,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
 
       {step === 2 && withQuestions && (
         <>
-        <section className="grid gap-3 xl:grid-cols-2">
+        <section className="grid gap-3 lg:grid-cols-2">
           <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
             <h3 className="text-lg font-semibold text-student-ink">
               1. Your definition
@@ -361,99 +361,113 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <CharCount value={distinction} min={CARE_MIN_CHARS.distinction} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student xl:col-span-2">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-3 shadow-student lg:col-span-2">
             <h3 className="text-lg font-semibold text-student-ink">
               3. Rate this chat
             </h3>
-            <p className="mt-2 text-base leading-6 text-student-ink">
-              A student was asked to do this:
-            </p>
-            <p className="mt-3 border border-student-border bg-navy-50 px-4 py-3 text-base leading-6 text-student-ink">
-              {CARE_CASE.assignment}
-            </p>
-            <div className="mt-3 space-y-2">
-              {CARE_CASE.turns.map((turn, i) => (
-                <div
-                  key={i}
-                  className={
-                    turn.role === "student"
-                      ? "ml-8 rounded-md bg-navy-800 px-4 py-3 text-sm leading-6 text-white"
-                      : "mr-8 rounded-md border border-student-border bg-white px-4 py-3 text-sm leading-6 text-student-ink"
-                  }
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
-                    {turn.role === "student" ? "Student" : "AI"}
-                  </p>
-                  <p className="mt-1">{turn.content}</p>
+            <div className="mt-2 grid items-start gap-3 lg:grid-cols-2">
+              <div>
+                <p className="text-sm leading-5 text-student-ink">
+                  A student was asked to do this:
+                </p>
+                <p className="mt-2 border border-student-border bg-navy-50 px-3 py-2 text-sm leading-5 text-student-ink">
+                  {CARE_CASE.assignment}
+                </p>
+                <div className="mt-2 space-y-2">
+                  {CARE_CASE.turns.map((turn, i) => (
+                    <div
+                      key={i}
+                      className={
+                        turn.role === "student"
+                          ? "ml-4 rounded-md bg-navy-800 px-3 py-2 text-sm leading-5 text-white"
+                          : "mr-4 rounded-md border border-student-border bg-white px-3 py-2 text-sm leading-5 text-student-ink"
+                      }
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
+                        {turn.role === "student" ? "Student" : "AI"}
+                      </p>
+                      <p className="mt-0.5">{turn.content}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-student-muted">The chat ends here.</p>
-            <div className="mt-4 border-t border-student-border pt-3">
-              <p className="text-base leading-6 text-student-ink">
-                {CARE_QUESTIONS.rating}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {CARE_CASE_SCALE.map(({ value, label }) => (
-                  <label
-                    key={value}
-                    className={`flex min-w-[5.5rem] cursor-pointer flex-col items-center rounded-md border px-2 py-2 text-center ${
-                      rating === value
-                        ? "border-navy-800 bg-navy-50"
-                        : "border-student-border bg-white"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="care-case-rating"
-                      value={value}
-                      checked={rating === value}
-                      onChange={() => setRating(value)}
-                      className="sr-only"
-                    />
-                    <span className="text-base font-semibold tabular-nums leading-none text-navy-800">
-                      {value}
-                    </span>
-                    <span className="mt-1 text-xs leading-4 text-student-muted">
-                      {label}
-                    </span>
-                  </label>
-                ))}
+                <p className="mt-1 text-xs text-student-muted">
+                  The chat ends here.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm leading-5 text-student-ink">
+                    {CARE_QUESTIONS.rating}
+                  </p>
+                  <div className="mt-2 grid grid-cols-5 gap-2">
+                    {CARE_CASE_SCALE.map(({ value, label }) => (
+                      <label
+                        key={value}
+                        className={`flex cursor-pointer flex-col items-center rounded-md border px-1 py-2 text-center ${
+                          rating === value
+                            ? "border-navy-800 bg-navy-50"
+                            : "border-student-border bg-white"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="care-case-rating"
+                          value={value}
+                          checked={rating === value}
+                          onChange={() => setRating(value)}
+                          className="sr-only"
+                        />
+                        <span className="text-base font-semibold tabular-nums leading-none text-navy-800">
+                          {value}
+                        </span>
+                        <span className="mt-1 h-8 text-[11px] leading-4 text-student-muted">
+                          {label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <AnswerField
+                  prompt={CARE_QUESTIONS.reason}
+                  value={judgment}
+                  onChange={setJudgment}
+                  min={CARE_MIN_CHARS.judgment}
+                  rows={6}
+                />
               </div>
             </div>
-            <AnswerField
-              prompt={CARE_QUESTIONS.reason}
-              value={judgment}
-              onChange={setJudgment}
-              min={CARE_MIN_CHARS.judgment}
-            />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student xl:col-span-2">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-3 shadow-student lg:col-span-2">
             <h3 className="text-lg font-semibold text-student-ink">
               4. Advise this student
             </h3>
-            <p className="mt-2 text-base leading-6 text-student-ink">
+            <p className="mt-1 text-sm leading-5 text-student-ink">
               Use the same chat. Answer each part in its own box.
             </p>
-            <AnswerField
-              prompt={CARE_QUESTIONS.advice}
-              value={advice}
-              onChange={setAdvice}
-              min={CARE_MIN_CHARS.advice}
-            />
-            <AnswerField
-              prompt={CARE_QUESTIONS.revisedOpening}
-              value={revisedOpening}
-              onChange={setRevisedOpening}
-              min={CARE_MIN_CHARS.revisedOpening}
-            />
-            <AnswerField
-              prompt={CARE_QUESTIONS.nextMessage}
-              value={nextMessage}
-              onChange={setNextMessage}
-              min={CARE_MIN_CHARS.nextMessage}
-            />
+            <div className="mt-2 grid items-stretch gap-3 lg:grid-cols-3">
+              <AnswerField
+                prompt={CARE_QUESTIONS.advice}
+                value={advice}
+                onChange={setAdvice}
+                min={CARE_MIN_CHARS.advice}
+                rows={6}
+              />
+              <AnswerField
+                prompt={CARE_QUESTIONS.revisedOpening}
+                value={revisedOpening}
+                onChange={setRevisedOpening}
+                min={CARE_MIN_CHARS.revisedOpening}
+                rows={6}
+              />
+              <AnswerField
+                prompt={CARE_QUESTIONS.nextMessage}
+                value={nextMessage}
+                onChange={setNextMessage}
+                min={CARE_MIN_CHARS.nextMessage}
+                rows={6}
+              />
+            </div>
           </article>
         </section>
 
