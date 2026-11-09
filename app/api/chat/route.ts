@@ -60,9 +60,38 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: text, model });
   } catch (e) {
     console.error(e);
+    const status =
+      e && typeof e === "object" && "status" in e
+        ? Number((e as { status?: number }).status)
+        : 0;
+    const code =
+      e && typeof e === "object" && "code" in e
+        ? String((e as { code?: string }).code ?? "")
+        : "";
+    const message = e instanceof Error ? e.message : "";
+    if (status === 401 || code === "invalid_api_key") {
+      return NextResponse.json(
+        { error: "The chatbot is unavailable: the OpenAI API key was rejected." },
+        { status: 500 },
+      );
+    }
+    if (
+      status === 429 ||
+      code === "insufficient_quota" ||
+      message.includes("insufficient_quota") ||
+      message.includes("credit_balance_exhausted")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "The chatbot is unavailable: the OpenAI account has no credits left.",
+        },
+        { status: 500 },
+      );
+    }
     return NextResponse.json(
       { error: "Chat completion failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
