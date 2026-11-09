@@ -373,22 +373,35 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
                 <p className="mt-2 border border-student-border bg-navy-50 px-3 py-2 text-sm leading-5 text-student-ink">
                   {CARE_CASE.assignment}
                 </p>
-                <div className="mt-2 space-y-2">
-                  {CARE_CASE.turns.map((turn, i) => (
-                    <div
-                      key={i}
-                      className={
-                        turn.role === "student"
-                          ? "ml-4 rounded-md bg-navy-800 px-3 py-2 text-sm leading-5 text-white"
-                          : "mr-4 rounded-md border border-student-border bg-white px-3 py-2 text-sm leading-5 text-student-ink"
-                      }
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
-                        {turn.role === "student" ? "Student" : "AI"}
-                      </p>
-                      <p className="mt-0.5">{turn.content}</p>
-                    </div>
-                  ))}
+                <div className="mt-2 space-y-1.5 rounded-md bg-student-canvas px-2 py-2">
+                  {CARE_CASE.turns.map((turn, i) => {
+                    const fromStudent = turn.role === "student";
+                    return (
+                      <div
+                        key={i}
+                        className={`flex ${fromStudent ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className="max-w-[85%]">
+                          <p
+                            className={`mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-student-muted ${
+                              fromStudent ? "text-right" : "text-left"
+                            }`}
+                          >
+                            {fromStudent ? "Student" : "AI"}
+                          </p>
+                          <p
+                            className={
+                              fromStudent
+                                ? "rounded-2xl rounded-br-sm bg-navy-800 px-3 py-1.5 text-sm leading-5 text-white"
+                                : "rounded-2xl rounded-bl-sm border border-student-border bg-white px-3 py-1.5 text-sm leading-5 text-student-ink"
+                            }
+                          >
+                            {turn.content}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <p className="mt-1 text-xs text-student-muted">
                   The chat ends here.
