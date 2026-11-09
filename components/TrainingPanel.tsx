@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   CARE_CASE,
+  CARE_CASE_SCALE,
   CARE_INSTRUCTION,
   CARE_MIN_CHARS,
   CARE_QUESTIONS,
@@ -165,6 +166,33 @@ function CharCount({ value, min }: { value: string; min: number }) {
   );
 }
 
+function AnswerField({
+  prompt,
+  value,
+  onChange,
+  min,
+  rows = 4,
+}: {
+  prompt: string;
+  value: string;
+  onChange: (value: string) => void;
+  min: number;
+  rows?: number;
+}) {
+  return (
+    <div className="mt-4 border-t border-student-border pt-3">
+      <p className="text-base leading-6 text-student-ink">{prompt}</p>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={rows}
+        className="mt-2 w-full rounded-md border border-student-border px-3 py-3 text-base leading-6 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
+      />
+      <CharCount value={value} min={min} />
+    </div>
+  );
+}
+
 export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   const withQuestions = needsSelfExplanation(condition);
 
@@ -177,8 +205,11 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   const [readConfirmed, setReadConfirmed] = useState(false);
   const [definition, setDefinition] = useState("");
   const [distinction, setDistinction] = useState("");
+  const [rating, setRating] = useState<number | null>(null);
   const [judgment, setJudgment] = useState("");
   const [advice, setAdvice] = useState("");
+  const [revisedOpening, setRevisedOpening] = useState("");
+  const [nextMessage, setNextMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -189,8 +220,11 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
   const questionsComplete =
     definition.trim().length >= CARE_MIN_CHARS.definition &&
     distinction.trim().length >= CARE_MIN_CHARS.distinction &&
+    rating !== null &&
     judgment.trim().length >= CARE_MIN_CHARS.judgment &&
-    advice.trim().length >= CARE_MIN_CHARS.advice;
+    advice.trim().length >= CARE_MIN_CHARS.advice &&
+    revisedOpening.trim().length >= CARE_MIN_CHARS.revisedOpening &&
+    nextMessage.trim().length >= CARE_MIN_CHARS.nextMessage;
 
   async function finish(answers: CareSelfExplanationAnswers | null) {
     setError(null);
@@ -327,24 +361,24 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <CharCount value={distinction} min={CARE_MIN_CHARS.distinction} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student xl:col-span-2">
             <h3 className="text-lg font-semibold text-student-ink">
-              3. Judge this chat
+              3. Rate this chat
             </h3>
-            <p className="mt-2 text-base leading-7 text-student-ink">
+            <p className="mt-2 text-base leading-6 text-student-ink">
               A student was asked to do this:
             </p>
-            <p className="mt-4 border border-student-border bg-navy-50 px-5 py-4 text-base leading-7 text-student-ink">
+            <p className="mt-3 border border-student-border bg-navy-50 px-4 py-3 text-base leading-6 text-student-ink">
               {CARE_CASE.assignment}
             </p>
-            <div className="mt-5 space-y-4">
+            <div className="mt-3 space-y-2">
               {CARE_CASE.turns.map((turn, i) => (
                 <div
                   key={i}
                   className={
                     turn.role === "student"
-                      ? "ml-8 rounded-md bg-navy-800 px-4 py-4 text-base leading-7 text-white"
-                      : "mr-8 rounded-md border border-student-border bg-white px-4 py-4 text-base leading-7 text-student-ink"
+                      ? "ml-8 rounded-md bg-navy-800 px-4 py-3 text-sm leading-6 text-white"
+                      : "mr-8 rounded-md border border-student-border bg-white px-4 py-3 text-sm leading-6 text-student-ink"
                   }
                 >
                   <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
@@ -355,32 +389,71 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
               ))}
             </div>
             <p className="mt-2 text-xs text-student-muted">The chat ends here.</p>
-            <p className="mt-4 text-base leading-7 text-student-ink">
-              {CARE_QUESTIONS.judgment}
-            </p>
-            <textarea
+            <div className="mt-4 border-t border-student-border pt-3">
+              <p className="text-base leading-6 text-student-ink">
+                {CARE_QUESTIONS.rating}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {CARE_CASE_SCALE.map(({ value, label }) => (
+                  <label
+                    key={value}
+                    className={`flex min-w-[5.5rem] cursor-pointer flex-col items-center rounded-md border px-2 py-2 text-center ${
+                      rating === value
+                        ? "border-navy-800 bg-navy-50"
+                        : "border-student-border bg-white"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="care-case-rating"
+                      value={value}
+                      checked={rating === value}
+                      onChange={() => setRating(value)}
+                      className="sr-only"
+                    />
+                    <span className="text-base font-semibold tabular-nums leading-none text-navy-800">
+                      {value}
+                    </span>
+                    <span className="mt-1 text-xs leading-4 text-student-muted">
+                      {label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <AnswerField
+              prompt={CARE_QUESTIONS.reason}
               value={judgment}
-              onChange={(e) => setJudgment(e.target.value)}
-              rows={5}
-              className="mt-3 w-full rounded-md border border-student-border px-3 py-3 text-base leading-7 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
+              onChange={setJudgment}
+              min={CARE_MIN_CHARS.judgment}
             />
-            <CharCount value={judgment} min={CARE_MIN_CHARS.judgment} />
           </article>
 
-          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student">
+          <article className="rounded-md border border-student-border bg-student-card px-4 py-4 shadow-student xl:col-span-2">
             <h3 className="text-lg font-semibold text-student-ink">
               4. Advise this student
             </h3>
-            <p className="mt-2 text-base leading-7 text-student-ink">
-              {CARE_QUESTIONS.advice}
+            <p className="mt-2 text-base leading-6 text-student-ink">
+              Use the same chat. Answer each part in its own box.
             </p>
-            <textarea
+            <AnswerField
+              prompt={CARE_QUESTIONS.advice}
               value={advice}
-              onChange={(e) => setAdvice(e.target.value)}
-              rows={7}
-              className="mt-3 w-full rounded-md border border-student-border px-3 py-3 text-base leading-7 text-student-ink focus:border-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700/20"
+              onChange={setAdvice}
+              min={CARE_MIN_CHARS.advice}
             />
-            <CharCount value={advice} min={CARE_MIN_CHARS.advice} />
+            <AnswerField
+              prompt={CARE_QUESTIONS.revisedOpening}
+              value={revisedOpening}
+              onChange={setRevisedOpening}
+              min={CARE_MIN_CHARS.revisedOpening}
+            />
+            <AnswerField
+              prompt={CARE_QUESTIONS.nextMessage}
+              value={nextMessage}
+              onChange={setNextMessage}
+              min={CARE_MIN_CHARS.nextMessage}
+            />
           </article>
         </section>
 
@@ -404,14 +477,18 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
             <button
               type="button"
               disabled={!questionsComplete || saving}
-              onClick={() =>
+              onClick={() => {
+                if (rating === null) return;
                 void finish({
                   definition: definition.trim(),
                   distinction: distinction.trim(),
+                  rating,
                   judgment: judgment.trim(),
                   advice: advice.trim(),
-                })
-              }
+                  revisedOpening: revisedOpening.trim(),
+                  nextMessage: nextMessage.trim(),
+                });
+              }}
               className="rounded-md bg-navy-800 px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-navy-900 disabled:opacity-50"
             >
               {saving ? "Saving…" : "Finish and continue"}

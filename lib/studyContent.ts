@@ -80,11 +80,21 @@ export const INSTRUCTION_RECAP_BULLETS: string[] = [
 ];
 
 export const CARE_MIN_CHARS = {
-  definition: 80,
-  distinction: 80,
-  judgment: 80,
+  definition: 50,
+  distinction: 50,
+  judgment: 50,
   advice: 50,
+  revisedOpening: 50,
+  nextMessage: 50,
 } as const;
+
+export const CARE_CASE_SCALE = [
+  { value: 1, label: "Very weak" },
+  { value: 2, label: "Weak" },
+  { value: 3, label: "Mixed" },
+  { value: 4, label: "Strong" },
+  { value: 5, label: "Very strong" },
+] as const;
 
 /** Which follow-up is shown as Message 1. Stored with the answer. */
 export type CareDistinctionOrder = "extend_first" | "repair_first";
@@ -102,19 +112,19 @@ export const CARE_DISTINCTION = {
 
 export const CARE_CASE = {
   assignment:
-    "Write a short explanation for first-year students about how feedback helps learning. About 200 words, one paragraph, include one concrete classroom example, and connect the example to why feedback changes what a student does next.",
+    "Write a short explanation for classmates about how taking a practice quiz soon after reading helps them remember the material. About 200 words, one paragraph, include one concrete example of a student preparing for a test, and connect the example to why the quiz changes what they remember.",
   turns: [
-    { role: "student" as const, content: "Tell me about feedback." },
+    { role: "student" as const, content: "Tell me about quizzes." },
     {
       role: "ai" as const,
       content:
-        "Feedback is information about performance. It can come from teachers, peers, or automated systems. Effective feedback is specific, timely, and focused on the task rather than the person. Researchers often distinguish feedback about the task, the process, and self-regulation.",
+        "Quizzes are short tests. Teachers use them to check what students know. A quiz can be multiple choice, short answer, or a few problems. Students often take quizzes in class or online.",
     },
     { role: "student" as const, content: "Can you say more?" },
     {
       role: "ai" as const,
       content:
-        "Feedback supports learning when it helps students see a gap between their current work and a goal. Types include corrective feedback, suggestive feedback, and evaluative feedback. The timing of feedback and who gives it both matter.",
+        "Quizzes can happen before a unit, during a unit, or at the end. Some quizzes are graded and some are for practice. The number of questions and the time limit both vary. Quizzes are one of several ways teachers assess learning.",
     },
     { role: "student" as const, content: "Make it better." },
   ],
@@ -124,11 +134,14 @@ export const CARE_QUESTIONS = {
   definition:
     "In your own words, what does a student have to do to prompt and interact well? Include both how the first request is built and what the student does after the AI answers.",
   articulation:
-    "Articulation is one of the four moves. In your own words, what does articulation require in the request itself? Name what a student has to make specific.",
-  judgment:
-    "What does the opening leave out? What do the later messages fail to do?",
-  advice:
-    "Tell this student how to improve the interaction. Rewrite the opening so the task, goal, and background are there and the request is specific. Then write the single next message they should send now, and say what that message is trying to change.",
+    "Articulation is one of the four moves. In your own words, what does articulation require in the request itself?",
+  rating:
+    "Rate this student’s prompting from 1 (very weak) to 5 (very strong).",
+  reason: "Why did you give that rating?",
+  advice: "Advise this student. What should they change about this interaction?",
+  revisedOpening:
+    "How would you open the chat? Revise the first prompt.",
+  nextMessage: "What would you send instead of the last message?",
 } as const;
 
 /**

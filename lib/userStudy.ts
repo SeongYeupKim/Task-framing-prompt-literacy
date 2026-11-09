@@ -268,14 +268,25 @@ export async function saveInstructionCompletion(
 ) {
   const db = getClientDb();
   const ref = doc(db, COLLECTION, uid);
+  if (
+    answers &&
+    (!Number.isInteger(answers.rating) ||
+      answers.rating < 1 ||
+      answers.rating > 5)
+  ) {
+    throw new Error("Invalid case rating");
+  }
   const now = new Date().toISOString();
   await updateDoc(ref, {
     ...(answers
       ? {
           careSeDefinition: answers.definition,
           careSeDistinction: answers.distinction,
+          careSeRating: answers.rating,
           careSeJudgment: answers.judgment,
           careSeAdvice: answers.advice,
+          careSeRevisedOpening: answers.revisedOpening,
+          careSeNextMessage: answers.nextMessage,
           ...(answers.distinctionOrder
             ? { careSeDistinctionOrder: answers.distinctionOrder }
             : {}),
@@ -405,7 +416,10 @@ export async function resetStudyFromBeginning(
     careSeDefinition: deleteField(),
     careSeDistinction: deleteField(),
     careSeJudgment: deleteField(),
+    careSeRating: deleteField(),
     careSeAdvice: deleteField(),
+    careSeRevisedOpening: deleteField(),
+    careSeNextMessage: deleteField(),
     careSeDistinctionOrder: deleteField(),
     instructionCompletedAt: deleteField(),
     eval1: deleteField(),

@@ -29,7 +29,7 @@ The two instruction arms read the same CARE text (contextualization, articulatio
 
 - `condition`, `phase`, timestamps  
 - `aiAcceptanceResponses` (14× Likert 1–5), `aiAcceptanceCompletedAt`. Pilot rows that still hold the retired 20-item scale stay length 20.  
-- **Instruction:** `instructionCompletedAt`, `trainingCompletedAt`. **`instruction_se` also stores** `careSeDefinition`, `careSeDistinction`, `careSeJudgment`, `careSeAdvice`, `careSeDistinctionOrder` (`extend_first` or `repair_first`).
+- **Instruction:** `instructionCompletedAt`, `trainingCompletedAt`. **`instruction_se` also stores** `careSeDefinition`, `careSeDistinction`, `careSeRating` (1–5), `careSeJudgment` (reason), `careSeAdvice`, `careSeRevisedOpening`, `careSeNextMessage`. Older rows may still have `careSeDistinctionOrder`.
 - Pilot fields (`instructionSelfExplanation`, matching, `eval1`) remain on older documents.  
 - `genaiMessages`, `essayText`, `essaySubmittedAt`. A follow-up prompt also stores `secAfterAiToInput` (AI reply shown → first keystroke) and `secAfterAiToSend` (AI reply shown → send). Wide CSV columns are `st_i_sec_to_input` and `st_i_sec_to_send`.
 - `demographics`, `demographicsSubmittedAt`

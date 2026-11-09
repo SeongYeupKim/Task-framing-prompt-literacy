@@ -82,8 +82,13 @@ export interface DemographicsSubmission {
 export interface CareSelfExplanationAnswers {
   definition: string;
   distinction: string;
+  /** 1–5 rating of the case chat. */
+  rating: number;
+  /** Reason for the rating. */
   judgment: string;
   advice: string;
+  revisedOpening: string;
+  nextMessage: string;
   /** Older item 2 randomized two follow-ups. Current item 2 does not. */
   distinctionOrder?: "extend_first" | "repair_first";
 }
@@ -112,7 +117,11 @@ export interface UserStudyDoc {
   careSeDefinition?: string;
   careSeDistinction?: string;
   careSeJudgment?: string;
+  /** 1–5 rating of the question-3 case. */
+  careSeRating?: number;
   careSeAdvice?: string;
+  careSeRevisedOpening?: string;
+  careSeNextMessage?: string;
   careSeDistinctionOrder?: "extend_first" | "repair_first";
   instructionCompletedAt?: string;
   /** First entry into the GenAI + essay block (after final task intro). */
