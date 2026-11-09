@@ -24,7 +24,7 @@ export const CARE_INSTRUCTION = {
   why:
     "It matters because a high-quality answer depends on both parts. If the AI does not know your purpose, or a later message does not respond to what it just said, the answer stays generic and hard to use.",
   guide:
-    "Four dimensions support high-quality prompting. Unfold one at a time. Contextualization and articulation shape the request you send. Responsive interaction and evaluative refinement are what you do after you see the AI’s response.",
+    "Four dimensions support high-quality prompting. Unfold a dimension and its explanation stays on the right until you fold it, so you can look across them. Contextualization and articulation shape the request you send. Responsive interaction and evaluative refinement are what you do after you see the AI’s response.",
   dimensions: [
     {
       letter: "C",

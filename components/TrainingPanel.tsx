@@ -26,15 +26,23 @@ function CareReading({
 }: {
   onOpened?: (letter: CareLetter) => void;
 }) {
-  const [open, setOpen] = useState<CareLetter | null>(null);
+  const [openLetters, setOpenLetters] = useState<CareLetter[]>([]);
 
   function toggle(letter: CareLetter) {
-    setOpen((current) => (current === letter ? null : letter));
+    setOpenLetters((current) =>
+      current.includes(letter)
+        ? current.filter((item) => item !== letter)
+        : [...current, letter],
+    );
     onOpened?.(letter);
   }
 
+  const openDimensions = CARE_INSTRUCTION.dimensions.filter((dim) =>
+    openLetters.includes(dim.letter),
+  );
+
   return (
-    <div className="mx-auto max-w-3xl">
+    <div>
       <h2 className="text-xl font-semibold leading-snug text-student-ink">
         {CARE_INSTRUCTION.title}
       </h2>
@@ -49,36 +57,67 @@ function CareReading({
       <p className="mt-2 text-base leading-6 text-student-ink">
         {CARE_INSTRUCTION.guide}
       </p>
-      <div className="mt-4 space-y-2">
-        {CARE_INSTRUCTION.dimensions.map((dim) => {
-          const isOpen = open === dim.letter;
-          return (
-            <article
-              key={dim.letter}
-              className="relative overflow-hidden rounded-md border border-student-border bg-white shadow-sm"
-            >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute right-0 top-0 border-b-[18px] border-l-[18px] border-b-navy-100 border-l-transparent"
-              />
+      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
+        <div className="space-y-2 lg:sticky lg:top-24">
+          {CARE_INSTRUCTION.dimensions.map((dim) => {
+            const isOpen = openLetters.includes(dim.letter);
+            return (
               <button
+                key={dim.letter}
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => toggle(dim.letter)}
-                className="flex w-full items-center gap-3 px-4 py-3 pr-8 text-left"
+                className={`relative flex w-full items-center gap-3 overflow-hidden rounded-md border bg-white px-3 py-3 pr-7 text-left shadow-sm ${
+                  isOpen
+                    ? "border-navy-800"
+                    : "border-student-border hover:border-navy-200"
+                }`}
               >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute right-0 top-0 border-b-[16px] border-l-[16px] border-b-navy-100 border-l-transparent"
+                />
                 <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy-800 text-sm font-semibold text-white">
                   {dim.letter}
                 </span>
-                <span className="text-base font-semibold text-student-ink">
+                <span className="text-sm font-semibold leading-5 text-student-ink">
                   {dim.title}
                 </span>
-                <span className="ml-auto text-sm font-medium text-navy-800">
+                <span className="ml-auto shrink-0 text-sm font-medium text-navy-800">
                   {isOpen ? "Fold" : "Unfold"}
                 </span>
               </button>
-              {isOpen && (
-                <div className="space-y-3 border-t border-student-border px-4 py-3 text-sm leading-6 text-student-ink">
+            );
+          })}
+        </div>
+        <div className="min-h-[16rem] space-y-3">
+          {openDimensions.length === 0 ? (
+            <p className="rounded-md border border-dashed border-navy-200 bg-white px-4 py-6 text-base leading-6 text-student-muted">
+              Unfold a dimension. Its explanation stays in this column until
+              you fold it.
+            </p>
+          ) : (
+            openDimensions.map((dim) => (
+              <article
+                key={dim.letter}
+                className="rounded-md border border-student-border bg-white shadow-sm"
+              >
+                <div className="flex items-center gap-3 border-b border-student-border px-4 py-2.5">
+                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy-800 text-sm font-semibold text-white">
+                    {dim.letter}
+                  </span>
+                  <h3 className="text-base font-semibold text-student-ink">
+                    {dim.title}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => toggle(dim.letter)}
+                    className="ml-auto text-sm font-medium text-navy-800"
+                  >
+                    Fold
+                  </button>
+                </div>
+                <div className="space-y-3 px-4 py-3 text-sm leading-6 text-student-ink">
                   <p>{dim.definition}</p>
                   {dim.priorAi && (
                     <div className="rounded-md border border-student-border bg-student-canvas px-3 py-2">
@@ -108,10 +147,10 @@ function CareReading({
                     </p>
                   )}
                 </div>
-              )}
-            </article>
-          );
-        })}
+              </article>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
@@ -173,7 +212,7 @@ export function TrainingPanel({ condition, studyUid, onComplete }: Props) {
         </p>
         <p className="mt-2 text-base leading-7 text-student-ink">
           {step === 1
-            ? "Start with the definition. Then unfold one dimension at a time."
+            ? "Start with the definition. Unfold a dimension to read it on the right. It stays there until you fold it."
             : "Answer in your own words. Open “Reread the instruction” if you want a dimension again."}
         </p>
       </div>
